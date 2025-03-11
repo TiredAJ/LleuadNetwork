@@ -4,7 +4,7 @@ using CSharpFunctionalExtensions;
 
 namespace SharpGraph;
 
-public interface IGraph<TNode> where TNode : BaseNode, IEnumerable<BaseNode>
+public interface IGraph<TID, TNode> where TNode : INode<TID>
 {
     #region Get
     public Maybe<TNode> GetNodeByID(int _ID);
