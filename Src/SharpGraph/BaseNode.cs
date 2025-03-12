@@ -1,14 +1,16 @@
 namespace SharpGraph;
 
-public abstract class BaseNode<TID, TConnection> : INode<TID>
+public abstract class BaseNode<TConnection> : INode<uint>
 {
-    required public TID ID;
+    required public uint ID;
 
     protected List<TConnection> Conns { get; set; } = new(); 
 
     public List<TConnection> GetConnections()
         => Conns;
 
-    public TID GetID()
+    public uint GetID()
         => ID;
+
+    internal abstract void SetID(uint _ID);
 }

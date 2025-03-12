@@ -1,21 +1,27 @@
-using System.Collections;
 using System.Linq.Expressions;
-using System.Numerics;
 
 using CSharpFunctionalExtensions;
 
 namespace SharpGraph;
 
-public class Graph<TID, TNode> : IGraph<TID, TNode> where TNode : INode<TID> where TID : IEqualityOperators<TID, TID, bool>
+public class Graph<TNode> : IGraph<TNode> where TNode : INode<uint>
 {
-    protected Dictionary<TID, TNode> Nodes = new();
+    protected Dictionary<uint, TNode> Nodes = new();
 
-    protected TID UnassignableID;
+    readonly protected uint UnassignableID;
+    protected uint LastID = 1;
 
-    public Graph(TID _UnassignableID) {
+    public Graph(uint _UnassignableID, uint _LastID) {
         UnassignableID = _UnassignableID;
+        LastID = _LastID;
     }
-    
+
+    public Graph() {
+        UnassignableID = 0;
+    }
+
+    protected uint GetNextID()
+        => ++LastID;
     
     public void Clear() 
         => Nodes.Clear(); 
@@ -32,10 +38,10 @@ public class Graph<TID, TNode> : IGraph<TID, TNode> where TNode : INode<TID> whe
     public int Count 
         => Nodes.Count;
 
-    public Maybe<TNode> GetNodeByID(TID _ID) 
+    public Maybe<TNode> GetNodeByID(uint _ID) 
         => Nodes.TryGetValue(_ID, out TNode? MaybeNode) ? MaybeNode : Maybe<TNode>.None;
 
-    public IEnumerable<TNode> GetConnectedNodes(TID _ID) {
+    public IEnumerable<TNode> GetConnectedNodes(uint _ID) {
         Maybe<TNode> Result = GetNodeByID(_ID);
 
         return Result.HasValue ? Result.Value.GetConnectedNodes().Cast<TNode>() : [];
@@ -47,12 +53,13 @@ public class Graph<TID, TNode> : IGraph<TID, TNode> where TNode : INode<TID> whe
     public Maybe<TNode> Insert(TNode _NewNode) {
         if (_NewNode.GetID() == UnassignableID)
         {
-            
+            _NewNode.SetID(GetNextID());
         }
     }
+    
     public bool TryInsert(TNode _NewNode, out TNode _SavedNode) { throw new NotImplementedException(); }
-    public TNode Remove(int _ID) { throw new NotImplementedException(); }
+    public TNode Remove(uint _ID) { throw new NotImplementedException(); }
     public IEnumerable<TNode> Find(Expression<Func<TNode, bool>> _Expr) { throw new NotImplementedException(); }
     public bool DoesNodeExist(TNode _Node) { throw new NotImplementedException(); }
-    public bool DoesNodeExist(int _ID) { throw new NotImplementedException(); }
+    public bool DoesNodeExist(uint _ID) { throw new NotImplementedException(); }
 }

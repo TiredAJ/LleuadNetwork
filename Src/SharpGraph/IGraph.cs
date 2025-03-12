@@ -4,12 +4,12 @@ using CSharpFunctionalExtensions;
 
 namespace SharpGraph;
 
-public interface IGraph<TID, TNode> where TNode : INode<TID>
+public interface IGraph<TNode> where TNode : INode<uint>
 {
     #region Get
-    public Maybe<TNode> GetNodeByID(int _ID);
+    public Maybe<TNode> GetNodeByID(uint _ID);
 
-    public IEnumerable<TNode> GetConnectedNodes(int _ID);
+    public IEnumerable<TNode> GetConnectedNodes(uint _ID);
 
     public IEnumerable<TNode> GetAllNodes();
     #endregion
@@ -21,7 +21,7 @@ public interface IGraph<TID, TNode> where TNode : INode<TID>
     #endregion
 
     #region Remove
-    public TNode Remove(int _ID);
+    public TNode Remove(uint _ID);
     #endregion
 
     #region Find
@@ -31,6 +31,6 @@ public interface IGraph<TID, TNode> where TNode : INode<TID>
     #region Checks
     public bool DoesNodeExist(TNode _Node);
     
-    public bool DoesNodeExist(int _ID);
+    public bool DoesNodeExist(uint _ID);
     #endregion
 }
