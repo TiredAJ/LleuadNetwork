@@ -1,6 +1,10 @@
 namespace SharpGraph;
 
-public class Node<TConnection> : BaseNode
+public class Node<TConnection> : BaseNode<int, TConnection>
 {
-    private Dictionary<TConnection, BaseNode> Connections;
+    private Dictionary<TConnection, INode<int>> Connections;
+
+    public Node(int _ID) {
+        ID = _ID;
+    }
 }
