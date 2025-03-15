@@ -4,20 +4,20 @@ using CSharpFunctionalExtensions;
 
 namespace SharpGraph;
 
-public class Graph<TNode> : IGraph<TNode> where TNode : INode<uint>
+public class Graph<TNode> : IGraph<TNode> where TNode : class, INode<uint>
 {
     protected Dictionary<uint, TNode> Nodes = new();
 
-    readonly protected uint UnassignableID;
+    readonly protected uint NullID;
     protected uint LastID = 1;
 
-    public Graph(uint _UnassignableID, uint _LastID) {
-        UnassignableID = _UnassignableID;
+    public Graph(uint _NullID, uint _LastID) {
+        NullID = _NullID;
         LastID = _LastID;
     }
 
     public Graph() {
-        UnassignableID = 0;
+        NullID = 0;
     }
 
     protected uint GetNextID()
@@ -51,15 +51,47 @@ public class Graph<TNode> : IGraph<TNode> where TNode : INode<uint>
         => Nodes.Values;
 
     public Maybe<TNode> Insert(TNode _NewNode) {
-        if (_NewNode.GetID() == UnassignableID)
-        {
-            _NewNode.SetID(GetNextID());
-        }
+
+        uint NextID = GetNextID();
+
+        if (Nodes.ContainsKey(NextID))
+        { throw new Exception("ID already exists!"); /*TODO custom exc*/ }
+        
+        
+        if (_NewNode.GetID() == NullID)
+        { (_NewNode as NodeID)?.SetID(NextID); }
+
+        return Nodes.TryAdd(NextID, _NewNode) ? _NewNode : Maybe<TNode>.None;
+
     }
-    
-    public bool TryInsert(TNode _NewNode, out TNode _SavedNode) { throw new NotImplementedException(); }
-    public TNode Remove(uint _ID) { throw new NotImplementedException(); }
-    public IEnumerable<TNode> Find(Expression<Func<TNode, bool>> _Expr) { throw new NotImplementedException(); }
-    public bool DoesNodeExist(TNode _Node) { throw new NotImplementedException(); }
-    public bool DoesNodeExist(uint _ID) { throw new NotImplementedException(); }
+
+    public bool TryInsert(TNode _NewNode, out TNode? _SavedNode) {
+
+        Maybe<TNode> Res = Insert(_NewNode);
+
+        if (Res.HasValue)
+        {
+            _SavedNode = Res.Value;
+            return true;
+        }
+
+        _SavedNode = null;
+
+        return false;
+    }
+
+    public Maybe<TNode> Remove(uint _ID) {
+
+        bool R = Nodes.Remove(_ID, out TNode? Node);
+
+        return R ? Node : Maybe<TNode>.None;
+    }
+
+    public IEnumerable<KeyValuePair<uint, TNode>> FindAny(Func<KeyValuePair<uint, TNode>, bool> _Expr) {
+        return Nodes.Where(_Expr);
+    }
+
+    public bool DoesNodeExist(uint _ID) {
+        return Nodes.ContainsKey(_ID);
+    }
 }

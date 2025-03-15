@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LleuadNetwork", "LleuadNetw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpGraph", "..\SharpGraph\SharpGraph.csproj", "{E356077B-0962-4A6D-8691-83A0B42108CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipesTester", "..\Testing\PipesTester\PipesTester.csproj", "{2F461BC0-6943-4C08-849C-1722C7E7F9B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{E356077B-0962-4A6D-8691-83A0B42108CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E356077B-0962-4A6D-8691-83A0B42108CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E356077B-0962-4A6D-8691-83A0B42108CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F461BC0-6943-4C08-849C-1722C7E7F9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F461BC0-6943-4C08-849C-1722C7E7F9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F461BC0-6943-4C08-849C-1722C7E7F9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F461BC0-6943-4C08-849C-1722C7E7F9B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

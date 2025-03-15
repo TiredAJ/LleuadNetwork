@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace SharpGraph;
 
 public abstract class BaseNode<TConnection> : INode<uint>
@@ -12,5 +14,6 @@ public abstract class BaseNode<TConnection> : INode<uint>
     public uint GetID()
         => ID;
 
-    internal abstract void SetID(uint _ID);
+    public IEnumerable<INode<uint>> GetConnectedNodes()
+        => throw new NotImplementedException();
 }

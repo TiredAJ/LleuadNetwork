@@ -17,20 +17,24 @@ public interface IGraph<TNode> where TNode : INode<uint>
     #region Add
     public Maybe<TNode> Insert(TNode _NewNode);
 
-    public bool TryInsert(TNode _NewNode, out TNode _SavedNode);
+    public bool TryInsert(TNode _NewNode, out TNode? _SavedNode);
     #endregion
 
     #region Remove
-    public TNode Remove(uint _ID);
+    public Maybe<TNode> Remove(uint _ID);
     #endregion
 
     #region Find
-    public IEnumerable<TNode> Find(Expression<Func<TNode, bool>> _Expr);
+    public IEnumerable<KeyValuePair<uint, TNode>> FindAny(Func<KeyValuePair<uint, TNode>, bool> _Expr);
     #endregion
 
-    #region Checks
-    public bool DoesNodeExist(TNode _Node);
-    
+    #region Checks    
     public bool DoesNodeExist(uint _ID);
     #endregion
+}
+
+internal class NodeID : BaseNode<uint>
+{
+    internal void SetID(uint _ID)
+        => ID = _ID;
 }
