@@ -1,9 +1,14 @@
-﻿namespace LuaTest;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
+namespace LuaTest;
 class Program
 {
-    static void Main(string[] args)
-    {
-        Console.WriteLine("Hello, World!");
+    static private Benchmarkerer Temp = new Benchmarkerer();
+    
+    static void Main(string[] args) {
+        BenchmarkRunner.Run<Benchmarkerer>();
+
+        //Temp.LuaCSharp();
     }
 }
