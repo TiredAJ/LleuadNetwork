@@ -1,38 +1,26 @@
 ﻿using System.IO.Pipelines;
 
+using Microsoft.VisualBasic;
+
 namespace PipesTester;
 
 class Program
 {
-    static private int MessageCount;
+    static private Switchbox SwitchBoxer = new Switchbox();
+
+    static private Node WriterNode = new("12");
+    static private Node ReaderNode = new("12");
     
-    static void Main(string[] args) {
+    static void Main() {
+        SwitchBoxer.Connect(WriterNode);
+        SwitchBoxer.Connect(ReaderNode);
 
-        Pipe CommPipe = new Pipe();
+        WriterNode.Writer = (Count) => new Message<string>("Reader Node", 
+                                                           $"{Count}: ");
 
-        Task Writer = WriteToPipe(); 
-        Task Reader = ReadFromPipe();
-
-        Task.WhenAll(Writer, Reader);
-    }
-
-    static async Task WriteToPipe() {
+        ReaderNode.OnReceive = (_m) => { Console.WriteLine($"Message received for {_m.Address}, with payload {_m.Payload}"); };
         
-
-        Interlocked.Increment(ref MessageCount);
-    }
-
-    static async Task ReadFromPipe() {
-
-        while (true)
-        {
-            if (MessageCount > 0)
-            {
-
-
-                Interlocked.Decrement(ref MessageCount);
-            }            
-        }
-        
+        WriterNode.StartWriting();
+        ReaderNode.StartReading();
     }
 }
