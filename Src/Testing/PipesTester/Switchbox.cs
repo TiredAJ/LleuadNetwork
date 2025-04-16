@@ -16,13 +16,26 @@ public class Switchbox
         };
     }
 
-    public void Connect(Node _N) => _N.Connection = GetOrMakeConnection(_N.ConnectionID);
+    public void Connect(Node _NA, Node _NB) {
+        if (_NA.Connections.ContainsKey(_NB.ID) && _NB.Connections.ContainsKey(_NA.ID))
+        { return; }
 
-    private Channel<Message<string>> GetOrMakeConnection(string _ID) {
+        MakeConnection()
+    }
+
+    private Channel<Message<string>> MakeConnection(Node _NA, Node _NB) {
         if (Connections.TryGetValue(_ID, out Channel<Message<string>>? Connection))
         { return Connection; }
-        
-        Connections.Add(_ID, Channel.CreateBounded<Message<string>>(BCODefault, (_Msg) => Console.WriteLine($"Dropped message {_Msg}")));
+
+        CreateConnection(_ID);
         return Connections[_ID];
     }
+
+    private void CreateConnection(string _ID) {
+        Connections.Add(_ID, Channel.CreateBounded<Message<string>>(BCODefault, (_Msg) => Console.WriteLine($"Dropped message {_Msg}")));
+    }
+    
+    private string GetConnectionString(string _A, string _B) => {
+        //add string values together
+    }  
 }
