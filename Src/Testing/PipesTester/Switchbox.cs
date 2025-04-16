@@ -8,11 +8,11 @@ public class Switchbox
     private BoundedChannelOptions BCODefault;
 
     public Switchbox() {
-        BCODefault = new BoundedChannelOptions(100) {
+        BCODefault = new BoundedChannelOptions(50) {
             AllowSynchronousContinuations = false,
             SingleReader = true,
             SingleWriter = true,
-            FullMode = BoundedChannelFullMode.DropWrite
+            FullMode = BoundedChannelFullMode.Wait
         };
     }
 

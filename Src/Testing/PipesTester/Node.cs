@@ -29,17 +29,17 @@ public class Node
 
         Task T = Connection.Reader.Completion;
 
-        Message<string> Received = Message<string>.Blank();
-        
         while (!T.IsCompleted)
         {
+            Message<string> Received;
+
             try
-            { 
-                Received = await Connection.Reader.ReadAsync();
-                break;
-            }
+            { Received = await Connection.Reader.ReadAsync(); }
             catch (ChannelClosedException exc)
-            { Debug.WriteLine("Channel was closed on read."); }
+            {
+                Debug.WriteLine("Channel was closed on read."); 
+                continue;
+            }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
