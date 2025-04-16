@@ -1,4 +1,5 @@
-﻿using System.IO.Pipelines;
+﻿using System.Diagnostics;
+using System.IO.Pipelines;
 
 using Microsoft.VisualBasic;
 
@@ -15,12 +16,13 @@ class Program
         SwitchBoxer.Connect(WriterNode);
         SwitchBoxer.Connect(ReaderNode);
 
-        WriterNode.Writer = (Count) => new Message<string>("Reader Node", 
-                                                           $"{Count}: ");
+        WriterNode.Writer = DoingStuffClass.Write;
 
-        ReaderNode.OnReceive = (_m) => { Console.WriteLine($"Message received for {_m.Address}, with payload {_m.Payload}"); };
+        ReaderNode.OnReceive = DoingStuffClass.Read;
         
-        WriterNode.StartWriting();
-        ReaderNode.StartReading();
+        Task ReadTask = ReaderNode.StartReading();
+        Task WriteTask = WriterNode.StartWriting();
+
+        Task.WaitAll(ReadTask, WriteTask);
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace PipesTester;
@@ -8,53 +9,75 @@ public class Node
         ConnectionID = _ConnectionID;
     }
 
-    private int SentMessageCount = 0;
-    private int ReceivedMessageCount = 0;
+    private long TotalSentMessages = 0;
+    private long TotalReceivedMessages = 0;
 
     public Channel<Message<string>> Connection { get; internal set; }
 
     public string ConnectionID { get; internal set; }
 
-    public void StartReading() => Task.Run(ReceiveLoop);
+    public Task StartReading() => Task.Run(ReceiveLoop);
 
-    public void StartWriting() => Task.Run(WriteLoop);
+    public Task StartWriting() => Task.Run(WriteLoop);
     
     private async Task ReceiveLoop() {
 
+        int ReceivedMessagesCount = 0;
+        
         if (OnReceive is null)
         { return; }
 
         Task T = Connection.Reader.Completion;
+
+        Message<string> Received = Message<string>.Blank();
         
         while (!T.IsCompleted)
         {
-            Message<string> Received = await Connection.Reader.ReadAsync();
-
-            Interlocked.Increment(ref ReceivedMessageCount);
+            try
+            { 
+                Received = await Connection.Reader.ReadAsync();
+                break;
+            }
+            catch (ChannelClosedException exc)
+            { Debug.WriteLine("Channel was closed on read."); }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
+            
+            ReceivedMessagesCount++;
             
             OnReceive(Received);
         }
+
+        TotalReceivedMessages += ReceivedMessagesCount;
     }
 
     private async Task WriteLoop() {
+        int SentMessageCount = 0;
+        
         if (Writer is null)
         { return; }
 
         for (int I = 0; I < 110; I++)
         {
-            Console.WriteLine(SentMessageCount);
+            SentMessageCount++;
+
+            Context CTX = new Context(SentMessageCount, DateTime.Now);
             
-            Message<string> ToWrite = Writer(SentMessageCount);
+            Console.WriteLine(CTX.ToString());
+            
+            Message<string> ToWrite = Writer(CTX);
 
             await Connection.Writer.WriteAsync(ToWrite);
-            
-            Interlocked.Increment(ref SentMessageCount);
         }
         
         Connection.Writer.Complete();
+        TotalSentMessages += SentMessageCount;
     }
     
     public Action<Message<string>>? OnReceive { get; set; }
     
-    public Func<int, Message<string>>? Writer { get; set; }
+    public Func<Context, Message<string>>? Writer { get; set; }
 }
