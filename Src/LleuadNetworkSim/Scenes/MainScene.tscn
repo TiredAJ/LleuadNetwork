@@ -1,29 +1,50 @@
-[gd_scene load_steps=8 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=14 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
-[ext_resource type="Script" uid="uid://b0v6ogohr638f" path="res://Scenes/btn_Spawn.cs" id="3_qxria"]
-[ext_resource type="Script" uid="uid://bj5y7ocl7l7w8" path="res://Scenes/CollectionNode.cs" id="4_7rqgy"]
-[ext_resource type="Script" uid="uid://ccr3tkxcdfxim" path="res://Scenes/ScreenBounding.cs" id="4_q68mp"]
+[ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
+[ext_resource type="Script" uid="uid://cyq4r7luut642" path="res://Scripts/Buttons/btn_Connect.cs" id="3_q68mp"]
+[ext_resource type="Script" uid="uid://dd1d371lnw2vq" path="res://Scripts/Buttons/MainAreaButton.cs" id="4_0iob3"]
+[ext_resource type="Script" uid="uid://dbyqsk33sd7ii" path="res://Scripts/Buttons/btn_Send.cs" id="4_f140w"]
 [ext_resource type="PackedScene" uid="uid://cxnqtqw22ucrf" path="res://Scenes/network_node.tscn" id="4_qxria"]
-[ext_resource type="Script" uid="uid://cyq4r7luut642" path="res://Scenes/btn_Connect.cs" id="5_y4jh7"]
+[ext_resource type="StyleBox" uid="uid://cxfa3uwnbt6ub" path="res://Styles/Buttons/PressedStyle.tres" id="6_0iob3"]
+[ext_resource type="Script" uid="uid://cajvrvldjqdy4" path="res://Scripts/Nodes/CollectionNode.cs" id="6_y4jh7"]
 [ext_resource type="PackedScene" uid="uid://cvutjyufj0xr5" path="res://Scenes/node_connection.tscn" id="7_q68mp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f140w"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8ju71"]
 
 [node name="MainScene" type="Node2D"]
 
-[node name="Background" type="CanvasLayer" parent="."]
-layer = -1
+[node name="CollectionNode" type="Node" parent="."]
+script = ExtResource("6_y4jh7")
+ConnectionTemplate = ExtResource("7_q68mp")
+NetworkNodeTemplate = ExtResource("4_qxria")
 
-[node name="TextureRect" type="TextureRect" parent="Background"]
-z_index = -1
-offset_right = 4096.0
-offset_bottom = 4096.0
+[node name="TextureRect" type="TextureRect" parent="CollectionNode"]
+z_index = -2
+offset_right = 1000.0
+offset_bottom = 800.0
+mouse_filter = 2
 texture = ExtResource("1_7rqgy")
+expand_mode = 1
 
-[node name="ScreenBounding" type="StaticBody2D" parent="."]
-position = Vector2(-4, 0)
-script = ExtResource("4_q68mp")
+[node name="Button" type="Button" parent="CollectionNode" node_paths=PackedStringArray("CollNode")]
+modulate = Color(1, 1, 1, 0)
+self_modulate = Color(1, 1, 1, 0)
+show_behind_parent = true
+z_index = -1
+offset_right = 1000.0
+offset_bottom = 800.0
+script = ExtResource("4_0iob3")
+CollNode = NodePath("..")
 
 [node name="Control" type="Control" parent="."]
+z_index = 4096
 layout_mode = 3
 anchors_preset = 0
 offset_left = 939.0
@@ -31,27 +52,54 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="btn_Spawn" type="Button" parent="Control" node_paths=PackedStringArray("NodeCollection")]
+[node name="btn_Spawn" type="Button" parent="Control" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
-offset_left = -49.0
-offset_top = -7.0
-offset_right = 56.0
-offset_bottom = 24.0
+anchor_left = 0.087
+anchor_top = 0.212
+anchor_right = 0.087
+anchor_bottom = 0.212
+offset_left = -62.48
+offset_top = -16.48
+offset_right = 49.52
+offset_bottom = 15.52
+theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+toggle_mode = true
 text = "Spawn Node"
-script = ExtResource("3_qxria")
-NodeCollection = NodePath("../../CollectionNode")
-NodeScene = ExtResource("4_qxria")
+script = ExtResource("2_y4jh7")
+CollNode = NodePath("../../CollectionNode")
 
-[node name="btn_Connect" type="Button" parent="Control" node_paths=PackedStringArray("CollectionNode")]
+[node name="btn_Connect" type="Button" parent="Control"]
 layout_mode = 2
-offset_left = -180.0
-offset_top = -7.0
-offset_right = -54.0
-offset_bottom = 24.0
+anchor_left = -2.925
+anchor_top = 0.212
+anchor_right = -2.925
+anchor_bottom = 0.212
+offset_left = -94.0
+offset_top = -16.48
+offset_right = 42.0
+offset_bottom = 15.52
+theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+toggle_mode = true
 text = "Connect Nodes"
-script = ExtResource("5_y4jh7")
-CollectionNode = NodePath("../../CollectionNode")
+script = ExtResource("3_q68mp")
 
-[node name="CollectionNode" type="Node" parent="."]
-script = ExtResource("4_7rqgy")
-Connection = ExtResource("7_q68mp")
+[node name="btn_Send" type="Button" parent="Control" node_paths=PackedStringArray("CollectionNode")]
+layout_mode = 2
+anchor_left = -6.15
+anchor_top = 0.187
+anchor_right = -6.15
+anchor_bottom = 0.187
+offset_left = -109.0
+offset_top = -15.48
+offset_right = 19.0
+offset_bottom = 16.52
+theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+text = "Send Message"
+script = ExtResource("4_f140w")
+CollectionNode = NodePath("../../CollectionNode")

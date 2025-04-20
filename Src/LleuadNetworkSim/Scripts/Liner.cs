@@ -10,6 +10,7 @@ public partial class Liner : Line2D
     public override void _Ready() {
         DefaultColor = Color.Color8(0, 0, 0, 255);
         Width = 10f;
+        
         base._Ready();
     }
 

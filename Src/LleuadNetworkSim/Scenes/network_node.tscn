@@ -1,18 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://cxnqtqw22ucrf"]
+[gd_scene load_steps=6 format=3 uid="uid://cxnqtqw22ucrf"]
 
-[ext_resource type="Script" uid="uid://cur26gw63h6j" path="res://Nodes/NetworkNode.cs" id="1_ob1qj"]
+[ext_resource type="Script" uid="uid://cur26gw63h6j" path="res://Scripts/Nodes/NetworkNode.cs" id="1_ob1qj"]
 [ext_resource type="Texture2D" uid="uid://dihr6vx3kjyco" path="res://Assets/Sprites/SelectedRing.png" id="2_2thui"]
+[ext_resource type="PackedScene" uid="uid://dv7ve2sluedit" path="res://packet.tscn" id="2_3i4p6"]
 [ext_resource type="Texture2D" uid="uid://dxdva0h2nvors" path="res://Assets/Sprites/DebugNetworkNode.png" id="2_x7y3s"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2thui"]
 radius = 54.037
 
 [node name="NetworkNode" type="CharacterBody2D" node_paths=PackedStringArray("SelectionRing")]
-z_index = 1
+z_index = 2
 input_pickable = true
 motion_mode = 1
 script = ExtResource("1_ob1qj")
 SelectionRing = NodePath("SelectionRing")
+PacketTemplate = ExtResource("2_3i4p6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_2thui")

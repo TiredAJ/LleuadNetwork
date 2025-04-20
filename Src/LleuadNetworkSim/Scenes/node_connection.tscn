@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cvutjyufj0xr5"]
 
-[ext_resource type="Script" uid="uid://bhsebjodwk05i" path="res://NodeConnection.cs" id="1_ppb2e"]
-[ext_resource type="Script" uid="uid://6ojl763i55f1" path="res://Scenes/Liner.cs" id="2_jst4j"]
+[ext_resource type="Script" uid="uid://bhsebjodwk05i" path="res://Scripts/Nodes/NodeConnection.cs" id="1_ppb2e"]
+[ext_resource type="Script" uid="uid://cy8qt7ox6c4v8" path="res://Scripts/Liner.cs" id="2_jst4j"]
 
 [sub_resource type="Curve2D" id="Curve2D_jst4j"]
 _data = {

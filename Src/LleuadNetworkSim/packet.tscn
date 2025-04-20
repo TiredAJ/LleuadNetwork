@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://dv7ve2sluedit"]
+
+[ext_resource type="Script" uid="uid://d0ug84317ipkf" path="res://Scripts/Nodes/Packet.cs" id="1_0sr6c"]
+[ext_resource type="Texture2D" uid="uid://drp7ejwtv474q" path="res://Assets/Sprites/Blehh.png" id="1_7wo6q"]
+
+[node name="Packet" type="PathFollow2D"]
+z_index = 1
+v_offset = 10.0
+cubic_interp = false
+loop = false
+script = ExtResource("1_0sr6c")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.111111, 0.111111)
+texture = ExtResource("1_7wo6q")

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 public partial class NetworkNode : CharacterBody2D
@@ -18,6 +19,11 @@ public partial class NetworkNode : CharacterBody2D
 
     [Export]
     private Sprite2D SelectionRing;
+    
+    [Export]
+    private PackedScene PacketTemplate;
+
+    private Dictionary<string, NodeConnection> Connections = [];
     
     public override void _Ready() {
         
@@ -56,6 +62,18 @@ public partial class NetworkNode : CharacterBody2D
         }
         
         base._InputEvent(viewport, @event, shapeIdx);
+    }
+
+    public void AddConnection(string _ID, NodeConnection _Conn) {
+        Connections.Add(_ID, _Conn);
+    }
+
+    public void SendMessage(string _ID) {
+        Packet Message = PacketTemplate.Instantiate<Packet>();
+        
+        Connections[_ID].AddChild(Message);
+
+        Connections[_ID].FollowerCount++;
     }
 
     private bool HandleUnselected() {

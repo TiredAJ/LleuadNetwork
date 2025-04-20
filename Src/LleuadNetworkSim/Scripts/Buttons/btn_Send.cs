@@ -1,14 +1,14 @@
 using Godot;
 using System;
 
-public partial class btn_Connect : Button
+public partial class btn_Send : Button
 {
     [Export]
     public CollectionNode CollectionNode;
-
+    
     public override void _Pressed() {
         
-        CollectionNode.TryConnect();
+        CollectionNode.TrySendMessage();
         
         base._Pressed();
     }
