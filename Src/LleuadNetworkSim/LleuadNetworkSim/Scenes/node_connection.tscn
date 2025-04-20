@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cvutjyufj0xr5"]
+
+[ext_resource type="Script" uid="uid://bhsebjodwk05i" path="res://NodeConnection.cs" id="1_ppb2e"]
+[ext_resource type="Script" uid="uid://6ojl763i55f1" path="res://Scenes/Liner.cs" id="2_jst4j"]
+
+[sub_resource type="Curve2D" id="Curve2D_jst4j"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 114, 90)
+}
+point_count = 1
+
+[node name="NodeConnection" type="Path2D" node_paths=PackedStringArray("Liner")]
+z_as_relative = false
+curve = SubResource("Curve2D_jst4j")
+script = ExtResource("1_ppb2e")
+Liner = NodePath("Liner")
+
+[node name="Liner" type="Line2D" parent="."]
+script = ExtResource("2_jst4j")

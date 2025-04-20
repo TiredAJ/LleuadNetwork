@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://bhmm832v4d0x6"]
+
+[ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
+[ext_resource type="Script" uid="uid://b0v6ogohr638f" path="res://Scenes/btn_Spawn.cs" id="3_qxria"]
+[ext_resource type="Script" uid="uid://bj5y7ocl7l7w8" path="res://Scenes/CollectionNode.cs" id="4_7rqgy"]
+[ext_resource type="Script" uid="uid://ccr3tkxcdfxim" path="res://Scenes/ScreenBounding.cs" id="4_q68mp"]
+[ext_resource type="PackedScene" uid="uid://cxnqtqw22ucrf" path="res://Scenes/network_node.tscn" id="4_qxria"]
+[ext_resource type="Script" uid="uid://cyq4r7luut642" path="res://Scenes/btn_Connect.cs" id="5_y4jh7"]
+[ext_resource type="PackedScene" uid="uid://cvutjyufj0xr5" path="res://Scenes/node_connection.tscn" id="7_q68mp"]
+
+[node name="MainScene" type="Node2D"]
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="Background"]
+z_index = -1
+offset_right = 4096.0
+offset_bottom = 4096.0
+texture = ExtResource("1_7rqgy")
+
+[node name="ScreenBounding" type="StaticBody2D" parent="."]
+position = Vector2(-4, 0)
+script = ExtResource("4_q68mp")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 939.0
+offset_top = 16.0
+offset_right = 979.0
+offset_bottom = 56.0
+
+[node name="btn_Spawn" type="Button" parent="Control" node_paths=PackedStringArray("NodeCollection")]
+layout_mode = 2
+offset_left = -49.0
+offset_top = -7.0
+offset_right = 56.0
+offset_bottom = 24.0
+text = "Spawn Node"
+script = ExtResource("3_qxria")
+NodeCollection = NodePath("../../CollectionNode")
+NodeScene = ExtResource("4_qxria")
+
+[node name="btn_Connect" type="Button" parent="Control" node_paths=PackedStringArray("CollectionNode")]
+layout_mode = 2
+offset_left = -180.0
+offset_top = -7.0
+offset_right = -54.0
+offset_bottom = 24.0
+text = "Connect Nodes"
+script = ExtResource("5_y4jh7")
+CollectionNode = NodePath("../../CollectionNode")
+
+[node name="CollectionNode" type="Node" parent="."]
+script = ExtResource("4_7rqgy")
+Connection = ExtResource("7_q68mp")

@@ -3,7 +3,6 @@ using System.Threading.Channels;
 
 namespace PipesTester;
 
-using Connection = Channel<Message<string>>;
 using ReaderConn = ChannelReader<Message<string>>;
 using WriterConn = ChannelWriter<Message<string>>;
 
@@ -23,8 +22,8 @@ public class Node
 
     public Task StartNode(CancellationToken? _CT = null) {
 
-        List<WriterConn> Writers = Connections.Values.Select(X => X.Writer).ToList(); 
-        List<ReaderConn> Readers = Connections.Values.Select(X => X.Reader).ToList(); 
+        List<WriterConn> Writers = Connections.Values.Select(X => X.Output).ToList(); 
+        List<ReaderConn> Readers = Connections.Values.Select(X => X.Input).ToList(); 
         
         return Task.WhenAll([ReceiveLoop(Readers, _CT), WriteLoop(Writers, _CT)]);
     }
@@ -36,7 +35,7 @@ public class Node
         
         List<Task> ReadTasks = [];
         
-        ReadTasks.AddRange(_Readers.Select(Conn => ConnReadLoop(Conn)));
+        ReadTasks.AddRange(_Readers.Select(Conn => ConnReadLoop(Conn, _CToken)));
 
         await Task.WhenAll(ReadTasks);
     }

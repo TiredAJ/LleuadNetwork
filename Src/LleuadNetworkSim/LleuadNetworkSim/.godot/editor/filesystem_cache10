@@ -1,0 +1,17 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1745141891
+::res://Assets/::1745141865
+Background.png::CompressedTexture2D/CompressedTexture2D::4180300400864843119::1745134192::1745134723::1::::<><><>0<>0<>f884370605c1104842897dc40897ea6b<>res://.godot/imported/Background.png-e8880a50f4091751eaed728281d3c21e.ctex::
+icon.svg::CompressedTexture2D/CompressedTexture2D::8461806692837014127::1745133875::1745141865::1::::<><><>0<>0<>384d5992893523e551252831ef6a2fb7<>res://.godot/imported/icon.svg-8193eb3d66a1b5143b8bb4c28c1dc139.ctex::
+::res://Assets/KRAs/::1745147732
+::res://Assets/Sprites/::1745147744
+DebugNetworkNode.png::CompressedTexture2D/CompressedTexture2D::8781074970006678564::1745137823::1745137854::1::::<><><>0<>0<>51da40618ea3fde46266443c6d2e614f<>res://.godot/imported/DebugNetworkNode.png-60dc423cf9dacd3b59d0e1b24eceae50.ctex::
+SelectedRing.png::CompressedTexture2D::7736312132756853722::1745147744::1745147749::1::::<><><>0<>0<>5cd53af5e4d7d7471437380a4fb39520<>res://.godot/imported/SelectedRing.png-ddcb5e03931bc8b54904e0b24f15ca3c.ctex::
+::res://Nodes/::1745147470
+NetworkNode.cs::CSharpScript::182747286204518739::1745147470::0::1::::<>CharacterBody2D<><>0<>0<><>::
+::res://Scenes/::1745147471
+MainScene.tscn::PackedScene::2903304170676672729::1745147471::0::1::::<><><>0<>0<><>::uid://b0s764acagoyx::::res://Assets/Background.png<>uid://b0v6ogohr638f::::res://Scenes/btn_Spawn.cs<>uid://bj5y7ocl7l7w8::::res://Scenes/CollectionNode.cs<>uid://ccr3tkxcdfxim::::res://Scenes/ScreenBounding.cs
+btn_Spawn.cs::CSharpScript::4186401272478975167::1745145961::0::1::::<>Button<><>0<>0<><>::
+network_node.tscn::PackedScene::6415027959455106431::1745147471::0::1::::<><><>0<>0<><>::uid://cur26gw63h6j::::res://Nodes/NetworkNode.cs<>uid://dxdva0h2nvors::::res://Assets/Sprites/DebugNetworkNode.png
+CollectionNode.cs::CSharpScript::3081566701248070981::1745147020::0::1::::<>Node<><>0<>0<><>::
+ScreenBounding.cs::CSharpScript::4950048043222043344::1745141253::0::1::::<>StaticBody2D<><>0<>0<><>::

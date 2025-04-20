@@ -1,28 +1,24 @@
-﻿using System.Diagnostics;
-using System.IO.Pipelines;
-
-using Microsoft.VisualBasic;
-
-namespace PipesTester;
+﻿namespace PipesTester;
 
 class Program
 {
     static private Switchbox SwitchBoxer = new Switchbox();
 
-    static private Node WriterNode = new("12");
-    static private Node ReaderNode = new("12");
+    static private Node NodeA = new("12");
+    static private Node NodeB = new("12");
     
     static void Main() {
-        SwitchBoxer.Connect(WriterNode);
-        SwitchBoxer.Connect(ReaderNode);
+        SwitchBoxer.Connect(NodeA, NodeB);
 
-        WriterNode.Writer = DoingStuffClass.Write;
+        NodeA.Writer = DoingStuffClass.Write;
+        NodeB.Writer = DoingStuffClass.Write;
 
-        ReaderNode.OnReceive = DoingStuffClass.Read;
+        NodeA.OnReceive = DoingStuffClass.Read;
+        NodeB.OnReceive = DoingStuffClass.Read;
         
-        Task ReadTask = ReaderNode.StartReading();
-        Task WriteTask = WriterNode.StartWriting();
+        Task TaskA = NodeA.StartNode();
+        Task TaskB = NodeB.StartNode();
 
-        Task.WaitAll(ReadTask, WriteTask);
+        Task.WaitAll(TaskA, TaskB);
     }
 }
