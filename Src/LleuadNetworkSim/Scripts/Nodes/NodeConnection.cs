@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -43,6 +42,14 @@ public partial class NodeConnection : Path2D
         ResetCurve();
         
         base._Process(delta);
+    }
+    
+    public override void _ExitTree() {
+
+        foreach (var Child in GetChildren())
+        { Child.QueueFree(); }
+        
+        base._ExitTree();
     }
 
     private void ResetCurve() {        

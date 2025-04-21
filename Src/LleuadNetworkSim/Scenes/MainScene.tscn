@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=19 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -7,16 +7,23 @@
 [ext_resource type="Script" uid="uid://dbyqsk33sd7ii" path="res://Scripts/Buttons/btn_Send.cs" id="4_f140w"]
 [ext_resource type="PackedScene" uid="uid://cxnqtqw22ucrf" path="res://Scenes/network_node.tscn" id="4_qxria"]
 [ext_resource type="StyleBox" uid="uid://cxfa3uwnbt6ub" path="res://Styles/Buttons/PressedStyle.tres" id="6_0iob3"]
+[ext_resource type="Script" uid="uid://by763ow6bn8mg" path="res://Scripts/Buttons/SelectionButtonContainer.cs" id="6_8ju71"]
 [ext_resource type="Script" uid="uid://cajvrvldjqdy4" path="res://Scripts/Nodes/CollectionNode.cs" id="6_y4jh7"]
 [ext_resource type="PackedScene" uid="uid://cvutjyufj0xr5" path="res://Scenes/node_connection.tscn" id="7_q68mp"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f140w"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
+[ext_resource type="Script" uid="uid://b2obklxgik0bt" path="res://Scripts/Buttons/btn_Delete.cs" id="10_6t1o7"]
+[ext_resource type="Script" uid="uid://d01w0c2yqhf1m" path="res://Scripts/Buttons/btn_SelectionMode.cs" id="10_xb4mg"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8ju71"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xb4mg"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6t1o7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f140w"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
 
 [node name="MainScene" type="Node2D"]
 
@@ -38,6 +45,7 @@ modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 show_behind_parent = true
 z_index = -1
+offset_top = -8.0
 offset_right = 1000.0
 offset_bottom = 800.0
 script = ExtResource("4_0iob3")
@@ -52,54 +60,67 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="btn_Spawn" type="Button" parent="Control" node_paths=PackedStringArray("CollNode")]
+[node name="ButtonsContainer" type="FlowContainer" parent="Control"]
+layout_mode = 0
+offset_left = -427.0
+offset_top = -8.0
+offset_right = 53.0
+offset_bottom = 93.0
+alignment = 2
+last_wrap_alignment = 2
+
+[node name="SelectionContainer" type="FlowContainer" parent="Control/ButtonsContainer"]
 layout_mode = 2
-anchor_left = 0.087
-anchor_top = 0.212
-anchor_right = 0.087
-anchor_bottom = 0.212
-offset_left = -62.48
-offset_top = -16.48
-offset_right = 49.52
-offset_bottom = 15.52
+size_flags_horizontal = 3
+script = ExtResource("6_8ju71")
+
+[node name="btn_Connect" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollNode")]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+disabled = true
+text = "Connect Nodes"
+script = ExtResource("3_q68mp")
+CollNode = NodePath("../../../../CollectionNode")
+
+[node name="btn_Send" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+layout_mode = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+disabled = true
+text = "Send Message"
+script = ExtResource("4_f140w")
+CollectionNode = NodePath("../../../../CollectionNode")
+
+[node name="btn_Delete" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Delete"
+script = ExtResource("10_6t1o7")
+CollectionNode = NodePath("../../../../CollectionNode")
+
+[node name="btn_SelectionMode" type="Button" parent="Control/ButtonsContainer" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
+layout_mode = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_xb4mg")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_6t1o7")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+toggle_mode = true
+text = "Selection Mode"
+script = ExtResource("10_xb4mg")
+SelectionContainer = NodePath("../SelectionContainer")
+CollNode = NodePath("../../../CollectionNode")
+
+[node name="btn_Spawn" type="Button" parent="Control/ButtonsContainer" node_paths=PackedStringArray("CollNode")]
+layout_mode = 2
+size_flags_horizontal = 8
 theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
 theme_override_styles/pressed = ExtResource("6_0iob3")
 toggle_mode = true
 text = "Spawn Node"
 script = ExtResource("2_y4jh7")
-CollNode = NodePath("../../CollectionNode")
-
-[node name="btn_Connect" type="Button" parent="Control"]
-layout_mode = 2
-anchor_left = -2.925
-anchor_top = 0.212
-anchor_right = -2.925
-anchor_bottom = 0.212
-offset_left = -94.0
-offset_top = -16.48
-offset_right = 42.0
-offset_bottom = 15.52
-theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
-theme_override_styles/pressed = ExtResource("6_0iob3")
-toggle_mode = true
-text = "Connect Nodes"
-script = ExtResource("3_q68mp")
-
-[node name="btn_Send" type="Button" parent="Control" node_paths=PackedStringArray("CollectionNode")]
-layout_mode = 2
-anchor_left = -6.15
-anchor_top = 0.187
-anchor_right = -6.15
-anchor_bottom = 0.187
-offset_left = -109.0
-offset_top = -15.48
-offset_right = 19.0
-offset_bottom = 16.52
-theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
-theme_override_styles/pressed = ExtResource("6_0iob3")
-text = "Send Message"
-script = ExtResource("4_f140w")
-CollectionNode = NodePath("../../CollectionNode")
+CollNode = NodePath("../../../CollectionNode")

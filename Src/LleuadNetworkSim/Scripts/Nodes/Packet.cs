@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Diagnostics;
 
 public partial class Packet : PathFollow2D
@@ -7,7 +6,7 @@ public partial class Packet : PathFollow2D
     [Export]
     public float Speed = 250f;
 
-    private float PathLength;
+    private float PathLength = -1;
     
     private bool Run = false;
 
@@ -20,6 +19,9 @@ public partial class Packet : PathFollow2D
             PathLength = (GetParent() as NodeConnection).Length;
         }
         
+        GetChild<Sprite2D>(0)
+            .SetGlobalRotationDegrees(0);
+        
         base._EnterTree();
     }
 
@@ -31,7 +33,7 @@ public partial class Packet : PathFollow2D
         this.ProgressRatio += (float)(0.1f * delta);
 
         if (ProgressRatio >= 0.98f)
-        {
+        {            
             Debug.WriteLine($"Reached end of the line! progress: {this.Progress}, length: {this.PathLength}");
 
             (GetParent() as NodeConnection).FollowerCount--;
@@ -45,5 +47,8 @@ public partial class Packet : PathFollow2D
     public void PathUpdated(float _Length) {
         
         PathLength = _Length;
+
+        GetChild<Sprite2D>(0)
+            .GlobalRotation = 0;
     }
 }

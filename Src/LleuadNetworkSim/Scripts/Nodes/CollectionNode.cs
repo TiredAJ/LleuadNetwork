@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using Godot.Logging;
+
 using LleuadNetworkSim.Scripts.Nodes;
 
 using PipesTester;
@@ -19,6 +21,39 @@ public partial class CollectionNode : Node
     #region Selecting
     
     private List<NetworkNode> SelectedNodes = [];
+
+    public void SelectionMode(bool _Toggled) {
+
+        GetChild<Button>(1).MouseFilter = _Toggled ? Control.MouseFilterEnum.Ignore : Control.MouseFilterEnum.Stop;
+
+        if (!_Toggled)
+        {
+            foreach (NetworkNode NN in GetChildren().Where(X => X is NetworkNode NN))
+            { NN.Selected = false; }
+        }
+        
+        Mode = UIMode.NONE; 
+    }
+    
+    public bool RequestSelection(NetworkNode _Node) {
+
+        if (SelectedNodes.Contains(_Node))
+        {
+            SelectedNodes.Remove(_Node);
+            return false;
+        }
+        
+        if (SelectedNodes.Count == 2)
+        {
+            SelectedNodes[0].Selected = false;
+            
+            SelectedNodes.RemoveAt(0);
+        }
+        
+        SelectedNodes.Add(_Node);
+
+        return true;
+    }
     
     /// <summary>
     /// Returns true if successfully selected
@@ -61,6 +96,32 @@ public partial class CollectionNode : Node
         
         AddChild(SceneInstance);        
     }
+
+    public void HandleDelete() {
+
+        if (SelectedNodes.Count == 0)
+        { return; }
+        
+        NetworkNode NodeA = SelectedNodes[0];
+        DeleteNode(NodeA);
+
+        if (SelectedNodes.Count == 2)
+        {
+            NetworkNode NodeB = SelectedNodes[1];
+            DeleteNode(NodeB);
+        }
+        
+        SelectedNodes.Clear();
+    }
+
+    private void DeleteNode(NetworkNode _Node) {
+
+        ConnectedNodes = ConnectedNodes.Where(X => (X.Value.Item1 != _Node && X.Value.Item2 != _Node))
+                                    .ToDictionary();
+        
+        _Node.QueueFree();
+    }
+
     #endregion
 
     #region Connections
@@ -69,8 +130,10 @@ public partial class CollectionNode : Node
     
     public void TryConnect() {
 
-        if (Mode != UIMode.CONNECTING || SelectedNodes.Count != 2)
+        if (SelectedNodes.Count != 2)
         { return; }
+
+        Mode = UIMode.CONNECTING;
         
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];
@@ -78,7 +141,10 @@ public partial class CollectionNode : Node
         string ID = Convert.ToBase64String(NodeA.Name.ToString().AddValue(NodeB.Name));
 
         if (ConnectedNodes.ContainsKey(ID))
-        { return; }
+        {
+            GodotLogger.LogWarning($"Connection ID {ID} already exists");
+            return;
+        }
         
         ConnectedNodes.Add(ID, (NodeA, NodeB));
         
@@ -89,6 +155,12 @@ public partial class CollectionNode : Node
 
         NodeConnection ConnAB = ConnectionTemplate.Instantiate() as NodeConnection;
         NodeConnection ConnBA = ConnectionTemplate.Instantiate() as NodeConnection;
+
+        if (ConnAB is null || ConnBA is null)
+        {
+            GodotLogger.LogWarning($"Null connections: ConnAB: [{ConnAB}], ConnBA: [{ConnBA}]");
+            return;
+        }
         
         ConnAB.Init(NodeA, NodeB);
         ConnBA.Init(NodeB, NodeA);
@@ -103,8 +175,10 @@ public partial class CollectionNode : Node
 
     #region Messages
     public void TrySendMessage() {
-        if (Mode != UIMode.MESSAGING || SelectedNodes.Count != 2)
+        if (SelectedNodes.Count != 2)
         { return; }
+
+        Mode = UIMode.MESSAGING;
         
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];

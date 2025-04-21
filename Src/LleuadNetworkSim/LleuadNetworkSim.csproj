@@ -4,4 +4,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Godot.Logging" Version="1.2.0" />
+  </ItemGroup>
 </Project>

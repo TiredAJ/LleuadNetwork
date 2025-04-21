@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://drp7ejwtv474q" path="res://Assets/Sprites/Blehh.png" id="1_7wo6q"]
 
 [node name="Packet" type="PathFollow2D"]
-z_index = 1
-v_offset = 10.0
+z_index = 1000
+v_offset = 20.0
 cubic_interp = false
 loop = false
 script = ExtResource("1_0sr6c")
