@@ -61,14 +61,6 @@ public partial class NetworkNode : CharacterBody2D
         base._InputEvent(viewport, @event, shapeIdx);
     }
 
-    public override void _ExitTree() {
-
-        foreach (KeyValuePair<string, NodeConnection> Connection in Connections)
-        { Connection.Value.QueueFree(); }
-        
-        base._ExitTree();
-    }
-
     public void AddConnection(string _ID, NodeConnection _Conn) {
         Connections.Add(_ID, _Conn);
     }
@@ -85,15 +77,6 @@ public partial class NetworkNode : CharacterBody2D
         Connections[_ID].AddChild(Message);
 
         Connections[_ID].FollowerCount++;
-    }
-
-    private bool HandleUnselected() {
-        (GetParent() as CollectionNode).RemoveSelectedNode(this);
-        return false;
-    }
-
-    private bool HandleSelected() {
-        return (GetParent() as CollectionNode).AddSelectedNode(this);
     }
 
     private void RequestSelection() {

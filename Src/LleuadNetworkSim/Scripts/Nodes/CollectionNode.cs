@@ -73,9 +73,19 @@ public partial class CollectionNode : Node
         return true;
     }
 
-    public void RemoveSelectedNode(NetworkNode _Node) {
+    public bool DeselectNode(NetworkNode _Node) {
+        _Node.Selected = false;
+        
         SelectedNodes.Remove(_Node);
-        Debug.WriteLine($"{_Node.Name} was removed from selection");
+        
+        return false;
+    }
+
+    public void DeselectAll() {
+        foreach (NetworkNode Node in SelectedNodes)
+        { Node.Selected = false; }
+        
+        SelectedNodes.Clear();
     }
     
     #endregion
@@ -121,10 +131,19 @@ public partial class CollectionNode : Node
                                     .ToList();
 
         foreach (var Key in DeletableKeys)
+        { ConnectedNodes.Remove(Key); }
+
+        foreach (var KVP in Connections
+                     .Where(X => DeletableKeys.Contains(X.Key)))
         {
-            ConnectedNodes.Remove(Key);
-            Connections.Remove(Key);
+            (NodeConnection ConnAB, NodeConnection ConnBA) = KVP.Value;
+            
+            ConnAB.QueueFree();
+            ConnBA.QueueFree();
         }
+
+        foreach (var Key in DeletableKeys)
+        { Connections.Remove(Key); }
         
         _Node.QueueFree();
     }
@@ -156,11 +175,6 @@ public partial class CollectionNode : Node
         
         ConnectedNodes.Add(ID, (NodeA, NodeB));
         
-        NodeA.Selected = false;
-        NodeB.Selected = false;
-        
-        SelectedNodes.Clear();
-
         NodeConnection ConnAB = ConnectionTemplate.Instantiate() as NodeConnection;
         NodeConnection ConnBA = ConnectionTemplate.Instantiate() as NodeConnection;
 
