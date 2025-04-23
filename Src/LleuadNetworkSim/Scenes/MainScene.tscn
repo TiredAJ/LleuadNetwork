@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=20 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dbyqsk33sd7ii" path="res://Scripts/Buttons/btn_Send.cs" id="4_f140w"]
 [ext_resource type="PackedScene" uid="uid://cxnqtqw22ucrf" path="res://Scenes/network_node.tscn" id="4_qxria"]
 [ext_resource type="StyleBox" uid="uid://cxfa3uwnbt6ub" path="res://Styles/Buttons/PressedStyle.tres" id="6_0iob3"]
+[ext_resource type="Script" uid="uid://dcmaf1jovqc3f" path="res://Scripts/Buttons/cntr_MainButtons.cs" id="6_6t1o7"]
 [ext_resource type="Script" uid="uid://by763ow6bn8mg" path="res://Scripts/Buttons/SelectionButtonContainer.cs" id="6_8ju71"]
 [ext_resource type="Script" uid="uid://cajvrvldjqdy4" path="res://Scripts/Nodes/CollectionNode.cs" id="6_y4jh7"]
 [ext_resource type="PackedScene" uid="uid://cvutjyufj0xr5" path="res://Scenes/node_connection.tscn" id="7_q68mp"]
@@ -51,7 +52,7 @@ offset_bottom = 800.0
 script = ExtResource("4_0iob3")
 CollNode = NodePath("..")
 
-[node name="Control" type="Control" parent="."]
+[node name="Controls" type="Control" parent="."]
 z_index = 4096
 layout_mode = 3
 anchors_preset = 0
@@ -60,7 +61,7 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="ButtonsContainer" type="FlowContainer" parent="Control"]
+[node name="ButtonsContainer" type="FlowContainer" parent="Controls"]
 layout_mode = 0
 offset_left = -427.0
 offset_top = -8.0
@@ -68,13 +69,14 @@ offset_right = 53.0
 offset_bottom = 93.0
 alignment = 2
 last_wrap_alignment = 2
+script = ExtResource("6_6t1o7")
 
-[node name="SelectionContainer" type="FlowContainer" parent="Control/ButtonsContainer"]
+[node name="SelectionContainer" type="FlowContainer" parent="Controls/ButtonsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("6_8ju71")
 
-[node name="btn_Connect" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Connect" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
@@ -85,7 +87,7 @@ text = "Connect Nodes"
 script = ExtResource("3_q68mp")
 CollNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_Send" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+[node name="btn_Send" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
@@ -95,7 +97,7 @@ text = "Send Message"
 script = ExtResource("4_f140w")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_Delete" type="Button" parent="Control/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+[node name="btn_Delete" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -103,7 +105,7 @@ text = "Delete"
 script = ExtResource("10_6t1o7")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_SelectionMode" type="Button" parent="Control/ButtonsContainer" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
+[node name="btn_SelectionMode" type="Button" parent="Controls/ButtonsContainer" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_xb4mg")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_6t1o7")
@@ -113,8 +115,9 @@ text = "Selection Mode"
 script = ExtResource("10_xb4mg")
 SelectionContainer = NodePath("../SelectionContainer")
 CollNode = NodePath("../../../CollectionNode")
+metadata/Type = "Select"
 
-[node name="btn_Spawn" type="Button" parent="Control/ButtonsContainer" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Spawn" type="Button" parent="Controls/ButtonsContainer" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
@@ -124,3 +127,4 @@ toggle_mode = true
 text = "Spawn Node"
 script = ExtResource("2_y4jh7")
 CollNode = NodePath("../../../CollectionNode")
+metadata/Type = "Spawn"

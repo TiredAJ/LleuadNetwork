@@ -116,8 +116,15 @@ public partial class CollectionNode : Node
 
     private void DeleteNode(NetworkNode _Node) {
 
-        ConnectedNodes = ConnectedNodes.Where(X => (X.Value.Item1 != _Node && X.Value.Item2 != _Node))
-                                    .ToDictionary();
+        List<string> DeletableKeys = ConnectedNodes.Where(X => (X.Value.Item1 == _Node || X.Value.Item2 == _Node))
+                                    .Select(X => X.Key)
+                                    .ToList();
+
+        foreach (var Key in DeletableKeys)
+        {
+            ConnectedNodes.Remove(Key);
+            Connections.Remove(Key);
+        }
         
         _Node.QueueFree();
     }
@@ -127,6 +134,7 @@ public partial class CollectionNode : Node
     #region Connections
     
     private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
+    private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
     
     public void TryConnect() {
 
@@ -164,6 +172,8 @@ public partial class CollectionNode : Node
         
         ConnAB.Init(NodeA, NodeB);
         ConnBA.Init(NodeB, NodeA);
+        
+        Connections.Add(ID, (ConnAB, ConnBA));
         
         NodeA.AddConnection(NodeB.Name, ConnAB);
         NodeB.AddConnection(NodeA.Name, ConnBA);
