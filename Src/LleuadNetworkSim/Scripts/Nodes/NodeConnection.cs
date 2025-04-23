@@ -1,6 +1,7 @@
 using Godot;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class NodeConnection : Path2D
 {
@@ -79,5 +80,11 @@ public partial class NodeConnection : Path2D
             foreach (Packet P in GetChildren().Where(X => X is Packet))
             { P.PathUpdated(Length); }
         }
+    }
+
+    public void PacketArrived() {
+        FollowerCount--;
+
+        Task.Run(() => NodeB.PacketReceived());
     }
 }

@@ -36,12 +36,16 @@ public partial class Packet : PathFollow2D
         {            
             Debug.WriteLine($"Reached end of the line! progress: {this.Progress}, length: {this.PathLength}");
 
-            (GetParent() as NodeConnection).FollowerCount--;
+            (GetParent() as NodeConnection).PacketArrived();
             
-            this.QueueFree();            
+            this.QueueFree();
         }
         
         base._Process(delta);
+    }
+
+    private void Arrived() {
+        
     }
 
     public void PathUpdated(float _Length) {

@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 public partial class NetworkNode : CharacterBody2D
 {
@@ -18,6 +19,9 @@ public partial class NetworkNode : CharacterBody2D
 
     [Export]
     private Sprite2D SelectionRing;
+
+    [Export]
+    private Label NameLabel;
     
     [Export]
     private PackedScene PacketTemplate;
@@ -31,34 +35,43 @@ public partial class NetworkNode : CharacterBody2D
         Debug.WriteLine($"Node spawned at {Position}");
 
         CollNodeParent = GetParent<CollectionNode>();
+
+        NameLabel.Text = this.Name;
         
         base._Ready();
     }
 
-    public override void _UnhandledInput(InputEvent @event)
+    public override void _UnhandledInput(InputEvent _Event)
     {        
-        if (@event is InputEventMouseButton && !@event.IsPressed())
+        if (_Event is InputEventMouseButton && !_Event.IsPressed())
         { Lifted = false; }
 
-        if (Lifted && @event is InputEventMouseMotion IEMM)
+        if (Lifted && _Event is InputEventMouseMotion IEMM)
         { Position += IEMM.Relative; }
         
-        base._UnhandledInput(@event);
+        base._UnhandledInput(_Event);
     }
 
-    public override void _InputEvent(Viewport viewport, InputEvent @event, int shapeIdx)
+    public override void _InputEvent(Viewport _Viewport, InputEvent _Event, int _ShapeIdx)
     {
-        if (@event is InputEventMouseButton IEMM && @event.IsPressed())
+        if (_Event is InputEventMouseButton IEMM && _Event.IsPressed())
         {
-            if (IEMM.ButtonIndex == MouseButton.Middle)
-            { Lifted = true; }
-            else if (IEMM.ButtonIndex == MouseButton.Left)
-            { RequestSelection(); }                 
-            
+            switch (IEMM.ButtonIndex)
+            { 
+                case MouseButton.Middle:
+                    Lifted = true;
+                    break;
+                case MouseButton.Left:
+                    RequestSelection();
+                    break;
+                default:
+                    break;
+            }
+
             Debug.WriteLine("Clicked");
         }
         
-        base._InputEvent(viewport, @event, shapeIdx);
+        base._InputEvent(_Viewport, _Event, _ShapeIdx);
     }
 
     public void AddConnection(string _ID, NodeConnection _Conn) {
@@ -84,5 +97,11 @@ public partial class NetworkNode : CharacterBody2D
         { return; }
         
         Selected = CollNodeParent.RequestSelection(this);
+    }
+
+    public async Task PacketReceived() {
+        /* handle packet - read channel */
+        
+        Debug.WriteLine($"Packet received at {this.Name}");
     }
 }
