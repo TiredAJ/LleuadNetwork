@@ -15,4 +15,8 @@ static public class Extensions
                     .Select(X => Convert.ToByte(X.First + X.Second))
                     .ToArray();
     }
+
+    static public string ToBase64(this Guid _UUID) {
+        return Convert.ToBase64String(_UUID.ToByteArray());
+    }
 }

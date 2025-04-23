@@ -10,12 +10,11 @@ public partial class NodeConnection : Path2D
     
     public NetworkNode NodeA;
     public NetworkNode NodeB;
+    public int FollowerCount = 0;
+    public float Length = 0;
 
     private Vector2 PointAPrev;
     private Vector2 PointBPrev;
-
-    public int FollowerCount = 0;
-    public float Length = 0;
 
     public void Init(NetworkNode _A, NetworkNode _B) {
         NodeA = _A;
@@ -49,6 +48,9 @@ public partial class NodeConnection : Path2D
 
         foreach (var Child in GetChildren())
         { Child.QueueFree(); }
+
+        NodeA.RemoveConnection(NodeB.Name);
+        NodeB.RemoveConnection(NodeA.Name);
         
         base._ExitTree();
     }

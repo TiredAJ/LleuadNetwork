@@ -5,6 +5,20 @@ using System.Threading.Tasks;
 
 public partial class NetworkNode : CharacterBody2D
 {
+    #region Family
+    [Export]
+    private Sprite2D SelectionRing;
+
+    [Export]
+    private Label NameLabel;
+    
+    [Export]
+    private PackedScene PacketTemplate;
+
+    private CollectionNode CollNodeParent;
+    #endregion
+
+    #region Selection and movement
     [Export]
     public bool Lifted = false;
 
@@ -16,20 +30,28 @@ public partial class NetworkNode : CharacterBody2D
             SelectionRing.Visible = Selected;
         }
     } = false;
-
-    [Export]
-    private Sprite2D SelectionRing;
-
-    [Export]
-    private Label NameLabel;
     
-    [Export]
-    private PackedScene PacketTemplate;
+    private void RequestSelection() {
+        if (Lifted)
+        { return; }
+        
+        Selected = CollNodeParent.RequestSelection(this);
+    }
+    #endregion
 
-    private CollectionNode CollNodeParent;
-
+    #region Connections
     private Dictionary<string, NodeConnection> Connections = [];
     
+    public void AddConnection(string _ID, NodeConnection _Conn) {
+        Connections.Add(_ID, _Conn);
+    }
+    
+    public void RemoveConnection(string _ID) {
+        Connections.Remove(_ID);
+    }
+    #endregion
+
+    #region Overrides
     public override void _Ready() {
         
         Debug.WriteLine($"Node spawned at {Position}");
@@ -73,11 +95,9 @@ public partial class NetworkNode : CharacterBody2D
         
         base._InputEvent(_Viewport, _Event, _ShapeIdx);
     }
+    #endregion
 
-    public void AddConnection(string _ID, NodeConnection _Conn) {
-        Connections.Add(_ID, _Conn);
-    }
-
+    #region Packets and messaging
     public void SendMessage(string _ID) {
 
         if (!Connections.ContainsKey(_ID))
@@ -91,17 +111,11 @@ public partial class NetworkNode : CharacterBody2D
 
         Connections[_ID].FollowerCount++;
     }
-
-    private void RequestSelection() {
-        if (Lifted)
-        { return; }
-        
-        Selected = CollNodeParent.RequestSelection(this);
-    }
-
+    
     public async Task PacketReceived() {
         /* handle packet - read channel */
         
         Debug.WriteLine($"Packet received at {this.Name}");
     }
+    #endregion
 }

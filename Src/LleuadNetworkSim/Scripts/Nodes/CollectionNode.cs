@@ -102,7 +102,7 @@ public partial class CollectionNode : Node
         NetworkNode SceneInstance = NetworkNodeTemplate.Instantiate() as NetworkNode;
 
         SceneInstance.Position = _Location;
-        SceneInstance.Name = $"NetworkNode-" + Guid.NewGuid().ToString();
+        SceneInstance.Name = $"NetworkNode-" + Guid.NewGuid().ToBase64();
         
         AddChild(SceneInstance);        
     }
@@ -147,7 +147,6 @@ public partial class CollectionNode : Node
         
         _Node.QueueFree();
     }
-
     #endregion
 
     #region Connections
@@ -183,6 +182,9 @@ public partial class CollectionNode : Node
             GodotLogger.LogWarning($"Null connections: ConnAB: [{ConnAB}], ConnBA: [{ConnBA}]");
             return;
         }
+        
+        ConnAB.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
+        ConnBA.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
         
         ConnAB.Init(NodeA, NodeB);
         ConnBA.Init(NodeB, NodeA);
