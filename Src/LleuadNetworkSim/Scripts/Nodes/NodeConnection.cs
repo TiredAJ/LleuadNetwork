@@ -1,7 +1,10 @@
 using Godot;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+
+using LleuadNetworkSim.Scripts.Objects;
 
 public partial class NodeConnection : Path2D
 {
@@ -13,10 +16,13 @@ public partial class NodeConnection : Path2D
     public int FollowerCount = 0;
     public float Length = 0;
 
+    private Channel<Message> CommsChannel;
+    private ChannelReader<Message> CommsInput;
+
     private Vector2 PointAPrev;
     private Vector2 PointBPrev;
 
-    public void Init(NetworkNode _A, NetworkNode _B) {
+    public void Init(NetworkNode _A, NetworkNode _B, Channel<Message> _Channel, ChannelReader<Message> _Input) {
         NodeA = _A;
         NodeB = _B;
 
@@ -87,6 +93,6 @@ public partial class NodeConnection : Path2D
     public void PacketArrived() {
         FollowerCount--;
 
-        Task.Run(() => NodeB.PacketReceived());
+        Task.Run(async () => NodeB.PacketReceived(await CommsInput.ReadAsync()));
     }
 }

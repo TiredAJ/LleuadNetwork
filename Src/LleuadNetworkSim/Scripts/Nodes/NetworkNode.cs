@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using LleuadNetworkSim.Scripts.Objects;
+
 public partial class NetworkNode : CharacterBody2D
 {
     #region Family
@@ -112,7 +114,7 @@ public partial class NetworkNode : CharacterBody2D
         Connections[_ID].FollowerCount++;
     }
     
-    public async Task PacketReceived() {
+    public async Task PacketReceived(Message _Msg) {
         /* handle packet - read channel */
         
         Debug.WriteLine($"Packet received at {this.Name}");

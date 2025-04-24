@@ -5,6 +5,7 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageReference Include="Godot.Logging" Version="1.2.0" />
   </ItemGroup>
 </Project>

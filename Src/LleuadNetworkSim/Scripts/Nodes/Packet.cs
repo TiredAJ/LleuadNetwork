@@ -4,7 +4,7 @@ using System.Diagnostics;
 public partial class Packet : PathFollow2D
 {
     [Export]
-    public float Speed = 250f;
+    private float Speed = 250f;
 
     private float PathLength = -1;
     
@@ -25,12 +25,12 @@ public partial class Packet : PathFollow2D
         base._EnterTree();
     }
 
-    public override void _Process(double delta) {
+    public override void _Process(double _Delta) {
 
         if (!Run)
         { return; }
         
-        this.ProgressRatio += (float)(0.1f * delta);
+        this.Progress += (float)(Speed * _Delta);
 
         if (ProgressRatio >= 0.98f)
         {            
@@ -41,7 +41,7 @@ public partial class Packet : PathFollow2D
             this.QueueFree();
         }
         
-        base._Process(delta);
+        base._Process(_Delta);
     }
 
     private void Arrived() {

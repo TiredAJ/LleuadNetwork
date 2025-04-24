@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Channels;
 
 using Godot.Logging;
 
 using LleuadNetworkSim.Scripts.Nodes;
+using LleuadNetworkSim.Scripts.Objects;
 
 using PipesTester;
 
@@ -18,6 +20,9 @@ public partial class CollectionNode : Node
     [Export]
     private PackedScene NetworkNodeTemplate;
 
+    
+    
+    
     #region Selecting
     
     private List<NetworkNode> SelectedNodes = [];
@@ -154,6 +159,13 @@ public partial class CollectionNode : Node
     private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
     private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
     
+    private BoundedChannelOptions BCODefault = new BoundedChannelOptions(20) {
+        AllowSynchronousContinuations = false,
+        SingleReader = true,
+        SingleWriter = true,
+        FullMode = BoundedChannelFullMode.Wait
+    };
+    
     public void TryConnect() {
 
         if (SelectedNodes.Count != 2)
@@ -186,8 +198,11 @@ public partial class CollectionNode : Node
         ConnAB.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
         ConnBA.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
         
-        ConnAB.Init(NodeA, NodeB);
-        ConnBA.Init(NodeB, NodeA);
+        Channel<Message> ChannelAB = Channel.CreateBounded<Message>(BCODefault);
+        Channel<Message> ChannelBA = Channel.CreateBounded<Message>(BCODefault);
+        
+        ConnAB.Init(NodeA, NodeB, ChannelAB, ChannelBA.Reader);
+        ConnBA.Init(NodeB, NodeA, ChannelBA, ChannelAB.Reader);
         
         Connections.Add(ID, (ConnAB, ConnBA));
         
