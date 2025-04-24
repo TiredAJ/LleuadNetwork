@@ -1,6 +1,8 @@
 using Godot;
 using System.Diagnostics;
 
+using LleuadNetworkSim.Scripts.Objects;
+
 public partial class Packet : PathFollow2D
 {
     [Export]
@@ -9,6 +11,8 @@ public partial class Packet : PathFollow2D
     private float PathLength = -1;
     
     private bool Run = false;
+    
+    public Message Msg { get; set; }
 
     public override void _EnterTree() {
 
@@ -42,10 +46,6 @@ public partial class Packet : PathFollow2D
         }
         
         base._Process(_Delta);
-    }
-
-    private void Arrived() {
-        
     }
 
     public void PathUpdated(float _Length) {

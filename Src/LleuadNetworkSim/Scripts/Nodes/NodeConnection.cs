@@ -49,7 +49,12 @@ public partial class NodeConnection : Path2D
         
         base._Process(delta);
     }
-    
+
+    public override void _EnterTree() {
+        
+        base._EnterTree();
+    }
+
     public override void _ExitTree() {
 
         foreach (var Child in GetChildren())

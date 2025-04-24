@@ -105,11 +105,13 @@ public partial class NetworkNode : CharacterBody2D
         if (!Connections.ContainsKey(_ID))
         { return; }
         
-        Packet Message = PacketTemplate.Instantiate<Packet>();
+        Packet Packet = PacketTemplate.Instantiate<Packet>();
+        Message Msg = new Message(this.Name, _ID, $"Hello from {this.Name}!! This is a payload");
 
-        Message.ZIndex -= Connections[_ID].FollowerCount; 
+        Packet.ZIndex -= Connections[_ID].FollowerCount;
+        Packet.Msg = Msg;
         
-        Connections[_ID].AddChild(Message);
+        Connections[_ID].AddChild(Packet);
 
         Connections[_ID].FollowerCount++;
     }

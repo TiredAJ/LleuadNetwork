@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,16 +13,17 @@ public struct Headers
 
     static readonly private ImmutableDictionary<string, string> DEFAULT_HEADERS = ImmutableDictionary.CreateRange([
         new KeyValuePair<string, string>("SENDER_ADDRESS", DEFAULT_VAL),
-        new KeyValuePair<string, string>("RECEIVE_ADDRESS", DEFAULT_VAL),
+        new KeyValuePair<string, string>("DESTINATION_ADDRESS", DEFAULT_VAL),
         new KeyValuePair<string, string>("TYPE", DEFAULT_VAL),
+        new KeyValuePair<string, string>("ENCODING", "utf-8"),
         new KeyValuePair<string, string>("INDEX", "-1"),
         new KeyValuePair<string, string>("PRIORITY", "20"),
-        new KeyValuePair<string, string>("CREATION_TIME", DEFAULT_VAL),
-        new KeyValuePair<string, string>("LIFESPAN", "100"),
+        new KeyValuePair<string, string>("CREATION_TIME", DateTime.MinValue.ToBinary().ToString()),
+        new KeyValuePair<string, string>("LIFESPAN", "60000"),
         new KeyValuePair<string, string>("HOPS", "0"),
         new KeyValuePair<string, string>("RECEIVE_RESPONSE_REQUIRED", "NO"),
         new KeyValuePair<string, string>("MESSAGE_SIZE", "0"),
-        new KeyValuePair<string, string>("MAX_SIZE", "1000"),
+        new KeyValuePair<string, string>("MAX_MESSAGE_SIZE", "1000"),
         new KeyValuePair<string, string>("TOTAL_SIZE", "-1")
     ]);
 
@@ -40,7 +42,7 @@ public struct Headers
         return IntHeaders[_H.ToStr()];
     }
 
-    public void SetValue(Header _H, string _Value) {
+    public void SetHeaderValue(Header _H, string _Value) {
         IntHeaders[_H.ToStr()] = _Value;
     }
 
