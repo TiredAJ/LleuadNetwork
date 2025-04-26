@@ -2,17 +2,22 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Channels;
+
+using CSharpFunctionalExtensions;
 
 using Godot.Logging;
 
+using LleuadNetworkSim.Scripts.Exceptions;
 using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
 
 using PipesTester;
 
-public partial class CollectionNode : Node
+public partial class CollectionNode : Node, IPersistable
 {
     [Export]
     private PackedScene ConnectionTemplate;
@@ -20,8 +25,8 @@ public partial class CollectionNode : Node
     [Export]
     private PackedScene NetworkNodeTemplate;
 
-    
-    
+    [Export]
+    private PackedScene ExceptionPopupTemplate;
     
     #region Selecting
     
@@ -156,7 +161,9 @@ public partial class CollectionNode : Node
 
     #region Connections
     
+    //maybe persist
     private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
+    //maybe persist
     private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
     
     private BoundedChannelOptions BCODefault = new BoundedChannelOptions(20) {
@@ -215,6 +222,9 @@ public partial class CollectionNode : Node
     #endregion
 
     #region Messages
+
+    private Maybe<MapChallenge> Challenge = Maybe.None;
+    
     public void TrySendMessage() {
         if (SelectedNodes.Count != 2)
         { return; }
@@ -227,4 +237,42 @@ public partial class CollectionNode : Node
         NodeA.SendMessage(NodeB.Name);        
     }    
     #endregion
+
+    #region Persist
+    public JsonNode Save() {
+        throw new NotImplementedException();
+    }
+    public void Load(JsonNode _JData) {
+        throw new NotImplementedException();
+    }
+    
+    public void SaveMap() {
+        throw new NotImplementedException();
+    }
+    public void LoadMap() {
+        throw new NotImplementedException();
+    }
+    
+    public void TryLoadChallenge(string _Path) {
+        
+        if (Path.GetExtension(_Path) != ".lnchallenge") //25MB
+        { ExceptionPopupWrapper.Throw(this, new InvalidChallengeFileException(_Path)); }
+
+        long FileSize = new FileInfo(_Path).Length;
+
+        if (FileSize > (25 * 1000 * 1000))
+        { ExceptionPopupWrapper.Throw(this, new FileTooLargeException(FileSize)); }
+        
+        Challenge = new MapChallenge(_Path);
+        Challenge.Value.GenerateChallenge();
+    }
+    
+    public void Persist() {
+        
+    }
+    public void Open() { 
+        throw new NotImplementedException();
+    }    
+    #endregion
+
 }

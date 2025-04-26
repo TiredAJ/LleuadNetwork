@@ -1,11 +1,14 @@
 using Godot;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
+using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
 
-public partial class NetworkNode : CharacterBody2D
+public partial class NetworkNode : CharacterBody2D, IPersistable
 {
     #region Family
     [Export]
@@ -22,7 +25,7 @@ public partial class NetworkNode : CharacterBody2D
 
     #region Selection and movement
     [Export]
-    public bool Lifted = false;
+    private bool Lifted = false;
 
     [Export]
     public bool Selected {
@@ -42,6 +45,7 @@ public partial class NetworkNode : CharacterBody2D
     #endregion
 
     #region Connections
+    //needs persisting
     private Dictionary<string, NodeConnection> Connections = [];
     
     public void AddConnection(string _ID, NodeConnection _Conn) {
@@ -122,4 +126,32 @@ public partial class NetworkNode : CharacterBody2D
         Debug.WriteLine($"Packet received at {this.Name}");
     }
     #endregion
+
+    #region Persistence
+    public JsonNode Save() {
+        /*
+         * Need to save:
+         *  - Node name
+         *  - what node (names) it's connected to 
+         */
+
+        JsonArray JArray = [];
+
+        foreach (string Key in Connections.Keys)
+        { JArray.Add(Key); }
+
+        return new JsonObject{
+                                ["Name"] = this.Name.ToString(),
+                                ["Connections"] = JArray
+                            };
+    }
+    
+    public void Load(JsonNode _JData) {
+        //maybe consider JsonObject
+ 
+        
+        throw new System.NotImplementedException(); 
+    }
+    #endregion
+    
 }

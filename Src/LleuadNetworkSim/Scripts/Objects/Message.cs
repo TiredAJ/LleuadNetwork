@@ -1,17 +1,27 @@
 using System;
 using System.Text;
 
+using CSharpFunctionalExtensions;
+
 using LleuadNetworkSim.Scripts.Objects.Exceptions;
+
+using PipesTester;
 
 namespace LleuadNetworkSim.Scripts.Objects;
 
 public class Message
 {
-    private Headers IntHeaders = new Headers();
+    private Headers IntHeaders;
 
     #region Headers
 
     #region DefaultHeaders
+
+    public string ID {
+        get => IntHeaders.GetHeader(Header.ID);
+        set => IntHeaders.SetHeaderValue(Header.ID, value);
+    }
+    
     /// <summary>
     /// Address of the sender node.
     /// </summary>
@@ -123,6 +133,9 @@ public class Message
     #endregion
 
     public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null) {
+
+        IntHeaders = new Headers();
+        
         SenderAddress = _SenderAddress;
         DestinationAddress = _DestinationAddress;
         CreationTime = DateTime.Now;
@@ -131,15 +144,19 @@ public class Message
         { Payload = _Payload; }
     }
     
-    public string Payload {
+    public Maybe<string> Payload {
         get;
         set {
-            int Size = SizeInBytes(value);
+            if (value.HasValue)
+            {
+                int Size = SizeInBytes(value.Value);
 
-            if (Size > MaxMessageSize)
-            { throw new PayloadTooLargeException(Size, MaxMessageSize); }
+                if (Size > MaxMessageSize)
+                { throw new PayloadTooLargeException(Size, MaxMessageSize); }
 
-            MessageSize = Size;
+                MessageSize = Size;
+            }
+            
             field = value;
         }
     } = string.Empty;
@@ -150,11 +167,36 @@ public class Message
             || CreationTime == DateTime.MinValue)
         { return false; }
 
-        if (MessageSize != SizeInBytes(Payload))
+        if (MessageSize != SizeInBytes(Payload.Value))
         { return false; }
 
         return true;
     }
 
     private int SizeInBytes(string _Value) => MessageEncoding.GetByteCount(_Value);
+
+    public Message Clone() {
+        return new Message(SenderAddress, DestinationAddress, Payload.GetValueOrDefault())
+        {
+            CreationTime = CreationTime,
+            Hops = Hops,
+            Index = Index,
+            Lifespan = Lifespan,
+            MessageEncoding = MessageEncoding,
+            MessageSize = MessageSize,
+            MessageType = MessageType,
+            ResponseRequired = ResponseRequired,
+            MaxMessageSize = MaxMessageSize,
+            Priority = Priority,
+            TotalSize = TotalSize
+        };
+    }
+
+    public override string ToString() {
+        return $"[ID: {ID}],[Sender Addr: {SenderAddress}],[Destination Addr: {DestinationAddress}]," +
+                $"[Type: {MessageType}],[Encoding: {MessageEncoding}],[Index: {Index}]," +
+                $"[Priority: {Priority}],[Creation Time: {CreationTime}],[Lifespan: {Lifespan}]," +
+                $"[Hops: {Hops}],[Response Req: {ResponseRequired}],[Size: {MessageSize}]," +
+                $"[Max Size: {MaxMessageSize}],[Total Size: {TotalSize}]\n[Payload: {Payload}]";
+    }
 }

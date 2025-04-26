@@ -3,9 +3,11 @@
     <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageReference Include="Godot.Logging" Version="1.2.0" />
+    <PackageReference Include="morelinq" Version="4.4.0" />
   </ItemGroup>
 </Project>

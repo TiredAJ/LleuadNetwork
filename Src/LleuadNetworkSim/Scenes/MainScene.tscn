@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=23 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -13,6 +13,9 @@
 [ext_resource type="PackedScene" uid="uid://cvutjyufj0xr5" path="res://Scenes/node_connection.tscn" id="7_q68mp"]
 [ext_resource type="Script" uid="uid://b2obklxgik0bt" path="res://Scripts/Buttons/btn_Delete.cs" id="10_6t1o7"]
 [ext_resource type="Script" uid="uid://d01w0c2yqhf1m" path="res://Scripts/Buttons/btn_SelectionMode.cs" id="10_xb4mg"]
+[ext_resource type="Script" uid="uid://c5yxcuvgmi76a" path="res://Scripts/Buttons/btn_SaveMap.cs" id="14_6rnll"]
+[ext_resource type="Script" uid="uid://qeq2yg8smphb" path="res://Scripts/Buttons/btn_LoadMap.cs" id="15_enc0b"]
+[ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -46,9 +49,8 @@ modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 show_behind_parent = true
 z_index = -1
-offset_top = -8.0
 offset_right = 1000.0
-offset_bottom = 800.0
+offset_bottom = 808.0
 script = ExtResource("4_0iob3")
 CollNode = NodePath("..")
 
@@ -61,7 +63,7 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="ButtonsContainer" type="FlowContainer" parent="Controls"]
+[node name="MainButtons" type="FlowContainer" parent="Controls"]
 layout_mode = 0
 offset_left = -427.0
 offset_top = -8.0
@@ -71,12 +73,12 @@ alignment = 2
 last_wrap_alignment = 2
 script = ExtResource("6_6t1o7")
 
-[node name="SelectionContainer" type="FlowContainer" parent="Controls/ButtonsContainer"]
+[node name="SelectionContainer" type="FlowContainer" parent="Controls/MainButtons"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("6_8ju71")
 
-[node name="btn_Connect" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Connect" type="Button" parent="Controls/MainButtons/SelectionContainer" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
@@ -87,7 +89,7 @@ text = "Connect Nodes"
 script = ExtResource("3_q68mp")
 CollNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_Send" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+[node name="btn_Send" type="Button" parent="Controls/MainButtons/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
@@ -97,7 +99,7 @@ text = "Send Message"
 script = ExtResource("4_f140w")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_Delete" type="Button" parent="Controls/ButtonsContainer/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
+[node name="btn_Delete" type="Button" parent="Controls/MainButtons/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -105,7 +107,7 @@ text = "Delete"
 script = ExtResource("10_6t1o7")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_SelectionMode" type="Button" parent="Controls/ButtonsContainer" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
+[node name="btn_SelectionMode" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_xb4mg")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_6t1o7")
@@ -117,7 +119,7 @@ SelectionContainer = NodePath("../SelectionContainer")
 CollNode = NodePath("../../../CollectionNode")
 metadata/Type = "Select"
 
-[node name="btn_Spawn" type="Button" parent="Controls/ButtonsContainer" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Spawn" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
@@ -128,3 +130,43 @@ text = "Spawn Node"
 script = ExtResource("2_y4jh7")
 CollNode = NodePath("../../../CollectionNode")
 metadata/Type = "Spawn"
+
+[node name="SaveLoadButtons" type="FlowContainer" parent="Controls"]
+layout_mode = 0
+offset_left = -931.0
+offset_top = -8.0
+offset_right = -739.0
+offset_bottom = 64.0
+alignment = 1
+last_wrap_alignment = 2
+
+[node name="btn_SaveMap" type="Button" parent="Controls/SaveLoadButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save Map"
+script = ExtResource("14_6rnll")
+
+[node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "Load Map"
+script = ExtResource("15_enc0b")
+
+[node name="btn_LoadChallenge" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Load Challenge"
+script = ExtResource("16_6rnll")
+CollNode = NodePath("../../../CollectionNode")
+FD = NodePath("FileDialog")
+
+[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadChallenge"]
+title = "Open a File"
+unresizable = true
+popup_window = true
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.lnchallenge")
+use_native_dialog = true

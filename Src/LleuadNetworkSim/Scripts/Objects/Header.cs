@@ -6,6 +6,11 @@ namespace LleuadNetworkSim.Scripts.Objects;
 public enum Header
 {
     /// <summary>
+    /// (Auto) The unique ID of this message;
+    /// </summary>
+    ID,
+    
+    /// <summary>
     /// (Required) Address of the sender node.
     /// </summary>
     SENDER_ADDRESS,
@@ -79,6 +84,7 @@ public enum Header
 static public class Extensions
 {
     static public string ToStr(this Header _H) => _H switch {
+        Header.ID => "ID",
         Header.SENDER_ADDRESS => "SENDER_ADDRESS",
         Header.DESTINATION_ADDRESS => "DESTINATION_ADDRESS",
         Header.TYPE => "TYPE",

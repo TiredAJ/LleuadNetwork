@@ -11,13 +11,12 @@ radius = 54.037
 resource_local_to_scene = true
 load_path = "res://.godot/imported/DebugNetworkNode.png-60dc423cf9dacd3b59d0e1b24eceae50.ctex"
 
-[node name="NetworkNode" type="CharacterBody2D" node_paths=PackedStringArray("SelectionRing", "NameLabel")]
+[node name="NetworkNode" type="CharacterBody2D" node_paths=PackedStringArray("SelectionRing")]
 z_index = 1005
 input_pickable = true
 motion_mode = 1
 script = ExtResource("1_ob1qj")
 SelectionRing = NodePath("SelectionRing")
-NameLabel = NodePath("Name")
 PacketTemplate = ExtResource("2_3i4p6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

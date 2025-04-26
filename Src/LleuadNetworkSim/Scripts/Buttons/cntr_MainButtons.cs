@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Linq;
 
 public partial class cntr_MainButtons : FlowContainer
@@ -21,12 +20,10 @@ public partial class cntr_MainButtons : FlowContainer
     }
 
     public void SelectionMode() {
-        //BTN_Spawn.SwitchToggle();
         BTN_Spawn.ButtonPressed = false;
     }
 
     public void SpawnMode() {
-        //BTN_SelectionMode.SwitchToggle(false);
         BTN_SelectionMode.ButtonPressed = false;
     }
 }

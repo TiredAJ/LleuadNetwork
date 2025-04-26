@@ -12,6 +12,7 @@ public struct Headers
     public const string DEFAULT_VAL = "DEFAULT";
 
     static readonly private ImmutableDictionary<string, string> DEFAULT_HEADERS = ImmutableDictionary.CreateRange([
+        new KeyValuePair<string, string>("ID", "MDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAw"),
         new KeyValuePair<string, string>("SENDER_ADDRESS", DEFAULT_VAL),
         new KeyValuePair<string, string>("DESTINATION_ADDRESS", DEFAULT_VAL),
         new KeyValuePair<string, string>("TYPE", DEFAULT_VAL),
@@ -27,9 +28,16 @@ public struct Headers
         new KeyValuePair<string, string>("TOTAL_SIZE", "-1")
     ]);
 
-    private Dictionary<string, string> IntHeaders = DEFAULT_HEADERS.ToDictionary();
+    private Dictionary<string, string> IntHeaders;
 
+    public Headers() {
+        IntHeaders = DEFAULT_HEADERS.ToDictionary();
+    }
+    
     public Headers(Dictionary<string, string> Metadata) {
+        
+        IntHeaders = DEFAULT_HEADERS.ToDictionary();
+        
         foreach (KeyValuePair<string, string> KVP in Metadata)
         { IntHeaders.TryAdd(KVP.Key, KVP.Value); }
     }

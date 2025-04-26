@@ -1,0 +1,64 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsvyxjkhr5oiq"]
+
+[ext_resource type="Script" uid="uid://b3b7hdra8h4nd" path="res://Scripts/Buttons/btn_Ok_ExceptionPopup.cs" id="1_reov6"]
+[ext_resource type="Script" uid="uid://dp2e1tdhip503" path="res://Scenes/ExceptionPopup.cs" id="1_shvc0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shvc0"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="ExceptionPopup" type="PopupPanel" node_paths=PackedStringArray("ExceptionName", "ExceptionDetails")]
+title = "Error"
+initial_position = 2
+size = Vector2i(350, 350)
+visible = true
+theme_override_styles/panel = SubResource("StyleBoxFlat_shvc0")
+script = ExtResource("1_shvc0")
+ExceptionName = NodePath("HFlowContainer/ExcName")
+ExceptionDetails = NodePath("HFlowContainer/ExcDetails")
+
+[node name="HFlowContainer" type="FlowContainer" parent="."]
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -175.0
+offset_right = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+last_wrap_alignment = 2
+
+[node name="ExcName" type="Label" parent="HFlowContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "Exception name"
+horizontal_alignment = 1
+
+[node name="ExcDetails" type="TextEdit" parent="HFlowContainer"]
+custom_minimum_size = Vector2(300, 250)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_readonly_color = Color(1, 1, 0.960784, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Text"
+placeholder_text = "Exception Details"
+editable = false
+emoji_menu_enabled = false
+shortcut_keys_enabled = false
+drag_and_drop_selection_enabled = false
+virtual_keyboard_enabled = false
+wrap_mode = 1
+indent_wrapped_lines = true
+
+[node name="btn_Ok" type="Button" parent="HFlowContainer" node_paths=PackedStringArray("ParentPopup")]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 10
+text = "OK"
+script = ExtResource("1_reov6")
+ParentPopup = NodePath("../..")
