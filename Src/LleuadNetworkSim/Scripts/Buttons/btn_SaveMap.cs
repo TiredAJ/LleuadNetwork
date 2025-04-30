@@ -8,7 +8,7 @@ public partial class btn_SaveMap : Button
     
     public override void _Pressed() {
 
-        CollNode.Save();
+        CollNode.SaveMap();
         
         base._Pressed();
     }

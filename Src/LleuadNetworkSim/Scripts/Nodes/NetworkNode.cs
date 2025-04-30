@@ -128,7 +128,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Persistence
-    public JsonNode Save() {
+    public JsonObject Save() {
         /*
          * Need to save:
          *  - Node name
@@ -142,13 +142,16 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
         return new JsonObject{
                                 ["Name"] = this.Name.ToString(),
-                                ["Connections"] = JArray
+                                ["Connections"] = JArray,
+                                ["Pos"] = new JsonArray() {Position.X, Position.Y},
                             };
     }
     
-    public void Load(JsonNode _JData) {
+    public void Load(JsonObject _JData) {
         //maybe consider JsonObject
- 
+
+        this.Name = _JData["Name"].ToString();
+        
         
         throw new System.NotImplementedException(); 
     }

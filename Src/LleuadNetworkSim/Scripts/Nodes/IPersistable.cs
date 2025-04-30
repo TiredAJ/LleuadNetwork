@@ -4,6 +4,6 @@ namespace LleuadNetworkSim.Scripts.Nodes;
 
 public interface IPersistable
 {
-    public JsonNode Save();
-    public void Load(JsonNode _JData);
+    public JsonObject Save();
+    public void Load(JsonObject _JData);
 }
