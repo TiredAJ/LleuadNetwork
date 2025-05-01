@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 
-namespace PipesTester;
+namespace LleuadNetworkSim.Utils;
 
 static public class Extensions
 {

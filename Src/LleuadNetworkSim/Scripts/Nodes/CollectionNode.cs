@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Channels;
 
@@ -14,6 +15,7 @@ using Godot.Logging;
 using LleuadNetworkSim.Scripts.Exceptions;
 using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
+using LleuadNetworkSim.Utils;
 
 using PipesTester;
 
@@ -112,7 +114,7 @@ public partial class CollectionNode : Node, IPersistable
         NetworkNode SceneInstance = NetworkNodeTemplate.Instantiate() as NetworkNode;
 
         SceneInstance.Position = _Location;
-        SceneInstance.Name = $"NetworkNode-" + Guid.NewGuid().ToBase64();
+        SceneInstance.Name = Guid.NewGuid().ToBase64();
         
         AddChild(SceneInstance);        
     }
@@ -239,29 +241,47 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
 
     #region Persist
-    public JsonNode Save() {
+    public JsonObject Save() {
         throw new NotImplementedException();
     }
-    public void Load(JsonNode _JData) {
+    public void Load(JsonObject _JData) {
         throw new NotImplementedException();
     }
     
-    public void SaveMap() {
-        throw new NotImplementedException();
+    public void SaveMap(string _Path) {
+
+        JsonSerializerOptions JSO = new JsonSerializerOptions() {
+            AllowTrailingCommas = false,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            AllowOutOfOrderMetadataProperties = false
+        }; 
+        
+        JsonObject JData = new JsonObject();
+        JsonArray JArray = new JsonArray();
+        
+        foreach (NetworkNode NN in GetChildren().OfType<NetworkNode>())
+        { JArray.Add(NN.Save()); }
+        
+        JData.Add("NetworkNodes", JArray);
+
+        if (!Path.HasExtension(_Path))
+        { Debug.WriteLine("no extension!"); }
+
+        using StreamWriter Writer = new (_Path);
+
+        Writer.Write(JData.ToJsonString(JSO));
     }
-    public void LoadMap() {
+    public void LoadMap(string _Path) {
+
+        FileValidator.ValidateFile(_Path, ".lnmap", this);
+        
         throw new NotImplementedException();
     }
     
     public void TryLoadChallenge(string _Path) {
         
-        if (Path.GetExtension(_Path) != ".lnchallenge") //25MB
-        { ExceptionPopupWrapper.Throw(this, new InvalidChallengeFileException(_Path)); }
-
-        long FileSize = new FileInfo(_Path).Length;
-
-        if (FileSize > (25 * 1000 * 1000))
-        { ExceptionPopupWrapper.Throw(this, new FileTooLargeException(FileSize)); }
+        FileValidator.ValidateFile(_Path, ".lnchallenge", this);
         
         Challenge = new MapChallenge(_Path);
         Challenge.Value.GenerateChallenge();

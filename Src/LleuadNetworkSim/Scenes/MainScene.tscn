@@ -1,9 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=24 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
 [ext_resource type="Script" uid="uid://cyq4r7luut642" path="res://Scripts/Buttons/btn_Connect.cs" id="3_q68mp"]
 [ext_resource type="Script" uid="uid://dd1d371lnw2vq" path="res://Scripts/Buttons/MainAreaButton.cs" id="4_0iob3"]
+[ext_resource type="PackedScene" uid="uid://bsvyxjkhr5oiq" path="res://Scenes/exception_popup.tscn" id="4_enc0b"]
 [ext_resource type="Script" uid="uid://dbyqsk33sd7ii" path="res://Scripts/Buttons/btn_Send.cs" id="4_f140w"]
 [ext_resource type="PackedScene" uid="uid://cxnqtqw22ucrf" path="res://Scenes/network_node.tscn" id="4_qxria"]
 [ext_resource type="StyleBox" uid="uid://cxfa3uwnbt6ub" path="res://Styles/Buttons/PressedStyle.tres" id="6_0iob3"]
@@ -31,10 +32,12 @@
 
 [node name="MainScene" type="Node2D"]
 
-[node name="CollectionNode" type="Node" parent="."]
+[node name="CollectionNode" type="Node" parent="." node_paths=PackedStringArray("FD")]
 script = ExtResource("6_y4jh7")
 ConnectionTemplate = ExtResource("7_q68mp")
 NetworkNodeTemplate = ExtResource("4_qxria")
+ExceptionPopupTemplate = ExtResource("4_enc0b")
+FD = NodePath("")
 
 [node name="TextureRect" type="TextureRect" parent="CollectionNode"]
 z_index = -2
@@ -140,18 +143,27 @@ offset_bottom = 64.0
 alignment = 1
 last_wrap_alignment = 2
 
-[node name="btn_SaveMap" type="Button" parent="Controls/SaveLoadButtons"]
+[node name="btn_SaveMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Save Map"
 script = ExtResource("14_6rnll")
+CollNode = NodePath("../../../CollectionNode")
+FD = NodePath("FileDialog")
 
-[node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons"]
+[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_SaveMap"]
+auto_translate_mode = 1
+access = 2
+filters = PackedStringArray("*.lnmap")
+use_native_dialog = true
+
+[node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 text = "Load Map"
 script = ExtResource("15_enc0b")
+CollNode = NodePath("../../../CollectionNode")
 
 [node name="btn_LoadChallenge" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
 layout_mode = 2

@@ -2,7 +2,7 @@ using System;
 
 using Godot;
 
-namespace PipesTester;
+namespace LleuadNetworkSim.Utils;
 
 public class ExceptionPopupWrapper
 {

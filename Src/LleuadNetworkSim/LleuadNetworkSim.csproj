@@ -10,4 +10,8 @@
     <PackageReference Include="Godot.Logging" Version="1.2.0" />
     <PackageReference Include="morelinq" Version="4.4.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Misc\ExampleFiles\Map.lnmap" />
+    <Content Include="Misc\ExampleFiles\Map2.lnmap" />
+  </ItemGroup>
 </Project>

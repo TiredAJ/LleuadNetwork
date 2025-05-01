@@ -1,0 +1,37 @@
+{
+  "NetworkNodes": [
+    {
+      "Name": "j9AGmvxfl0eZeMHi2yyJLg==",
+      "Connections": [
+        "IANmenA78kitciHlZugyTQ==",
+        "X_HqwpLSY0uQYgdLeXsKqw=="
+      ],
+      "Pos": [
+        873,
+        188
+      ]
+    },
+    {
+      "Name": "IANmenA78kitciHlZugyTQ==",
+      "Connections": [
+        "j9AGmvxfl0eZeMHi2yyJLg==",
+        "X_HqwpLSY0uQYgdLeXsKqw=="
+      ],
+      "Pos": [
+        673,
+        537
+      ]
+    },
+    {
+      "Name": "X_HqwpLSY0uQYgdLeXsKqw==",
+      "Connections": [
+        "IANmenA78kitciHlZugyTQ==",
+        "j9AGmvxfl0eZeMHi2yyJLg=="
+      ],
+      "Pos": [
+        180,
+        422
+      ]
+    }
+  ]
+}
