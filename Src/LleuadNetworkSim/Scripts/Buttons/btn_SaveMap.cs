@@ -13,8 +13,6 @@ public partial class btn_SaveMap : Button
 
         FD.FileMode = FileDialog.FileModeEnum.SaveFile;
         
-        //FD.DirSelected += CollNode.SaveMap;
-
         FD.FileSelected += CollNode.SaveMap;
         
         base._Ready();

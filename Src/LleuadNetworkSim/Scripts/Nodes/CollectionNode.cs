@@ -12,12 +12,9 @@ using CSharpFunctionalExtensions;
 
 using Godot.Logging;
 
-using LleuadNetworkSim.Scripts.Exceptions;
 using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
 using LleuadNetworkSim.Utils;
-
-using PipesTester;
 
 public partial class CollectionNode : Node, IPersistable
 {
@@ -241,6 +238,7 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
 
     #region Persist
+    
     public JsonObject Save() {
         throw new NotImplementedException();
     }
@@ -249,7 +247,6 @@ public partial class CollectionNode : Node, IPersistable
     }
     
     public void SaveMap(string _Path) {
-
         JsonSerializerOptions JSO = new JsonSerializerOptions() {
             AllowTrailingCommas = false,
             DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
@@ -273,11 +270,19 @@ public partial class CollectionNode : Node, IPersistable
         Writer.Write(JData.ToJsonString(JSO));
     }
     public void LoadMap(string _Path) {
-
+        
         FileValidator.ValidateFile(_Path, ".lnmap", this);
+
+        using StreamReader Reader = new(_Path);
+
+        var JObj = JsonObject.Parse(Reader.ReadToEnd(), new JsonNodeOptions());
+        
+        JObj[""]
         
         throw new NotImplementedException();
     }
+    
+    
     
     public void TryLoadChallenge(string _Path) {
         

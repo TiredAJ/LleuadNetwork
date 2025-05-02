@@ -2,8 +2,6 @@ using System;
 
 using LleuadNetworkSim.Utils;
 
-using PipesTester;
-
 namespace LleuadNetworkSim.Scripts.Exceptions;
 
 public class FileTooLargeException(long _FileSize) : Exception(DebugMessage(_FileSize))

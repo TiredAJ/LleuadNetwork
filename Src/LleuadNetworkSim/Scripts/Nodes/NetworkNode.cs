@@ -141,10 +141,10 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         { JArray.Add(Key); }
 
         return new JsonObject{
-                                ["Name"] = this.Name.ToString(),
-                                ["Connections"] = JArray,
-                                ["Pos"] = new JsonArray() {Position.X, Position.Y},
-                            };
+            ["Name"] = this.Name.ToString(),
+            ["Connections"] = JArray,
+            ["Pos"] = new JsonArray() {Position.X, Position.Y},
+        };
     }
     
     public void Load(JsonObject _JData) {

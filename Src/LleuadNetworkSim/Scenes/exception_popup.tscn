@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bsvyxjkhr5oiq"]
 
 [ext_resource type="Script" uid="uid://b3b7hdra8h4nd" path="res://Scripts/Buttons/btn_Ok_ExceptionPopup.cs" id="1_reov6"]
-[ext_resource type="Script" uid="uid://dp2e1tdhip503" path="res://Scenes/ExceptionPopup.cs" id="1_shvc0"]
+[ext_resource type="Script" uid="uid://dp2e1tdhip503" path="res://Scripts/ExceptionPopup.cs" id="1_shvc0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shvc0"]
 bg_color = Color(0, 0, 0, 1)
@@ -21,8 +21,8 @@ anchors_preset = 13
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -175.0
-offset_right = 175.0
+offset_right = 350.0
+offset_bottom = 350.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3

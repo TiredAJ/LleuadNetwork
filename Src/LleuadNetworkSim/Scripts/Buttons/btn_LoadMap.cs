@@ -1,14 +1,25 @@
 using Godot;
-using System;
 
 public partial class btn_LoadMap : Button
 {
     [Export]
     private CollectionNode CollNode;
+    
+    [Export]
+    private FileDialog FD;
+
+    public override void _Ready() {
+        
+        FD.FileMode = FileDialog.FileModeEnum.OpenFile;
+
+        FD.FileSelected += CollNode.LoadMap;
+        
+        base._Ready();
+    }
 
     public override void _Pressed() {
 
-        CollNode.LoadMap();
+        FD.Popup();
         
         base._Pressed();
     }

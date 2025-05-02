@@ -32,12 +32,11 @@
 
 [node name="MainScene" type="Node2D"]
 
-[node name="CollectionNode" type="Node" parent="." node_paths=PackedStringArray("FD")]
+[node name="CollectionNode" type="Node" parent="."]
 script = ExtResource("6_y4jh7")
 ConnectionTemplate = ExtResource("7_q68mp")
 NetworkNodeTemplate = ExtResource("4_qxria")
 ExceptionPopupTemplate = ExtResource("4_enc0b")
-FD = NodePath("")
 
 [node name="TextureRect" type="TextureRect" parent="CollectionNode"]
 z_index = -2
@@ -157,13 +156,20 @@ access = 2
 filters = PackedStringArray("*.lnmap")
 use_native_dialog = true
 
-[node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode")]
+[node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 text = "Load Map"
 script = ExtResource("15_enc0b")
 CollNode = NodePath("../../../CollectionNode")
+FD = NodePath("FileDialog")
+
+[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadMap"]
+auto_translate_mode = 1
+access = 2
+filters = PackedStringArray("*.lnmap")
+use_native_dialog = true
 
 [node name="btn_LoadChallenge" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
 layout_mode = 2
