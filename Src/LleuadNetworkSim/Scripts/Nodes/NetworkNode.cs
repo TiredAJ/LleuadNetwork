@@ -1,12 +1,13 @@
 using Godot;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
+using LleuadNetworkSim.Utils;
+using LleuadNetworkSim.Utils.Validators.Json;
 
 public partial class NetworkNode : CharacterBody2D, IPersistable
 {
@@ -45,7 +46,6 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Connections
-    //needs persisting
     private Dictionary<string, NodeConnection> Connections = [];
     
     public void AddConnection(string _ID, NodeConnection _Conn) {
@@ -129,12 +129,6 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
     #region Persistence
     public JsonObject Save() {
-        /*
-         * Need to save:
-         *  - Node name
-         *  - what node (names) it's connected to 
-         */
-
         JsonArray JArray = [];
 
         foreach (string Key in Connections.Keys)
@@ -143,17 +137,19 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         return new JsonObject{
             ["Name"] = this.Name.ToString(),
             ["Connections"] = JArray,
-            ["Pos"] = new JsonArray() {Position.X, Position.Y},
+            ["Pos"] = new JsonObject() {
+                ["X"] = Position.X,
+                ["Y"] = Position.Y
+            },
         };
     }
     
-    public void Load(JsonObject _JData) {
-        //maybe consider JsonObject
+    public void Load(IBaseVO _VOData) {
 
-        this.Name = _JData["Name"].ToString();
+        NetworkNodeVO VO = (_VOData as NetworkNodeVO)!;
         
-        
-        throw new System.NotImplementedException(); 
+        this.Name = VO.Name;
+        this.Position = VO.Pos.ToVec2();
     }
     #endregion
     

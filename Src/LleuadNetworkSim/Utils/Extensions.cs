@@ -2,6 +2,10 @@ using System;
 using System.Linq;
 using System.Text;
 
+using Godot;
+
+using LleuadNetworkSim.Utils.Validators.Json;
+
 namespace LleuadNetworkSim.Utils;
 
 static public class Extensions
@@ -42,4 +46,7 @@ static public class Extensions
 
         return $"{((_Size >> 50) / (float)1024):F0} EB";
     }
+
+    static public Vector2 ToVec2(this PositionVectorVO _PVO)
+        => new(_PVO.X, _PVO.Y);
 }

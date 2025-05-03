@@ -4,7 +4,7 @@ using Godot;
 
 using LleuadNetworkSim.Scripts.Exceptions;
 
-namespace LleuadNetworkSim.Utils;
+namespace LleuadNetworkSim.Utils.Validators;
 
 public class FileValidator
 {

@@ -6,10 +6,10 @@
         "IANmenA78kitciHlZugyTQ==",
         "X_HqwpLSY0uQYgdLeXsKqw=="
       ],
-      "Pos": [
-        873,
-        188
-      ]
+      "Pos": {
+        "X": 873,
+        "Y": 188 
+      }
     },
     {
       "Name": "IANmenA78kitciHlZugyTQ==",
@@ -17,10 +17,10 @@
         "j9AGmvxfl0eZeMHi2yyJLg==",
         "X_HqwpLSY0uQYgdLeXsKqw=="
       ],
-      "Pos": [
-        673,
-        537
-      ]
+      "Pos": {
+        "X": 673,
+        "Y": 537
+      }
     },
     {
       "Name": "X_HqwpLSY0uQYgdLeXsKqw==",
@@ -28,10 +28,10 @@
         "IANmenA78kitciHlZugyTQ==",
         "j9AGmvxfl0eZeMHi2yyJLg=="
       ],
-      "Pos": [
-        180,
-        422
-      ]
+      "Pos": {
+        "X": 180,
+        "Y": 422
+      }
     }
   ]
 }

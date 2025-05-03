@@ -9,9 +9,11 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageReference Include="Godot.Logging" Version="1.2.0" />
     <PackageReference Include="morelinq" Version="4.4.0" />
+    <PackageReference Include="NJsonSchema" Version="11.3.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Misc\ExampleFiles\Map.lnmap" />
     <Content Include="Misc\ExampleFiles\Map2.lnmap" />
+    <Content Include="Misc\ExampleFiles\Map3.lnmap" />
   </ItemGroup>
 </Project>
