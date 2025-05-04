@@ -1,4 +1,3 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,9 +9,9 @@ using System.Threading.Channels;
 
 using CSharpFunctionalExtensions;
 
+using Godot;
 using Godot.Logging;
 
-using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Scripts.Objects;
 using LleuadNetworkSim.Utils;
 using LleuadNetworkSim.Utils.Validators;
@@ -20,20 +19,21 @@ using LleuadNetworkSim.Utils.Validators.Json;
 
 using MoreLinq;
 
+namespace LleuadNetworkSim.Scripts.Nodes;
+
 public partial class CollectionNode : Node, IPersistable
 {
     [Export]
-    private PackedScene ConnectionTemplate;
+    private PackedScene ConnectionTemplate = null!;
     
     [Export]
-    private PackedScene NetworkNodeTemplate;
+    private PackedScene NetworkNodeTemplate = null!;
 
     [Export]
-    private PackedScene ExceptionPopupTemplate;
+    private PackedScene ExceptionPopupTemplate = null!;
     
     #region Selecting
-    
-    private List<NetworkNode> SelectedNodes = [];
+    readonly private List<NetworkNode> SelectedNodes = [];
 
     public void SelectionMode(bool _Toggled) {
 
@@ -41,7 +41,7 @@ public partial class CollectionNode : Node, IPersistable
 
         if (!_Toggled)
         {
-            foreach (NetworkNode NN in GetChildren().Where(X => X is NetworkNode NN))
+            foreach (NetworkNode NN in GetChildren<NetworkNode>())
             { NN.Selected = false; }
         }
         
@@ -104,15 +104,14 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
     
     #region Spawning
-
-    public UIMode Mode = UIMode.NONE;
+    public UIMode Mode { get; set; } = UIMode.NONE;
 
     public void SpawnNode(Vector2 _Location) {
 
         if (Mode != UIMode.SPAWNING)
         { return; }
         
-        NetworkNode SceneInstance = NetworkNodeTemplate.Instantiate() as NetworkNode;
+        NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
 
         SceneInstance.Position = _Location;
         SceneInstance.Name = Guid.NewGuid().ToBase64();
@@ -140,13 +139,13 @@ public partial class CollectionNode : Node, IPersistable
     private void DeleteNode(NetworkNode _Node) {
 
         List<string> DeletableKeys = ConnectedNodes.Where(X => (X.Value.Item1 == _Node || X.Value.Item2 == _Node))
-                                    .Select(X => X.Key)
-                                    .ToList();
+                                                   .Select(X => X.Key)
+                                                   .ToList();
 
-        foreach (var Key in DeletableKeys)
+        foreach (string Key in DeletableKeys)
         { ConnectedNodes.Remove(Key); }
 
-        foreach (var KVP in Connections
+        foreach (KeyValuePair<string, (NodeConnection, NodeConnection)> KVP in Connections
                      .Where(X => DeletableKeys.Contains(X.Key)))
         {
             (NodeConnection ConnAB, NodeConnection ConnBA) = KVP.Value;
@@ -155,7 +154,7 @@ public partial class CollectionNode : Node, IPersistable
             ConnBA.QueueFree();
         }
 
-        foreach (var Key in DeletableKeys)
+        foreach (string Key in DeletableKeys)
         { Connections.Remove(Key); }
         
         _Node.QueueFree();
@@ -163,13 +162,10 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
 
     #region Connections
-    
-    //maybe persist
     private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
-    //maybe persist
     private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
-    
-    private BoundedChannelOptions BCODefault = new BoundedChannelOptions(20) {
+
+    readonly private BoundedChannelOptions BCODefault = new BoundedChannelOptions(20) {
         AllowSynchronousContinuations = false,
         SingleReader = true,
         SingleWriter = true,
@@ -201,8 +197,8 @@ public partial class CollectionNode : Node, IPersistable
         
         ConnectedNodes.Add(ID, (_NA, _NB));
         
-        NodeConnection ConnAB = ConnectionTemplate.Instantiate() as NodeConnection;
-        NodeConnection ConnBA = ConnectionTemplate.Instantiate() as NodeConnection;
+        NodeConnection? ConnAB = ConnectionTemplate.Instantiate() as NodeConnection;
+        NodeConnection? ConnBA = ConnectionTemplate.Instantiate() as NodeConnection;
 
         if (ConnAB is null || ConnBA is null)
         {
@@ -216,8 +212,8 @@ public partial class CollectionNode : Node, IPersistable
         Channel<Message> ChannelAB = Channel.CreateBounded<Message>(BCODefault);
         Channel<Message> ChannelBA = Channel.CreateBounded<Message>(BCODefault);
         
-        ConnAB.Init(_NA, _NB, ChannelAB, ChannelBA.Reader);
-        ConnBA.Init(_NB, _NA, ChannelBA, ChannelAB.Reader);
+        ConnAB.Init(_NA, _NB, ChannelBA.Writer, ChannelBA.Reader);
+        ConnBA.Init(_NB, _NA, ChannelAB.Writer, ChannelAB.Reader);
         
         Connections.Add(ID, (ConnAB, ConnBA));
         
@@ -249,19 +245,6 @@ public partial class CollectionNode : Node, IPersistable
     #region Persist
     
     public JsonObject Save() {
-        throw new NotImplementedException();
-    }
-    public void Load(IBaseVO _VOData) {
-        throw new NotImplementedException();
-    }
-    
-    public void SaveMap(string _Path) {
-        JsonSerializerOptions JSO = new JsonSerializerOptions() {
-            AllowTrailingCommas = false,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            AllowOutOfOrderMetadataProperties = false
-        }; 
         
         JsonObject JData = new JsonObject();
         JsonArray JArray = new JsonArray();
@@ -271,10 +254,38 @@ public partial class CollectionNode : Node, IPersistable
         
         JData.Add("NetworkNodes", JArray);
 
-        if (!Path.HasExtension(_Path))
-        { Debug.WriteLine("no extension!"); }
+        return JData;
+    }
+    public void Load(IBaseVO _VOData) {
+        
+        if (_VOData is not CollectionNodeVO CollNodeVO)
+        { throw new NotImplementedException(); }
 
+        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
+        { LoadNetworkNode(NN); }
+
+        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
+        { ConnectLoadedNodes(NN); }
+    }
+    
+    public void SaveMap(string _Path) {
+
+        if (!Path.HasExtension(_Path))
+        {
+            Debug.WriteLine("Map save has extension!");
+            _Path = Path.ChangeExtension(_Path, "lnmap");
+        }
+        
+        JsonObject JData = Save();
+        
         using StreamWriter Writer = new (_Path);
+        
+        JsonSerializerOptions JSO = new() {
+            AllowTrailingCommas = false,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            AllowOutOfOrderMetadataProperties = false
+        }; 
 
         Writer.Write(JData.ToJsonString(JSO));
     }
@@ -286,20 +297,13 @@ public partial class CollectionNode : Node, IPersistable
 
         JsonNode JData = JsonValidator.ValidateJson<CollectionNodeVO>(_Path, this);
 
-        CollectionNodeVO? CollNodeVO = JData.Deserialize<CollectionNodeVO>();
+        CollectionNodeVO CollNodeVO = JData.Deserialize<CollectionNodeVO>()!;
 
-        if (CollNodeVO is null)
-        { throw new NotImplementedException(); }
-
-        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
-        { LoadNetworkNode(NN); }
-
-        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
-        { ConnectLoadedNodes(NN); }
+        Load(CollNodeVO);
     }
 
     private void LoadNetworkNode(NetworkNodeVO _NodeVO) {
-        NetworkNode SceneInstance = NetworkNodeTemplate.Instantiate() as NetworkNode;
+        NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
         
         SceneInstance.Load(_NodeVO);
         
@@ -332,13 +336,6 @@ public partial class CollectionNode : Node, IPersistable
         Challenge.Value.GenerateChallenge();
     }
     
-    public void Persist() {
-        
-    }
-    public void Open() { 
-        throw new NotImplementedException();
-    }
-
     private void ClearTransientChildren() {
         Connections.Clear();
         ConnectedNodes.Clear();
@@ -352,14 +349,14 @@ public partial class CollectionNode : Node, IPersistable
 
     private Maybe<T> GetChild<T>(Func<T, bool> _Predicate) where T : Node
         => GetChildren()
-            .OfType<T>()
-            .Where(X => !X.IsQueuedForDeletion())
-            .FirstOrDefault(_Predicate)
-            .AsMaybe();
+           .OfType<T>()
+           .Where(X => !X.IsQueuedForDeletion())
+           .FirstOrDefault(_Predicate)
+           .AsMaybe();
 
     private IEnumerable<T> GetChildren<T>() where T : Node
         => GetChildren()
-            .Where(X => !X.IsQueuedForDeletion())
-            .OfType<T>();
+           .Where(X => !X.IsQueuedForDeletion())
+           .OfType<T>();
     #endregion
 }

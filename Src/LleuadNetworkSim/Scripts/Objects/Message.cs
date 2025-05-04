@@ -165,10 +165,7 @@ public class Message
             || CreationTime == DateTime.MinValue)
         { return false; }
 
-        if (MessageSize != SizeInBytes(Payload.Value))
-        { return false; }
-
-        return true;
+        return MessageSize == SizeInBytes(Payload.Value);
     }
 
     private int SizeInBytes(string _Value) => MessageEncoding.GetByteCount(_Value);

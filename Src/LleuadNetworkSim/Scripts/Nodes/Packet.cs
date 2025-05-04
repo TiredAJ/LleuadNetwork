@@ -1,7 +1,10 @@
-using Godot;
 using System.Diagnostics;
 
+using Godot;
+
 using LleuadNetworkSim.Scripts.Objects;
+
+namespace LleuadNetworkSim.Scripts.Nodes;
 
 public partial class Packet : PathFollow2D
 {
@@ -20,7 +23,7 @@ public partial class Packet : PathFollow2D
         {
             Run = true;
 
-            PathLength = (GetParent() as NodeConnection).Length;
+            PathLength = ((GetParent() as NodeConnection)!).Length;
         }
         
         GetChild<Sprite2D>(0)
@@ -40,7 +43,7 @@ public partial class Packet : PathFollow2D
         {            
             Debug.WriteLine($"Reached end of the line! progress: {this.Progress}, length: {this.PathLength}");
 
-            (GetParent() as NodeConnection).PacketArrived();
+            (GetParent() as NodeConnection)?.PacketArrived();
             
             this.QueueFree();
         }

@@ -1,39 +1,45 @@
-using Godot;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
+using Godot;
+
 using LleuadNetworkSim.Scripts.Objects;
+
+namespace LleuadNetworkSim.Scripts.Nodes;
 
 public partial class NodeConnection : Path2D
 {
     [Export]
-    public Liner Liner;
-    
-    public NetworkNode NodeA;
-    public NetworkNode NodeB;
-    public int FollowerCount = 0;
-    public float Length = 0;
+    private Liner Liner = null!;
 
-    private Channel<Message> CommsChannel;
-    private ChannelReader<Message> CommsInput;
+    private NetworkNode NodeA = null!;
+    private NetworkNode NodeB = null!;
+    public int FollowerCount { get; set; } = 0;
+    public float Length { get; set; }
+
+    private ChannelWriter<Message> CommsOutput = null!;
+    private ChannelReader<Message> CommsInput = null!;
 
     private Vector2 PointAPrev;
     private Vector2 PointBPrev;
 
-    public void Init(NetworkNode _A, NetworkNode _B, Channel<Message> _Channel, ChannelReader<Message> _Input) {
+    public void Init(NetworkNode _A, NetworkNode _B, ChannelWriter<Message> _Output, ChannelReader<Message> _Input) {
         NodeA = _A;
         NodeB = _B;
 
-        if (IsNodeReady())
-        {
-            Debug.WriteLine("resetting curve!");
+        CommsOutput = _Output;
+        CommsInput = _Input;
+        
+        if (!IsNodeReady())
+        { return; }
+
+        Debug.WriteLine("resetting curve!");
             
-            ResetCurve();
+        ResetCurve();
             
-            Length = ToLocal(NodeA.GlobalPosition).DistanceTo(ToLocal(NodeB.GlobalPosition));
-        }
+        Length = ToLocal(NodeA.GlobalPosition).DistanceTo(ToLocal(NodeB.GlobalPosition));
     }
     
     public override void _Ready() {
@@ -43,16 +49,16 @@ public partial class NodeConnection : Path2D
         base._Ready();
     }
 
-    public override void _Process(double delta) {
+    public override void _Process(double _Delta) {
     
         ResetCurve();
         
-        base._Process(delta);
+        base._Process(_Delta);
     }
 
     public override void _ExitTree() {
 
-        foreach (var Child in GetChildren())
+        foreach (Node? Child in GetChildren())
         { Child.QueueFree(); }
 
         NodeA.RemoveConnection(NodeB.Name);
@@ -83,16 +89,29 @@ public partial class NodeConnection : Path2D
     }
 
     private void UpdateFollowers() {
-        if (FollowerCount > 0)
+        if (FollowerCount <= 0)
+        { return; }
+
+        foreach (Node? Node in GetChildren().Where(X => X is Packet))
         {
-            foreach (Packet P in GetChildren().Where(X => X is Packet))
-            { P.PathUpdated(Length); }
+            Packet? P = (Packet)Node;
+            P.PathUpdated(Length);
         }
     }
 
+    public void SendMessage(Message _Msg) {
+        Task.Run(async () => {
+                     Debug.WriteLine($"Sent Message to {_Msg.DestinationAddress}");
+                     await CommsOutput.WriteAsync(_Msg);
+                 });
+    }
+    
     public void PacketArrived() {
         FollowerCount--;
 
-        Task.Run(async () => NodeB.PacketReceived(await CommsInput.ReadAsync()));
+        Task.Run(async () => { 
+                     Message Msg = await CommsInput.ReadAsync();
+                     await NodeB.PacketReceived(Msg);
+                 });
     }
 }

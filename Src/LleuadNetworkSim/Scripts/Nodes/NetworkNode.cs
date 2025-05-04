@@ -1,27 +1,30 @@
-using Godot;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-using LleuadNetworkSim.Scripts.Nodes;
+using Godot;
+
 using LleuadNetworkSim.Scripts.Objects;
 using LleuadNetworkSim.Utils;
 using LleuadNetworkSim.Utils.Validators.Json;
+
+namespace LleuadNetworkSim.Scripts.Nodes;
 
 public partial class NetworkNode : CharacterBody2D, IPersistable
 {
     #region Family
     [Export]
-    private Sprite2D SelectionRing;
+    private Sprite2D SelectionRing = null!;
 
     [Export]
-    private Label NameLabel;
+    private Label NameLabel = null!;
     
     [Export]
-    private PackedScene PacketTemplate;
+    private PackedScene PacketTemplate = null!;
 
-    private CollectionNode CollNodeParent;
+    private CollectionNode CollNodeParent = null!;
     #endregion
 
     #region Selection and movement
@@ -46,9 +49,9 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Connections
-    private Dictionary<string, NodeConnection> Connections = [];
+    readonly private Dictionary<string, NodeConnection?> Connections = [];
     
-    public void AddConnection(string _ID, NodeConnection _Conn) {
+    public void AddConnection(string _ID, NodeConnection? _Conn) {
         Connections.Add(_ID, _Conn);
     }
     
@@ -106,24 +109,25 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #region Packets and messaging
     public void SendMessage(string _ID) {
 
-        if (!Connections.ContainsKey(_ID))
+        if (!Connections.TryGetValue(_ID, out NodeConnection? NodeConn))
         { return; }
         
         Packet Packet = PacketTemplate.Instantiate<Packet>();
-        Message Msg = new Message(this.Name, _ID, $"Hello from {this.Name}!! This is a payload");
+        Message Msg = new(this.Name, _ID, $"Hello from {this.Name}!! This is a payload");
 
-        Packet.ZIndex -= Connections[_ID].FollowerCount;
-        Packet.Msg = Msg;
-        
-        Connections[_ID].AddChild(Packet);
+        if (NodeConn == null)
+        { return; }
 
-        Connections[_ID].FollowerCount++;
+        Packet.ZIndex -= NodeConn.FollowerCount;
+        NodeConn.AddChild(Packet);
+        NodeConn.SendMessage(Msg);
+        NodeConn.FollowerCount++;
     }
     
     public async Task PacketReceived(Message _Msg) {
         /* handle packet - read channel */
         
-        Debug.WriteLine($"Packet received at {this.Name}");
+        Debug.WriteLine($"Packet received at {this.Name} from {_Msg.SenderAddress}");
     }
     #endregion
 
@@ -146,7 +150,8 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     
     public void Load(IBaseVO _VOData) {
 
-        NetworkNodeVO VO = (_VOData as NetworkNodeVO)!;
+        if (_VOData is not NetworkNodeVO VO)
+        { throw new NotImplementedException(); }
         
         this.Name = VO.Name;
         this.Position = VO.Pos.ToVec2();

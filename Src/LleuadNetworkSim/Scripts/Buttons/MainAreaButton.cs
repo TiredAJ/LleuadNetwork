@@ -5,10 +5,10 @@ using LleuadNetworkSim.Scripts.Nodes;
 public partial class MainAreaButton : Button
 {
     [Export]
-    private CollectionNode CollNode;
+    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
 
     public override void _Ready() {
-        CollNode = GetParent<CollectionNode>();
+        CollNode = GetParent<LleuadNetworkSim.Scripts.Nodes.CollectionNode>();
         
         base._Ready();
     }

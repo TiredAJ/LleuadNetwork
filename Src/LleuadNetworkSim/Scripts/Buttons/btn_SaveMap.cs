@@ -4,7 +4,7 @@ using System;
 public partial class btn_SaveMap : Button
 {
     [Export]
-    private CollectionNode CollNode;
+    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
     
     [Export]
     private FileDialog FD;

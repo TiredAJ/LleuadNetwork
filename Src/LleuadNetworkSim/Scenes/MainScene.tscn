@@ -148,10 +148,11 @@ size_flags_horizontal = 3
 text = "Save Map"
 script = ExtResource("14_6rnll")
 CollNode = NodePath("../../../CollectionNode")
-FD = NodePath("FileDialog")
+FD = NodePath("fd_SaveMap")
 
-[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_SaveMap"]
+[node name="fd_SaveMap" type="FileDialog" parent="Controls/SaveLoadButtons/btn_SaveMap"]
 auto_translate_mode = 1
+title = "Save map"
 access = 2
 filters = PackedStringArray("*.lnmap")
 use_native_dialog = true
@@ -163,10 +164,13 @@ size_flags_vertical = 4
 text = "Load Map"
 script = ExtResource("15_enc0b")
 CollNode = NodePath("../../../CollectionNode")
-FD = NodePath("FileDialog")
+FD = NodePath("fd_LoadMap")
 
-[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadMap"]
+[node name="fd_LoadMap" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadMap"]
 auto_translate_mode = 1
+title = "Load map"
+ok_button_text = "Open"
+file_mode = 0
 access = 2
 filters = PackedStringArray("*.lnmap")
 use_native_dialog = true
@@ -177,10 +181,10 @@ size_flags_horizontal = 3
 text = "Load Challenge"
 script = ExtResource("16_6rnll")
 CollNode = NodePath("../../../CollectionNode")
-FD = NodePath("FileDialog")
+FD = NodePath("fd_LoadChallenge")
 
-[node name="FileDialog" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadChallenge"]
-title = "Open a File"
+[node name="fd_LoadChallenge" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadChallenge"]
+title = "Load challenge"
 unresizable = true
 popup_window = true
 ok_button_text = "Open"

@@ -8,7 +8,7 @@ public partial class btn_SelectionMode : Button
     private SelectionButtonContainer SelectionContainer;
 
     [Export]
-    private CollectionNode CollNode;
+    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
 
     public override void _Toggled(bool _ToggledOn) {
 

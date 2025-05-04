@@ -22,7 +22,7 @@ public struct Headers
         new KeyValuePair<string, string>("CREATION_TIME", DateTime.MinValue.ToBinary().ToString()),
         new KeyValuePair<string, string>("LIFESPAN", "60000"),
         new KeyValuePair<string, string>("HOPS", "0"),
-        new KeyValuePair<string, string>("RECEIVE_RESPONSE_REQUIRED", "NO"),
+        new KeyValuePair<string, string>("RECEIVE_RESPONSE_REQUIRED", "FALSE"),
         new KeyValuePair<string, string>("MESSAGE_SIZE", "0"),
         new KeyValuePair<string, string>("MAX_MESSAGE_SIZE", "1000"),
         new KeyValuePair<string, string>("TOTAL_SIZE", "-1")
@@ -60,6 +60,6 @@ public struct Headers
     }
 
     public Maybe<string> GetMetadata(string _Header) {
-        return IntHeaders.TryGetValue(_Header, out string Value) ? Value : Maybe.None;
+        return IntHeaders.TryGetValue(_Header, out string? Value) ? Value : Maybe.None;
     }
 }

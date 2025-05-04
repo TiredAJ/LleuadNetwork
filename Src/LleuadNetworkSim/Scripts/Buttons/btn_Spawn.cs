@@ -5,7 +5,7 @@ using LleuadNetworkSim.Scripts.Nodes;
 public partial class btn_Spawn : Button
 {
     [Export]
-    private CollectionNode CollNode;
+    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
 
     public override void _Toggled(bool _ToggledOn) {
 

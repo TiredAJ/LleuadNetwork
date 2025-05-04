@@ -7,8 +7,10 @@ class Program
     static private Benchmarkerer Temp = new Benchmarkerer();
     
     static void Main(string[] args) {
-        BenchmarkRunner.Run<Benchmarkerer>();
+        //BenchmarkRunner.Run<Benchmarkerer>();
 
         //Temp.NLuaTest();
+
+        Temp.LuaCSharp();
     }
 }
