@@ -23,14 +23,12 @@ static public class Extensions
                     .ToArray();
     }
 
-    static public string ToBase64(this Guid _UUID) {
-        return Convert.ToBase64String(_UUID.ToByteArray());
-    }
+    static public string ToBase64(this Guid _UUID)
+        => Base64Url.EncodeToString(_UUID.ToByteArray());
 
-    static public string ToBase64Name(this Guid _UUID) {
-        return _UUID.ToBase64().TrimEnd('=')[10..];
-    }
-    
+    static public string ToBase64Name(this Guid _UUID)
+        => _UUID.ToBase64().TrimEnd('=')[10..];
+
     //thanks to fubo https://stackoverflow.com/a/15340481/19306828
     static public string ToFileSize(this long _Size) {
         if (_Size < 1024)
@@ -58,7 +56,7 @@ static public class Extensions
         => new(_PVO.X, _PVO.Y);
     
     static public bool HasFlagFast(this UIMode _Value, UIMode _Flag)
-    { return (_Value & _Flag) != 0; }
+        => (_Value & _Flag) != 0;
 
     static public int ToInt32(this JsonNode _JNode)
         => Convert.ToInt32(_JNode);

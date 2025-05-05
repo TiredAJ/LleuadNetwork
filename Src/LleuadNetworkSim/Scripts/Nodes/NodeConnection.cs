@@ -19,7 +19,7 @@ public partial class NodeConnection : Path2D
     private NetworkNode NodeA = null!;
     private NetworkNode NodeB = null!;
     public int FollowerCount { get; set; } = 0;
-    public float Length { get; set; } = 0;
+    public float Length { get; private set; } = 0;
 
     private ChannelWriter<Message> CommsOutput = null!;
     private ChannelReader<Message> CommsInput = null!;

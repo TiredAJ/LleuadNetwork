@@ -7,7 +7,7 @@ namespace LleuadNetworkSim.Scripts.Nodes;
 public partial class Packet : PathFollow2D
 {
     [Export]
-    private float Speed = 150f; //250
+    private float Speed = 250f;
 
     private float PathLength = -1;
     

@@ -1,77 +1,76 @@
 using BenchmarkDotNet.Attributes;
 
-using Lua;
-
-using LuaFunction = NLua.LuaFunction;
+using MoonSharp.Interpreter;
 
 namespace LuaTest;
 
 [MemoryDiagnoser]
 public class Benchmarkerer
 {
-    static private string LuaCode => @"
+    static private string LuaCode => """
+                                         function Load (Messages)
+                                             print("Load called");
 
-    function Load (Messages)
-        print(""Load called"");
+                                             for i,v in ipairs(Messages) do
+                                                 Direct(v);
+                                             end
+                                         end
 
-        for i,v in ipairs(Messages) do
-            Direct(v);
-        end
-    end
+                                     	function Direct (Msg)
+                                             print("Direct called");
 
-	function Direct (Msg)
-        print(""Direct called"");
-
-        if Msg.Address == ""Ya Mum"" then
-            print(""Ya Mum"");
-            print(Msg.Data);
-        else
-            print(""Not Ya Mum"");
-            print(Msg.Data);
-        end
-	end
-	";
+                                             if Msg.Address == "Ya Mum" then
+                                                 print("Ya Mum");
+                                                 print(Msg.Data);
+                                             else
+                                                 print("Not Ya Mum");
+                                                 print(Msg.Data);
+                                             end
+                                     	end
+                                     	
+                                     """;
     
-    static private string LuaCodeLocal => @"
+    static private string LuaCodeLocal => """
+                                              function Load (Messages)
+                                                  print("Load called");
 
-    function Load (Messages)
-        print(""Load called"");
+                                                  for i,v in ipairs(Messages) do
+                                                      Direct(v);
+                                                  end
+                                              end
 
-        for i,v in ipairs(Messages) do
-            Direct(v);
-        end
-    end
+                                              local function Direct (Msg)
+                                                  print("Direct called");
 
-    local function Direct (Msg)
-        print(""Direct called"");
+                                                  if Msg.Address == "Ya Mum" then
+                                                      print("Ya Mum");
+                                                      print(Msg.Data);
+                                                  else
+                                                      print("Not Ya Mum");
+                                                      print(Msg.Data);
+                                                  end
+                                          	end
 
-        if Msg.Address == ""Ya Mum"" then
-            print(""Ya Mum"");
-            print(Msg.Data);
-        else
-            print(""Not Ya Mum"");
-            print(Msg.Data);
-        end
-	end
+                                              return Direct;
+                                          	
+                                          """;
 
-    return Direct;
-	";
+    static private string LCSCode => """
+                                         local function Direct (Msg)
+                                             print("Direct called");
 
-    static private string LCSCode => @"
-    local function Direct (Msg)
-        print(""Direct called"");
+                                             --[[if Msg.Address == "Ya Mum" then
+                                                 print("Ya Mum");
+                                                 print(Msg.Data);
+                                             else
+                                                 print("Not Ya Mum");
+                                                 print(Msg.Data);
+                                             end--]]
+                                     	end
 
-        if Msg.Address == ""Ya Mum"" then
-            print(""Ya Mum"");
-            print(Msg.Data);
-        else
-            print(""Not Ya Mum"");
-            print(Msg.Data);
-        end
-	end
-
-    return Direct;
-    ";
+                                         return Direct;
+                                         
+                                     """;
 
     static private List<MessageObject> Messages = [
         new ("Ya Mum",     "Message 1"),
@@ -82,39 +81,55 @@ public class Benchmarkerer
         new ("Ya Cat",     "Message 6"),
     ];
     
-    //[Benchmark]
+    /*[Benchmark]
     public async Task NLuaTest() => await Task.Run(() => {
         using NLua.Lua lua = new NLua.Lua();
 
         lua.DoString(LuaCode);
-        lua.
         NLua.LuaFunction? ScriptFunc = lua["Load"] as NLua.LuaFunction;
 
         _ = ScriptFunc.Call(Messages)[0];
-    });
-
-    //[Benchmark]
+    });*/
+ 
+    /*[Benchmark]
     public async Task NeoLuaTest() => await Task.Run(() => {
         using Neo.IronLua.Lua lua = new Neo.IronLua.Lua();
 
         dynamic env = lua.CreateEnvironment();
         env.dochunk(LuaCode, "test.lua");
         env.Load(Messages);
-    });
+    });*/
+
+    /*[Benchmark]
+    public async Task LuaCSharp() {
+        try
+        {
+            LuaState lua = Lua.LuaState.Create();
+
+            Lua.LuaValue[] LuaValues = await lua.DoFileAsync("./Test.lua");
+        
+            Lua.LuaFunction Func = LuaValues[0].Read<Lua.LuaFunction>();
+
+            foreach (MessageObject MSG in Messages)
+            {
+                Lua.LuaValue[] FuncResult = await Func.InvokeAsync(lua, [ ]);
+                //FuncResult[0].Read<long>();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }*/
 
     [Benchmark]
-    public async Task LuaCSharp() {
-    
-        LuaState lua = Lua.LuaState.Create();
-        
-        Lua.LuaValue[] LuaValues = await lua.DoStringAsync(LCSCode);
-        
-        Lua.LuaFunction Func = LuaValues[0].Read<Lua.LuaFunction>();
+    public void MoonsSharp() {
 
-        foreach (MessageObject MSG in Messages)
-        {
-            Lua.LuaValue[] FuncResult = await Func.InvokeAsync(lua, [MSG]);
-            FuncResult[0].Read<long>();
-        }
+        Script script = new Script();
+        
+        script.DoString(LuaCode);
+        
+        script.Call(script.Globals["Direct"], )
     }
 }

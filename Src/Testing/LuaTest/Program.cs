@@ -9,8 +9,6 @@ class Program
     static void Main(string[] args) {
         //BenchmarkRunner.Run<Benchmarkerer>();
 
-        //Temp.NLuaTest();
-
-        Temp.LuaCSharp();
+        
     }
 }

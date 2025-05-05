@@ -169,7 +169,7 @@ public partial class CollectionNode : Node, IPersistable
     private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
     private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
 
-    readonly private BoundedChannelOptions BCODefault = new BoundedChannelOptions(20) {
+    readonly private BoundedChannelOptions BCODefault = new BoundedChannelOptions(100) {
         AllowSynchronousContinuations = false,
         SingleReader = true,
         SingleWriter = true,
