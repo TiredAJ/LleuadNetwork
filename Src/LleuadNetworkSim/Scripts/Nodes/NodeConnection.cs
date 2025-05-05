@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Channels;
@@ -5,6 +6,7 @@ using System.Threading.Tasks;
 
 using Godot;
 
+using LleuadNetworkSim.Scripts.Models.Message;
 using LleuadNetworkSim.Scripts.Objects;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
@@ -17,7 +19,7 @@ public partial class NodeConnection : Path2D
     private NetworkNode NodeA = null!;
     private NetworkNode NodeB = null!;
     public int FollowerCount { get; set; } = 0;
-    public float Length { get; set; }
+    public float Length { get; set; } = 0;
 
     private ChannelWriter<Message> CommsOutput = null!;
     private ChannelReader<Message> CommsInput = null!;
@@ -101,17 +103,30 @@ public partial class NodeConnection : Path2D
 
     public void SendMessage(Message _Msg) {
         Task.Run(async () => {
-                     Debug.WriteLine($"Sent Message to {_Msg.DestinationAddress}");
-                     await CommsOutput.WriteAsync(_Msg);
-                 });
+                    Debug.WriteLine($"Sent Message to {_Msg.DestinationAddress}");
+                    await CommsOutput.WriteAsync(_Msg);
+                });
     }
     
     public void PacketArrived() {
         FollowerCount--;
 
         Task.Run(async () => { 
-                     Message Msg = await CommsInput.ReadAsync();
-                     await NodeB.PacketReceived(Msg);
-                 });
+                    Message Msg = await CommsInput.ReadAsync();
+                    NodeB.PacketReceived(Msg); 
+                });
     }
+
+    public void ClearMessages() {
+        if (CommsInput.Count != 0)
+        { _ = CommsInput.ReadAllAsync(); }
+        
+        foreach (Packet Child in GetChildren<Packet>())
+        { Child?.QueueFree(); }
+    }
+    
+    private IEnumerable<T> GetChildren<T>() where T : Node
+        => GetChildren()
+            .Where(X => !X.IsQueuedForDeletion())
+            .OfType<T>();
 }

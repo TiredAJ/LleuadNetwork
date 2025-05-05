@@ -10,9 +10,15 @@ config_version=5
 
 [application]
 
-config/name="LleuadNetworkSim"
+config/name="LleuadNetwork"
+config/name_localized={
+"cy_GB": "RhwydwaithLleuad"
+}
+config/version="0.11.0"
 run/main_scene="res://Scenes/MainScene.tscn"
+config/use_custom_user_dir=true
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+run/max_fps=60
 config/icon="res://Assets/icon.svg"
 
 [display]
@@ -23,3 +29,11 @@ window/size/viewport_height=800
 [dotnet]
 
 project/assembly_name="LleuadNetworkSim"
+
+[editor]
+
+naming/script_name_casing=1
+
+[internationalization]
+
+locale/locale_filter_mode=1

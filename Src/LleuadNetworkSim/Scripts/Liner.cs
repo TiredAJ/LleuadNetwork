@@ -1,5 +1,7 @@
 using Godot;
 
+namespace LleuadNetworkSim.Scripts;
+
 public partial class Liner : Line2D
 {
     private Vector2 PointA;

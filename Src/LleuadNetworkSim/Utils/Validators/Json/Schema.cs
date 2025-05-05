@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace LleuadNetworkSim.Utils.Validators.Json;
 
@@ -9,12 +10,18 @@ public interface IBaseVO
 
 public record CollectionNodeVO : IBaseVO
 {
+    static public int SchemaVersion => 2;
+    public int _Version { get => 2; }
+    
     [Required]
     public NetworkNodeVO[] NetworkNodes { get; set; }
 }
 
 public record NetworkNodeVO : IBaseVO
 {
+    static public int SchemaVersion => 2;
+    public int _Version { get => 2; }
+    
     [Required]
     public string Name { get; set; }
     
@@ -26,6 +33,9 @@ public record NetworkNodeVO : IBaseVO
 
 public record PositionVectorVO : IBaseVO
 {
+    static public int SchemaVersion => 2;
+    public int _Version { get => 2; }
+    
     [Required]
     public float X { get; set; }
     

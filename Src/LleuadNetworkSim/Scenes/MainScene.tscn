@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=26 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -16,7 +16,9 @@
 [ext_resource type="Script" uid="uid://d01w0c2yqhf1m" path="res://Scripts/Buttons/btn_SelectionMode.cs" id="10_xb4mg"]
 [ext_resource type="Script" uid="uid://c5yxcuvgmi76a" path="res://Scripts/Buttons/btn_SaveMap.cs" id="14_6rnll"]
 [ext_resource type="Script" uid="uid://qeq2yg8smphb" path="res://Scripts/Buttons/btn_LoadMap.cs" id="15_enc0b"]
+[ext_resource type="Script" uid="uid://blwthrbqsbd0t" path="res://Scripts/Buttons/btn_RunChallenge.cs" id="15_hx8n4"]
 [ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
+[ext_resource type="Script" uid="uid://wlpw2251rq8l" path="res://Scripts/Buttons/btn_StopChallenge.cs" id="16_i0j58"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -65,15 +67,22 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="MainButtons" type="FlowContainer" parent="Controls"]
-layout_mode = 0
-offset_left = -427.0
-offset_top = -8.0
-offset_right = 53.0
-offset_bottom = 93.0
+[node name="MainButtons" type="FlowContainer" parent="Controls" node_paths=PackedStringArray("BTN_SelectionMode", "BTN_Spawn")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -5.075
+anchor_top = 1.6
+anchor_right = -5.075
+anchor_bottom = 1.6
+offset_left = -232.0
+offset_top = -72.0
+offset_right = 256.0
+offset_bottom = 32.0
 alignment = 2
 last_wrap_alignment = 2
 script = ExtResource("6_6t1o7")
+BTN_SelectionMode = NodePath("btn_SelectionMode")
+BTN_Spawn = NodePath("btn_Spawn")
 
 [node name="SelectionContainer" type="FlowContainer" parent="Controls/MainButtons"]
 layout_mode = 2
@@ -93,6 +102,7 @@ CollNode = NodePath("../../../../CollectionNode")
 
 [node name="btn_Send" type="Button" parent="Controls/MainButtons/SelectionContainer" node_paths=PackedStringArray("CollectionNode")]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_4b75m")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_8ju71")
 theme_override_styles/pressed = ExtResource("6_0iob3")
@@ -109,40 +119,76 @@ text = "Delete"
 script = ExtResource("10_6t1o7")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_SelectionMode" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
+[node name="btn_SelectionMode" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("SelectionContainer", "CollNode", "ButtonParent")]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_xb4mg")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_6t1o7")
 theme_override_styles/pressed = ExtResource("6_0iob3")
 toggle_mode = true
-text = "Selection Mode"
+text = "Selection
+Mode"
 script = ExtResource("10_xb4mg")
 SelectionContainer = NodePath("../SelectionContainer")
 CollNode = NodePath("../../../CollectionNode")
+ButtonParent = NodePath("..")
 metadata/Type = "Select"
 
-[node name="btn_Spawn" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Spawn" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("CollNode", "ButtonParent")]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
 theme_override_styles/pressed = ExtResource("6_0iob3")
 toggle_mode = true
-text = "Spawn Node"
+text = "Spawn
+Node"
 script = ExtResource("2_y4jh7")
 CollNode = NodePath("../../../CollectionNode")
+ButtonParent = NodePath("..")
+metadata/Type = "Spawn"
+
+[node name="VFlowContainer" type="HFlowContainer" parent="Controls/MainButtons"]
+layout_mode = 2
+
+[node name="btn_RunChallenge" type="Button" parent="Controls/MainButtons/VFlowContainer" node_paths=PackedStringArray("CollNode", "ButtonParent")]
+custom_minimum_size = Vector2(130, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+text = "Run Challenge"
+script = ExtResource("15_hx8n4")
+CollNode = NodePath("../../../../CollectionNode")
+ButtonParent = NodePath("../..")
+metadata/Type = "Spawn"
+
+[node name="btn_StopChallenge" type="Button" parent="Controls/MainButtons/VFlowContainer" node_paths=PackedStringArray("CollNode", "ButtonParent")]
+custom_minimum_size = Vector2(130, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+text = "Stop Challenge"
+script = ExtResource("16_i0j58")
+CollNode = NodePath("../../../../CollectionNode")
+ButtonParent = NodePath("../..")
 metadata/Type = "Spawn"
 
 [node name="SaveLoadButtons" type="FlowContainer" parent="Controls"]
 layout_mode = 0
 offset_left = -931.0
 offset_top = -8.0
-offset_right = -739.0
-offset_bottom = 64.0
+offset_right = -717.0
+offset_bottom = 96.0
 alignment = 1
 last_wrap_alignment = 2
 
 [node name="btn_SaveMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Save Map"
@@ -158,6 +204,7 @@ filters = PackedStringArray("*.lnmap")
 use_native_dialog = true
 
 [node name="btn_LoadMap" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -168,7 +215,7 @@ FD = NodePath("fd_LoadMap")
 
 [node name="fd_LoadMap" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadMap"]
 auto_translate_mode = 1
-title = "Load map"
+title = "Open a File"
 ok_button_text = "Open"
 file_mode = 0
 access = 2
@@ -176,6 +223,7 @@ filters = PackedStringArray("*.lnmap")
 use_native_dialog = true
 
 [node name="btn_LoadChallenge" type="Button" parent="Controls/SaveLoadButtons" node_paths=PackedStringArray("CollNode", "FD")]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Load Challenge"
@@ -184,7 +232,7 @@ CollNode = NodePath("../../../CollectionNode")
 FD = NodePath("fd_LoadChallenge")
 
 [node name="fd_LoadChallenge" type="FileDialog" parent="Controls/SaveLoadButtons/btn_LoadChallenge"]
-title = "Load challenge"
+title = "Open a File"
 unresizable = true
 popup_window = true
 ok_button_text = "Open"

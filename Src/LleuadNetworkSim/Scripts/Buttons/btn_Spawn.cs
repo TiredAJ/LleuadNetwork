@@ -2,10 +2,15 @@ using Godot;
 
 using LleuadNetworkSim.Scripts.Nodes;
 
+namespace LleuadNetworkSim.Scripts.Buttons;
+
 public partial class btn_Spawn : Button
 {
     [Export]
-    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
+    private CollectionNode CollNode = null!;
+
+    [Export]
+    private cntr_MainButtons ButtonParent = null!;
 
     public override void _Toggled(bool _ToggledOn) {
 
@@ -18,6 +23,6 @@ public partial class btn_Spawn : Button
         CollNode.Mode = _Toggled ? UIMode.SPAWNING : UIMode.NONE;
         
         if (_Toggled)
-        { GetParent<cntr_MainButtons>().SpawnMode(); }
+        { ButtonParent.SpawnMode(); }
     }
 }

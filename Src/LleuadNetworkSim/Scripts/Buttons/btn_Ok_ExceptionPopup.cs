@@ -1,9 +1,11 @@
 using Godot;
 
+namespace LleuadNetworkSim.Scripts.Buttons;
+
 public partial class btn_Ok_ExceptionPopup : Button
 {
     [Export]
-    private Popup ParentPopup;
+    private Popup ParentPopup = null!;
 
     public override void _Pressed() {
         

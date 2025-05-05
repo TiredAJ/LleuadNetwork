@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
+using LleuadNetworkSim.Scripts.Models.Message;
+
 using MoreLinq;
 
 namespace LleuadNetworkSim.Scripts.Objects;
 
 public class MapChallenge
 {
-    private Dictionary<string, List<Message>> Challenge = []; 
+    readonly private Dictionary<string, List<Message>> Challenge = []; 
     private Dictionary<Message, int> Distribution = [];
     private List<string> NodeAddresses = [];
 

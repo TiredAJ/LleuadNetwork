@@ -1,6 +1,6 @@
 using System;
 
-namespace LleuadNetworkSim.Scripts.Objects.Exceptions;
+namespace LleuadNetworkSim.Scripts.Models.Exceptions;
 
 public class PayloadTooLargeException : Exception
 {

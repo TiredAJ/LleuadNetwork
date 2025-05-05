@@ -5,7 +5,7 @@ using System.Linq;
 
 using CSharpFunctionalExtensions;
 
-namespace LleuadNetworkSim.Scripts.Objects;
+namespace LleuadNetworkSim.Scripts.Models.Message;
 
 public struct Headers
 {
@@ -25,7 +25,8 @@ public struct Headers
         new KeyValuePair<string, string>("RECEIVE_RESPONSE_REQUIRED", "FALSE"),
         new KeyValuePair<string, string>("MESSAGE_SIZE", "0"),
         new KeyValuePair<string, string>("MAX_MESSAGE_SIZE", "1000"),
-        new KeyValuePair<string, string>("TOTAL_SIZE", "-1")
+        new KeyValuePair<string, string>("TOTAL_SIZE", "-1"),
+        new KeyValuePair<string, string>("LAST_NODE_ID", DEFAULT_VAL)
     ]);
 
     private Dictionary<string, string> IntHeaders;

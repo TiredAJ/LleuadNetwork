@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Buffers.Text;
+using System.Text.Json.Nodes;
 
 using Godot;
 
+using LleuadNetworkSim.Scripts.Nodes;
 using LleuadNetworkSim.Utils.Validators.Json;
 
 namespace LleuadNetworkSim.Utils;
@@ -22,6 +25,10 @@ static public class Extensions
 
     static public string ToBase64(this Guid _UUID) {
         return Convert.ToBase64String(_UUID.ToByteArray());
+    }
+
+    static public string ToBase64Name(this Guid _UUID) {
+        return _UUID.ToBase64().TrimEnd('=')[10..];
     }
     
     //thanks to fubo https://stackoverflow.com/a/15340481/19306828
@@ -49,4 +56,10 @@ static public class Extensions
 
     static public Vector2 ToVec2(this PositionVectorVO _PVO)
         => new(_PVO.X, _PVO.Y);
+    
+    static public bool HasFlagFast(this UIMode _Value, UIMode _Flag)
+    { return (_Value & _Flag) != 0; }
+
+    static public int ToInt32(this JsonNode _JNode)
+        => Convert.ToInt32(_JNode);
 }

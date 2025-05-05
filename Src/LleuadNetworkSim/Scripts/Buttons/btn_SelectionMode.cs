@@ -1,14 +1,17 @@
 using Godot;
 
-using LleuadNetworkSim.Scripts.Nodes;
+namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class btn_SelectionMode : Button
 {
     [Export]
-    private SelectionButtonContainer SelectionContainer;
+    private SelectionButtonContainer SelectionContainer = null!;
 
     [Export]
-    private LleuadNetworkSim.Scripts.Nodes.CollectionNode CollNode;
+    private Nodes.CollectionNode CollNode = null!;
+
+    [Export]
+    private cntr_MainButtons ButtonParent = null!;
 
     public override void _Toggled(bool _ToggledOn) {
 
@@ -23,6 +26,6 @@ public partial class btn_SelectionMode : Button
         CollNode.SelectionMode(_Toggled);
 
         if (_Toggled)
-        { GetParent<cntr_MainButtons>().SelectionMode(); }
+        { ButtonParent.SelectionMode(); }
     }
 }

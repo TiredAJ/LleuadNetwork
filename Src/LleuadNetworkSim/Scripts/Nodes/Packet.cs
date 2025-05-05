@@ -2,28 +2,26 @@ using System.Diagnostics;
 
 using Godot;
 
-using LleuadNetworkSim.Scripts.Objects;
-
 namespace LleuadNetworkSim.Scripts.Nodes;
 
 public partial class Packet : PathFollow2D
 {
     [Export]
-    private float Speed = 250f;
+    private float Speed = 150f; //250
 
     private float PathLength = -1;
     
     private bool Run = false;
-    
-    public Message Msg { get; set; }
 
     public override void _EnterTree() {
 
-        if (GetParent() is not null)
+        Node? Parent = GetParent();
+        
+        if (Parent is not null)
         {
             Run = true;
 
-            PathLength = ((GetParent() as NodeConnection)!).Length;
+            PathLength = (Parent as NodeConnection)!.Length;
         }
         
         GetChild<Sprite2D>(0)
@@ -40,9 +38,7 @@ public partial class Packet : PathFollow2D
         this.Progress += (float)(Speed * _Delta);
 
         if (ProgressRatio >= 0.98f)
-        {            
-            Debug.WriteLine($"Reached end of the line! progress: {this.Progress}, length: {this.PathLength}");
-
+        {
             (GetParent() as NodeConnection)?.PacketArrived();
             
             this.QueueFree();

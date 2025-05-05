@@ -1,17 +1,21 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 
 using CSharpFunctionalExtensions;
 
 using Godot;
 using Godot.Logging;
 
+using LleuadNetworkSim.Scripts.Models.Message;
 using LleuadNetworkSim.Scripts.Objects;
 using LleuadNetworkSim.Utils;
 using LleuadNetworkSim.Utils.Validators;
@@ -114,7 +118,7 @@ public partial class CollectionNode : Node, IPersistable
         NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
 
         SceneInstance.Position = _Location;
-        SceneInstance.Name = Guid.NewGuid().ToBase64();
+        SceneInstance.Name = Guid.NewGuid().ToBase64Name();
         
         AddChild(SceneInstance);        
     }
@@ -191,7 +195,7 @@ public partial class CollectionNode : Node, IPersistable
 
         if (ConnectedNodes.ContainsKey(ID))
         {
-            GodotLogger.LogWarning($"Connection ID {ID} already exists");
+            GodotLogger.LogInfo($"Connection ID {ID} already exists, skipping...");
             return;
         }
         
@@ -206,8 +210,8 @@ public partial class CollectionNode : Node, IPersistable
             return;
         }
         
-        ConnAB.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
-        ConnBA.Name = $"NodeConnection-" + Guid.NewGuid().ToBase64();
+        ConnAB.Name = Guid.NewGuid().ToBase64();
+        ConnBA.Name = Guid.NewGuid().ToBase64();
         
         Channel<Message> ChannelAB = Channel.CreateBounded<Message>(BCODefault);
         Channel<Message> ChannelBA = Channel.CreateBounded<Message>(BCODefault);
@@ -238,7 +242,7 @@ public partial class CollectionNode : Node, IPersistable
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];
         
-        NodeA.SendMessage(NodeB.Name);        
+        NodeA.DebugSendMessage(NodeB.Name);        
     }    
     #endregion
 
@@ -345,8 +349,58 @@ public partial class CollectionNode : Node, IPersistable
     }
     #endregion
     
-    #region Utils
+    #region Challenges
 
+    private bool IsRunningchallenge = false;
+    private CancellationTokenSource CTSource = new();
+    
+    public async Task RunChallenge() {
+
+        if (IsRunningchallenge)
+        { ClearChallenge(); }
+
+        IsRunningchallenge = true;
+
+        Dictionary<string, NetworkNode> NNs = GetChildren<NetworkNode>().ToDictionary(K => K.Name.ToString(), V => V);
+
+        if (!Challenge.HasNoValue)
+        {
+            GodotLogger.LogInfo($"No challenge loaded, aborting challenge generation"); 
+            
+            return;
+        }
+        
+        /*
+        Dictionary<string, List<Message>> Data = Challenge.Value.GenerateChallenge(NNs.Keys.ToList());
+
+        foreach (KeyValuePair<string, NetworkNode> KVP in NNs)
+        { KVP.Value.Backlog = new ConcurrentQueue<Message>(Data[KVP.Key]); }
+        
+        */
+
+        CancellationToken CT = CTSource.Token;
+        
+        List<Task> NodesStartup = [];
+        NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(CT)));
+
+        await Task.WhenAll(NodesStartup);
+        IsRunningchallenge = false;
+    }
+
+    private void ClearChallenge() {
+        GetChildren<NodeConnection>().ForEach(X => X.ClearMessages());
+        CTSource.Cancel();
+        IsRunningchallenge = false;
+    }
+
+    public void StopChallenge() {
+        CTSource.Cancel();
+        ClearChallenge();
+    }
+    
+    #endregion
+    
+    #region Utils
     private Maybe<T> GetChild<T>(Func<T, bool> _Predicate) where T : Node
         => GetChildren()
            .OfType<T>()

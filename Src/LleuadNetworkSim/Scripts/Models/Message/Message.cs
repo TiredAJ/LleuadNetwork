@@ -3,21 +3,27 @@ using System.Text;
 
 using CSharpFunctionalExtensions;
 
-using LleuadNetworkSim.Scripts.Objects.Exceptions;
+using LleuadNetworkSim.Scripts.Models.Exceptions;
+using LleuadNetworkSim.Utils;
 
-namespace LleuadNetworkSim.Scripts.Objects;
+namespace LleuadNetworkSim.Scripts.Models.Message;
 
 public class Message
 {
     private Headers IntHeaders;
 
+    readonly public int MaxHops;
+    
     #region Headers
 
     #region DefaultHeaders
 
+    /// <summary>
+    /// ID of message
+    /// </summary>
     public string ID {
         get => IntHeaders.GetHeader(Header.ID);
-        set => IntHeaders.SetHeaderValue(Header.ID, value);
+        init => IntHeaders.SetHeaderValue(Header.ID, value);
     }
     
     /// <summary>
@@ -126,17 +132,25 @@ public class Message
         set => IntHeaders.SetHeaderValue(Header.TOTAL_SIZE, value.ToString());
     }
 
+    public string LastNodeID {
+        get => IntHeaders.GetHeader(Header.LAST_NODE_ID);
+        set => IntHeaders.SetHeaderValue(Header.LAST_NODE_ID, value);
+    }
     #endregion
 
     #endregion
 
-    public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null) {
-
+    public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50) {
         IntHeaders = new Headers();
         
         SenderAddress = _SenderAddress;
         DestinationAddress = _DestinationAddress;
-        CreationTime = DateTime.Now;
+        CreationTime = DateTime.UtcNow;
+        
+        ID = Guid.CreateVersion7()
+                 .ToBase64Name();
+
+        MaxHops = _MaxHops;
 
         if (_Payload is not null)
         { Payload = _Payload; }
@@ -194,4 +208,7 @@ public class Message
                 $"[Hops: {Hops}],[Response Req: {ResponseRequired}],[Size: {MessageSize}]," +
                 $"[Max Size: {MaxMessageSize}],[Total Size: {TotalSize}]\n[Payload: {Payload}]";
     }
+
+    public TimeSpan GetAliveTime()
+        => DateTime.UtcNow - CreationTime;
 }

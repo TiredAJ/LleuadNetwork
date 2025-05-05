@@ -1,7 +1,6 @@
 using System;
-using System.Diagnostics;
 
-namespace LleuadNetworkSim.Scripts.Objects;
+namespace LleuadNetworkSim.Scripts.Models.Message;
 
 public enum Header
 {
@@ -78,7 +77,12 @@ public enum Header
     /// (Defaults) If this message is a chunk, what the total size (in bytes) is
     ///  of all chunks together. -1 if it's not a chunk. 
     /// </summary>
-    TOTAL_SIZE
+    TOTAL_SIZE,
+    
+    /// <summary>
+    /// The ID of the last node this message was send from.
+    /// </summary>
+    LAST_NODE_ID
 }
 
 static public class Extensions
@@ -98,6 +102,7 @@ static public class Extensions
         Header.MESSAGE_SIZE => "MESSAGE_SIZE",
         Header.MAX_MESSAGE_SIZE => "MAX_MESSAGE_SIZE",
         Header.TOTAL_SIZE => "TOTAL_SIZE",
+        Header.LAST_NODE_ID => "LAST_NODE_ID", 
         _ => throw new ArgumentOutOfRangeException(nameof(_H), _H, null)
     };
 }

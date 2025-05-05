@@ -9,6 +9,7 @@ v_offset = 20.0
 cubic_interp = false
 loop = false
 script = ExtResource("1_0sr6c")
+Speed = 50.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.111111, 0.111111)

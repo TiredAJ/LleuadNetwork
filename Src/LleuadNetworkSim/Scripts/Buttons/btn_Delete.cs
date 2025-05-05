@@ -1,10 +1,11 @@
 using Godot;
-using System;
+
+namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class btn_Delete : Button
 {
     [Export]
-    public LleuadNetworkSim.Scripts.Nodes.CollectionNode CollectionNode;
+    private Nodes.CollectionNode CollectionNode = null!;
     
     public override void _Pressed() {
         

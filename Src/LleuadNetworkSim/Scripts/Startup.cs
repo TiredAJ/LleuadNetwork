@@ -2,11 +2,13 @@ using Godot;
 using Godot.Logging;
 using Godot.Logging.Targets;
 
+namespace LleuadNetworkSim.Scripts;
+
 public partial class Startup : Node2D
 {
     public override void _Ready() {
         
-        LogConfiguration Conf = new LogConfiguration();
+        LogConfiguration Conf = new();
         Conf.RegisterTarget(new GDPrintTarget("GodotConsole"));
 
         FormatRule Formatting = new FormatRule()
