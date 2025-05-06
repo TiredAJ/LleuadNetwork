@@ -18,4 +18,8 @@
     <Content Include="Misc\ExampleFiles\Map2.lnmap" />
     <Content Include="Misc\ExampleFiles\Map3.lnmap" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Using Include="LleuadNetworkSim.Utils.Globals" Static="true" />
+  </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@ using System;
 
 using LleuadNetworkSim.Utils;
 
-namespace LleuadNetworkSim.Scripts.Exceptions;
+namespace LleuadNetworkSim.Models.Exceptions;
 
 public class FileTooLargeException(long _FileSize) : Exception(DebugMessage(_FileSize))
 {

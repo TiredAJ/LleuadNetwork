@@ -1,13 +1,8 @@
-using System;
-
-using LleuadNetworkSim.Scripts.Models.Message;
-using LleuadNetworkSim.Scripts.Objects;
-
-namespace LleuadNetworkSim.Utils.Validators;
+namespace LleuadNetworkSim.Models.Validation;
 
 static public class NodeValidator
 {
-    static public bool MessageValid(Message _Msg) {
+    static public bool MessageValid(Message.Message _Msg) {
         _Msg.Hops++;
         
         if (_Msg.GetAliveTime() >= _Msg.Lifespan)

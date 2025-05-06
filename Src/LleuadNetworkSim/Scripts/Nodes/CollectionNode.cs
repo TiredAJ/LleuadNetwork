@@ -15,11 +15,12 @@ using CSharpFunctionalExtensions;
 using Godot;
 using Godot.Logging;
 
-using LleuadNetworkSim.Scripts.Models.Message;
-using LleuadNetworkSim.Scripts.Objects;
+using LleuadNetworkSim.Models;
+using LleuadNetworkSim.Models.Message;
+using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Validation;
+using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
-using LleuadNetworkSim.Utils.Validators;
-using LleuadNetworkSim.Utils.Validators.Json;
 
 using MoreLinq;
 
@@ -230,9 +231,6 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
 
     #region Messages
-
-    private Maybe<MapChallenge> Challenge = Maybe.None;
-    
     public void TrySendMessage() {
         if (SelectedNodes.Count != 2)
         { return; }
@@ -241,6 +239,8 @@ public partial class CollectionNode : Node, IPersistable
         
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];
+
+        Interlocked.Increment(ref G_TotalMessagesInPlay_Ref);
         
         NodeA.DebugSendMessage(NodeB.Name);        
     }    
@@ -351,11 +351,13 @@ public partial class CollectionNode : Node, IPersistable
     
     #region Challenges
 
+    private Maybe<MapChallenge> Challenge = Maybe.None;
     private bool IsRunningchallenge = false;
-    private CancellationTokenSource CTSource = new();
+    private CancellationTokenSource CTSource;
     
     public async Task RunChallenge() {
-
+        CTSource = new();
+        
         if (IsRunningchallenge)
         { ClearChallenge(); }
 
@@ -369,15 +371,15 @@ public partial class CollectionNode : Node, IPersistable
             
             return;
         }
-        
         /*
         Dictionary<string, List<Message>> Data = Challenge.Value.GenerateChallenge(NNs.Keys.ToList());
 
         foreach (KeyValuePair<string, NetworkNode> KVP in NNs)
         { KVP.Value.Backlog = new ConcurrentQueue<Message>(Data[KVP.Key]); }
-        
-        */
 
+        G_TotalMessagesInPlay = Data.Sum(X => X.Value.Count);
+        G_ChallengeID = Repo.LogEvent(new ChallengeRecord(Data.Count, G_TotalMessagesInPlay, Challenge.Value.Name));
+        */
         CancellationToken CT = CTSource.Token;
         
         List<Task> NodesStartup = [];

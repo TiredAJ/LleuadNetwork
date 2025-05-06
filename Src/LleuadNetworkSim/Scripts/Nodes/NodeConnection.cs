@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 using Godot;
 
-using LleuadNetworkSim.Scripts.Models.Message;
-using LleuadNetworkSim.Scripts.Objects;
+using LleuadNetworkSim.Models.Message;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 

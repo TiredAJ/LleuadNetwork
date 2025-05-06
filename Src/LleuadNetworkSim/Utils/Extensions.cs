@@ -6,8 +6,8 @@ using System.Text.Json.Nodes;
 
 using Godot;
 
+using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Scripts.Nodes;
-using LleuadNetworkSim.Utils.Validators.Json;
 
 namespace LleuadNetworkSim.Utils;
 

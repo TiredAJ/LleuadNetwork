@@ -5,7 +5,7 @@ using MoreLinq;
 
 using NJsonSchema.Validation;
 
-namespace LleuadNetworkSim.Scripts.Exceptions;
+namespace LleuadNetworkSim.Models.Exceptions;
 
 public class JsonSchemaValidationException(string _Path, ICollection<ValidationError> _Errors) : Exception(DebugMessage(_Path, _Errors))
 {

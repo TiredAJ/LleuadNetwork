@@ -3,10 +3,10 @@ using System.Text;
 
 using CSharpFunctionalExtensions;
 
-using LleuadNetworkSim.Scripts.Models.Exceptions;
+using LleuadNetworkSim.Models.Exceptions;
 using LleuadNetworkSim.Utils;
 
-namespace LleuadNetworkSim.Scripts.Models.Message;
+namespace LleuadNetworkSim.Models.Message;
 
 public class Message
 {

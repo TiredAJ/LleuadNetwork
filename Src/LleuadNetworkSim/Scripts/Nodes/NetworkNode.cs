@@ -10,13 +10,11 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Logging;
 
-using LleuadNetworkSim.Scripts.Buttons;
-using LleuadNetworkSim.Scripts.Models;
-using LleuadNetworkSim.Scripts.Models.Message;
-using LleuadNetworkSim.Scripts.Objects;
+using LleuadNetworkSim.Models.Message;
+using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Validation;
+using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
-using LleuadNetworkSim.Utils.Validators;
-using LleuadNetworkSim.Utils.Validators.Json;
 
 using MoreLinq;
 
@@ -195,6 +193,8 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     
     public void PacketReceived(Message _Msg) {
 
+        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Received));
+        
         if (_Msg.DestinationAddress == this.Name)
         {
             ConsumeMessage(_Msg);
@@ -213,14 +213,23 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     }
 
     private void ConsumeMessage(Message _Msg) {
-        Debug.WriteLine($"{this.Name} consumed packet from {_Msg.SenderAddress}");
+        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Consumed));
+        Repo.LogEvent(new FinalMessageRecord(_Msg, this.Name, true));
+
+        Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
+        
+        Debug.WriteLine($"{this.Name} consumed packet from {_Msg.SenderAddress}. There are {G_TotalMessagesInPlay} messages left");
     }
 
     private void DropMessage(Message _Msg) {
-        Debug.WriteLine($"Message was dropped by {this.Name} as it was no longer valid:" +
-                        $" {_Msg.Hops} hops, {_Msg.GetAliveTime().TotalSeconds:N2}s alive time");
+        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Dropped));
+        Repo.LogEvent(new FinalMessageRecord(_Msg, this.Name, false));
         
-        //log
+        Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
+        
+        Debug.WriteLine($"Message was dropped by {this.Name} as it was no longer valid:" +
+                        $" {_Msg.Hops} hops, {_Msg.GetAliveTime().TotalSeconds:N2}s alive time." +
+                        $". There are {G_TotalMessagesInPlay} messages left");
     }
     #endregion
 

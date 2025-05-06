@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-using LleuadNetworkSim.Utils.Validators.Json;
+using LleuadNetworkSim.Models.Validation.Json;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 

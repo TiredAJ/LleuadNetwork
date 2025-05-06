@@ -6,12 +6,13 @@ using System.Text.Json.Nodes;
 
 using Godot;
 
-using LleuadNetworkSim.Scripts.Exceptions;
+using LleuadNetworkSim.Models.Exceptions;
+using LleuadNetworkSim.Utils;
 
 using NJsonSchema;
 using NJsonSchema.Validation;
 
-namespace LleuadNetworkSim.Utils.Validators.Json;
+namespace LleuadNetworkSim.Models.Validation.Json;
 
 public class JsonValidator
 {

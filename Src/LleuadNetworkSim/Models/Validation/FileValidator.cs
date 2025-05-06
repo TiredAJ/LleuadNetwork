@@ -2,9 +2,10 @@ using System.IO;
 
 using Godot;
 
-using LleuadNetworkSim.Scripts.Exceptions;
+using LleuadNetworkSim.Models.Exceptions;
+using LleuadNetworkSim.Utils;
 
-namespace LleuadNetworkSim.Utils.Validators;
+namespace LleuadNetworkSim.Models.Validation;
 
 public class FileValidator
 {

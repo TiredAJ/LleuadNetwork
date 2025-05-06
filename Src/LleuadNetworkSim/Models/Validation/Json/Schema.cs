@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace LleuadNetworkSim.Utils.Validators.Json;
+namespace LleuadNetworkSim.Models.Validation.Json;
 
 #pragma warning disable CS8618
 

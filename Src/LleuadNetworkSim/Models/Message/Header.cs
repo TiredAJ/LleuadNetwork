@@ -1,6 +1,6 @@
 using System;
 
-namespace LleuadNetworkSim.Scripts.Models.Message;
+namespace LleuadNetworkSim.Models.Message;
 
 public enum Header
 {

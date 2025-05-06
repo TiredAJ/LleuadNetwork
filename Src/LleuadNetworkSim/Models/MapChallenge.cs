@@ -4,39 +4,41 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
-using LleuadNetworkSim.Scripts.Models.Message;
-
 using MoreLinq;
 
-namespace LleuadNetworkSim.Scripts.Objects;
+using Msg = LleuadNetworkSim.Models.Message.Message;
+
+namespace LleuadNetworkSim.Models;
 
 public class MapChallenge
 {
-    readonly private Dictionary<string, List<Message>> Challenge = []; 
-    private Dictionary<Message, int> Distribution = [];
+    readonly private Dictionary<string, List<Msg>> Challenge = []; 
+    private Dictionary<Msg, int> Distribution = [];
     private List<string> NodeAddresses = [];
+    
+    public string Name { get; set; }
 
     public MapChallenge(string _FilePath) {
         LoadFile(_FilePath);
     }
     
-    public MapChallenge(List<string> _NodeAddresses, Dictionary<Message, int> _Distribution) {
+    public MapChallenge(List<string> _NodeAddresses, Dictionary<Msg, int> _Distribution) {
         NodeAddresses = _NodeAddresses;
         Distribution = _Distribution;
     }
 
-    public Dictionary<string, List<Message>> GenerateChallenge(List<string> _NodeAddresses) {
+    public Dictionary<string, List<Msg>> GenerateChallenge(List<string> _NodeAddresses) {
         NodeAddresses = _NodeAddresses;
 
         return GenerateChallenge();
     }
 
-    public Dictionary<string, List<Message>> GenerateChallenge() {
-        Message[] AllMessagesArr = DistributeMessages();
+    public Dictionary<string, List<Msg>> GenerateChallenge() {
+        Msg[] AllMessagesArr = DistributeMessages();
 
         (new Random((int)DateTime.Now.Ticks)).Shuffle(AllMessagesArr);
 
-        List<Message[]> AllMessages = AllMessagesArr.Batch(NodeAddresses.Count).ToList();
+        List<Msg[]> AllMessages = AllMessagesArr.Batch(NodeAddresses.Count).ToList();
 
         for(int i = 0; i < NodeAddresses.Count; i++)
         {
@@ -44,9 +46,9 @@ public class MapChallenge
             
             List<string> AvailableAddr = NodeAddresses.Where(X => X != Sender).ToList();
 
-            Message[] Messages = AllMessages[i];
+            Msg[] Messages = AllMessages[i];
 
-            foreach (Message Msg in Messages)
+            foreach (Msg Msg in Messages)
             {
                 Msg.SenderAddress = Sender;
                 Msg.DestinationAddress = AvailableAddr.RandomSubset(1).First();
@@ -58,8 +60,8 @@ public class MapChallenge
         return Challenge;
     }
 
-    private Message[] DistributeMessages() {
-        List<Message> AllMessages = [];
+    private Msg[] DistributeMessages() {
+        List<Msg> AllMessages = [];
 
         foreach (var KVP in Distribution)
         {
@@ -71,12 +73,12 @@ public class MapChallenge
     }
 
     private void LoadFile(string _Path) {
+
+        Name = Path.GetFileName(_Path);
+        
         using Stream Reader = new FileStream(_Path, FileMode.Open);
 
-        Dictionary<Message, int>? Data = JsonSerializer.Deserialize<Dictionary<Message, int>>(Reader);
-
-        if (Data is null)
-        { /* error */ }
+        Dictionary<Msg, int>? Data = JsonSerializer.Deserialize<Dictionary<Msg, int>>(Reader);
 
         Distribution = Data;
     }
