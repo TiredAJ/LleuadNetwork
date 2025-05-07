@@ -1,8 +1,3 @@
-function LoadMsgs (Messages)
-     for i,v in ipairs(Messages) do
-         Direct(v);
-     end
- end
 
 function Direct (Msg)
      if Msg.Address == "Ya Mum" then
