@@ -2,7 +2,7 @@ namespace LleuadNetworkSim.Models.Validation;
 
 static public class NodeValidator
 {
-    static public bool MessageValid(Message.Message _Msg) {
+    static public bool MessageValid(Messaging.Message _Msg) {
         _Msg.Hops++;
         
         if (_Msg.GetAliveTime() >= _Msg.Lifespan)

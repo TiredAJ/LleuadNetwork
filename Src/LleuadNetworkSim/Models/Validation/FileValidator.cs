@@ -3,6 +3,7 @@ using System.IO;
 using Godot;
 
 using LleuadNetworkSim.Models.Exceptions;
+using LleuadNetworkSim.Models.Exceptions.Validation.File;
 using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Models.Validation;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Logging;
 
-using LleuadNetworkSim.Models.Message;
+using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;

@@ -7,6 +7,7 @@ using System.Text.Json.Nodes;
 using Godot;
 
 using LleuadNetworkSim.Models.Exceptions;
+using LleuadNetworkSim.Models.Exceptions.Validation.Json;
 using LleuadNetworkSim.Utils;
 
 using NJsonSchema;

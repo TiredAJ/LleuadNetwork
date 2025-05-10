@@ -5,7 +5,7 @@ using System.Linq;
 
 using CSharpFunctionalExtensions;
 
-namespace LleuadNetworkSim.Models.Message;
+namespace LleuadNetworkSim.Models.Messaging;
 
 public struct Headers
 {

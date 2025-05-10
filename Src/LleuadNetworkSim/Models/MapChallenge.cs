@@ -6,7 +6,7 @@ using System.Text.Json;
 
 using MoreLinq;
 
-using Msg = LleuadNetworkSim.Models.Message.Message;
+using Msg = LleuadNetworkSim.Models.Messaging.Message;
 
 namespace LleuadNetworkSim.Models;
 

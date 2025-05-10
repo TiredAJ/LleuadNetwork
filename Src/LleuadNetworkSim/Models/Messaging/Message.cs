@@ -4,9 +4,10 @@ using System.Text;
 using CSharpFunctionalExtensions;
 
 using LleuadNetworkSim.Models.Exceptions;
+using LleuadNetworkSim.Models.Exceptions.Messages;
 using LleuadNetworkSim.Utils;
 
-namespace LleuadNetworkSim.Models.Message;
+namespace LleuadNetworkSim.Models.Messaging;
 
 public class Message
 {

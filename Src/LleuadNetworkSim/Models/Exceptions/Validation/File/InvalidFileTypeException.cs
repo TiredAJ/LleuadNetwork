@@ -1,6 +1,6 @@
 using System;
 
-namespace LleuadNetworkSim.Models.Exceptions;
+namespace LleuadNetworkSim.Models.Exceptions.Validation.File;
 
 public class InvalidFileTypeException(string _FilePath, string _ExpectedFileType) : Exception(DebugMessage(_FilePath, _ExpectedFileType))
 {

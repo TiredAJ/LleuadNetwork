@@ -15,7 +15,7 @@ public record MessageJourneyRecord(
     string CurrentLocation,
     RecordAction Action
     ) {
-    public MessageJourneyRecord(Message.Message _Msg, string _CurrentLoc, RecordAction _Action)
+    public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action)
         : this(G_ChallengeID, _Msg.ID, _Msg.SenderAddress, _Msg.DestinationAddress, _Msg.MessageType, 
                _Msg.Hops, _CurrentLoc, _Action) {}
 };
