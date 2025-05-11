@@ -392,9 +392,11 @@ public partial class CollectionNode : Node, IPersistable
         G_ChallengeID = Repo.LogEvent(new ChallengeRecord(Data.Count, G_TotalMessagesInPlay, Challenge.Value.Name));
         */
         CancellationToken CT = CTSource.Token;
+
+        LuaScript LS = await LuaScriptAssembler.AssembleScript(_PreLoad: true);
         
         List<Task> NodesStartup = [];
-        NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(CT)));
+        NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(LS, CT)));
 
         await Task.WhenAll(NodesStartup);
         IsRunningchallenge = false;

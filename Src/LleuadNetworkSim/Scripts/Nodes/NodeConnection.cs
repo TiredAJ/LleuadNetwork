@@ -112,7 +112,7 @@ public partial class NodeConnection : Path2D
 
         Task.Run(async () => { 
                     Message Msg = await CommsInput.ReadAsync();
-                    NodeB.PacketReceived(Msg); 
+                    NodeB.MessageReceived(Msg); 
                 });
     }
 

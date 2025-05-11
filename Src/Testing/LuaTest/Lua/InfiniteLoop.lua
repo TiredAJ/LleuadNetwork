@@ -3,11 +3,11 @@
 --- Created by aj.
 --- DateTime: 5/11/25 10:26 AM
 ---
-i = 0
+i = Get_Value();
 
 function Run()
     
-    return fib(120)
+    return fib(120);
 end
 
 function fib(n)

@@ -15,6 +15,7 @@ using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Utils;
 
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Loaders;
 using MoonSharp.VsCodeDebugger;
 
 using FileAccess = System.IO.FileAccess;
@@ -24,60 +25,75 @@ namespace LleuadNetworkSim.Models.Lua;
 
 public class LuaController
 {
-    static private Maybe<MoonSharpVsCodeDebugServer> Server { get; set; } = Maybe<MoonSharpVsCodeDebugServer>.None;
+    static private Maybe<MoonSharpVsCodeDebugServer> Server { get; set; } = new MoonSharpVsCodeDebugServer();
+
+    readonly private Script Scrpt = new(/*CoreModules.Preset_SoftSandbox*/) {
+        Options = {
+            ScriptLoader = new FileSystemScriptLoader() {
+                IgnoreLuaPathGlobal = true,
+                ModulePaths = ["/usr/lib/lua/5.4"] 
+            }
+        }
+    };
     
-    private Script Scrpt = new(CoreModules.Preset_SoftSandbox);
-    private string NodeID = String.Empty;
-    private Dictionary<string, DynValue> DataRegister = [];
-    private Dictionary<string, string> ScriptFiles = [];
-    private Dictionary<string, Message> MessagesInProcess = [];
+    private string NodeID = string.Empty;
+    readonly private Dictionary<string, DynValue> DataRegister = [];
+    readonly private Dictionary<string, string> ScriptFiles = [];
+    readonly private Dictionary<string, (Message Msg, int Port)> MessagesInProcess = [];
     
-    private DynValue ProcessFunc = DynValue.Nil;
+    private DynValue ProcessCoroutine = DynValue.Nil;
     
     //the number of available ports this node has 
     public int PortCount { get; set; }
-    public Queue<Message> Backlog = [];
-    required public Action<int, Message> ExtSendMessage { get; init; }
+    public Queue<(Message Msg, int Port)> Backlog = [];
+    public Action<int, Message> ExtSendMessage { get; set; }
+    public Action PullBacklog { get; set; }
 
     public int AutoYieldCounter { get; set; } = 60_000;
     
-    public void LoadScript(LuaScript _LScript, string _NodeID) {
+    public void LoadScript(LuaScript _LS, string _NodeID) {
 
-        //validate file
+        NodeID = _NodeID;
         
-        Scrpt.DoFile(_LScript.FileLoc);
         LoadGlobals();
+
+        DynValue? Loaded = _LS.PreLoaded 
+                               ? Scrpt.DoString(_LS.FileData) 
+                               : Scrpt.LoadFile(_LS.FileLoc);
         
-        ProcessFunc = Scrpt.Globals.Get("Process");
+        DynValue ProcessFunc = Scrpt.Globals.Get("Process");
+
+        this.ProcessCoroutine = Scrpt.CreateCoroutine(ProcessFunc);
     }
 
     private void LoadGlobals() {
         Scrpt.Globals["Reg_Save"] = (Func<string, DynValue, bool>)Save;
-        Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)Load;
-        Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetDefaultMessage;
+        Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)(Load);
         Scrpt.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
-        Scrpt.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
-        Scrpt.Globals["Backlog_Count"] = (Func<int>)(() => Backlog.Count);
+        Scrpt.Globals["Backlog_Get"] = (Func<(Message Msg, int Port)?>)BacklogGetMessage;
+        Scrpt.Globals["Backlog_GetCount"] = (Func<int>)(() => Backlog.Count);
+        Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetNewMessage;
         Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
+        Scrpt.Globals["Node_ID"] = NodeID;
     }
 
     private void RunTest() {
         
-        if (ProcessFunc is not { Type: DataType.Function })
+        if (ProcessCoroutine is not { Type: DataType.Function })
         { throw new ScriptMissingRequiredFuncException("N/A", "ProcessMessage"); }
 
         try
         {
             Message TestMessage = MessageGenerator.DebugMessage;
             
-            DynValue Res = ProcessFunc.Function.Call(TestMessage);
+            DynValue Res = ProcessCoroutine.Function.Call(TestMessage);
 
             if (Res.Type != DataType.Number || Res.CastToNumber().ToInt() == -1)
             { throw new InvalidScriptFuncResultException(Res.Type, Res); }
         }
-        catch (Exception exc)
-        { throw new ScriptTestFuncFailureException(exc); }
+        catch (Exception Exc)
+        { throw new ScriptTestFuncFailureException(Exc); }
     }
 
     public async Task Start(CancellationToken _CT) {
@@ -87,23 +103,33 @@ public class LuaController
 
         await Task.Run(() => {
                            Stopwatch SW = new();
-                           ProcessFunc.Coroutine.AutoYieldCounter = AutoYieldCounter;
+                           ProcessCoroutine.Coroutine.AutoYieldCounter = AutoYieldCounter;
                            
                            while (!_CT.IsCancellationRequested)
                            {
                                SW.Restart();
 
-                               ProcessFunc.Coroutine.Resume();
+                               ProcessCoroutine.Coroutine.Resume();
                                
-                               Thread.Sleep(Math.Clamp((500 - SW.Elapsed.Milliseconds), 0, 500));
+                               Thread.Sleep(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500));
+
+                               if (Backlog.Count == 0)
+                               { PullBacklog(); }
                            }
                        },
                        _CT);
     }
 
     public void LoadDebugServer() {
-        Server = new MoonSharpVsCodeDebugServer();
-        Server.Value.Start();
+        try
+        { Server.Value.Start(); }
+        catch (InvalidOperationException)
+        { }
+        catch (Exception Exc)
+        {
+            Debug.WriteLine($"Couldn't load debug server due to {Exc.Message}");
+            throw;
+        }
     }
 
     #region Passthrough
@@ -135,8 +161,8 @@ public class LuaController
 
         string FileLoc;
         
-        if (ScriptFiles.TryGetValue(_FileName, out string? value))
-        { FileLoc = value; }
+        if (ScriptFiles.TryGetValue(_FileName, out string? Value))
+        { FileLoc = Value; }
         else
         {
             FileLoc = ProjectSettings.GlobalizePath("user://ScriptFiles/");
@@ -158,33 +184,54 @@ public class LuaController
             
             return DynValue.True;
         }
-        catch (Exception e)
-        { return DynValue.NewString($"Failed to write to file due to [{e.Message}]"); }
+        catch (Exception Exc)
+        { return DynValue.NewString($"Failed to write to file due to [{Exc.Message}]"); }
     }
 
-    private Message GetDefaultMessage()
+    /// <summary>
+    /// Allows the script to obtain a blank <see cref="Message"/>
+    /// </summary>
+    /// <returns>A <see cref="Message"/> with default values</returns>
+    static private Message GetNewMessage()
         => MessageGenerator.DefaultMessage();
 
-    private Message? BacklogGetMessage() {
+    /// <summary>
+    /// Allows the script to retrieve a <see cref="Message"/> from the backlog
+    /// </summary>
+    /// <returns>A <see cref="Message"/> if one is available, null otherwise</returns>
+    private (Message Msg, int Port)? BacklogGetMessage() {
 
         if (Backlog.Count == 0)
         { return null; }
 
-        Message Msg = Backlog.Dequeue();
+        (Message Msg, int Port) Msg = Backlog.Dequeue();
         
-        MessagesInProcess.Add(Msg.ID, Msg);
+        MessagesInProcess.Add(Msg.Msg.ID, Msg);
 
         return Msg;
     }
 
+    /// <summary>
+    /// Allows the script to send the <see cref="Message"/> it's currently
+    ///  processing to a specific port. 
+    /// </summary>
+    /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
+    /// <param name="_ID">The ID of the message.</param>
     private void SendMessage(int _Port, string _ID) {
-        if (!MessagesInProcess.Remove(_ID, out Message? Msg))
+        if (!MessagesInProcess.Remove(_ID, out (Message Msg, int _) Msg))
         { return; }
 
-        ExtSendMessage(_Port, Msg);
+        ExtSendMessage(_Port, Msg.Msg);
     }
 
-    private void SendMessage(int _Port, Message _Msg)
-        => ExtSendMessage(_Port, _Msg);
+    /// <summary>
+    /// Allows the script to send it's own message down a specific port.
+    /// </summary>
+    /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
+    /// <param name="_Msg">The <see cref="Message"/> to send.</param>
+    private void SendMessage(int _Port, Message _Msg) {
+        
+        ExtSendMessage(_Port, _Msg);
+    }
     #endregion
 }

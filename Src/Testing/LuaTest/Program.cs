@@ -23,9 +23,12 @@ class Program
         Temp.MoonsSharp(server);*/
 
         Script Scrpt = new(CoreModules.Preset_SoftSandbox);
+        
         Scrpt.DoFile("./Lua/InfiniteLoop.lua");
         
         DynValue ProcessFunc = Scrpt.Globals.Get("Run");
+
+        Scrpt.Globals["Get_Value"] = (Func<int>)(() => 12);
 
         DynValue ProcessCoroutine = Scrpt.CreateCoroutine(ProcessFunc);
         

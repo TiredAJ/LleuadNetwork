@@ -73,7 +73,7 @@ offset_top = 16.0
 offset_right = 979.0
 offset_bottom = 56.0
 
-[node name="MainButtons" type="FlowContainer" parent="Controls"]
+[node name="MainButtons" type="FlowContainer" parent="Controls" node_paths=PackedStringArray("BTN_SelectionMode", "BTN_Spawn")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = -5.075
@@ -87,6 +87,8 @@ offset_bottom = 32.0
 alignment = 2
 last_wrap_alignment = 2
 script = ExtResource("6_6t1o7")
+BTN_SelectionMode = NodePath("btn_SelectionMode")
+BTN_Spawn = NodePath("btn_Spawn")
 
 [node name="SelectionContainer" type="FlowContainer" parent="Controls/MainButtons"]
 layout_mode = 2
@@ -123,7 +125,7 @@ text = "Delete"
 script = ExtResource("10_6t1o7")
 CollectionNode = NodePath("../../../../CollectionNode")
 
-[node name="btn_SelectionMode" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("SelectionContainer", "CollNode")]
+[node name="btn_SelectionMode" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("SelectionContainer", "CollNode", "ButtonParent")]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_xb4mg")
@@ -135,9 +137,10 @@ Mode"
 script = ExtResource("10_xb4mg")
 SelectionContainer = NodePath("../SelectionContainer")
 CollNode = NodePath("../../../CollectionNode")
+ButtonParent = NodePath("..")
 metadata/Type = "Select"
 
-[node name="btn_Spawn" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("CollNode")]
+[node name="btn_Spawn" type="Button" parent="Controls/MainButtons" node_paths=PackedStringArray("CollNode", "ButtonParent")]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -149,6 +152,7 @@ text = "Spawn
 Node"
 script = ExtResource("2_y4jh7")
 CollNode = NodePath("../../../CollectionNode")
+ButtonParent = NodePath("..")
 metadata/Type = "Spawn"
 
 [node name="VFlowContainer" type="HFlowContainer" parent="Controls/MainButtons"]

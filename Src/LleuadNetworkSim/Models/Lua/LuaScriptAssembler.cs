@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -19,7 +21,7 @@ public partial class LuaScriptAssembler
     static private int Priority = 0;
 
     #region Regex
-    [GeneratedRegex("(?=.*?(require))(?=.*?(Message))", RegexOptions.IgnoreCase, "en-gb")]
+    [GeneratedRegex("(?=.*?(require))", RegexOptions.IgnoreCase, "en-gb")]
     static private partial Regex MessageRequireRemover();
     #endregion
     
@@ -60,7 +62,7 @@ public partial class LuaScriptAssembler
 
             string Line = Reader.ReadLine() ?? "";
             
-            string StrPriority = Line.Trim(' ', '-') ?? $"{LuaScriptAssembler.Priority}";
+            string StrPriority = Line.ToLower().Trim(' ', '-', 'p') ?? $"{LuaScriptAssembler.Priority}";
             
             int TempPriority = Convert.ToInt32(StrPriority);
 
@@ -73,30 +75,46 @@ public partial class LuaScriptAssembler
         }
     }
     
-    static public Task<LuaScript> AssembleScript(string? _Destination = null) {
+    static public Task<LuaScript> AssembleScript(string? _Destination = null, bool _PreLoad = false) {
         
         return Task.Run(async () => {
-                            _Destination ??= Path.GetRandomFileName();
+                            _Destination ??= ProjectSettings.GlobalizePath("user://generated/" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".lua");
 
                             if (File.Exists(_Destination))
                             { File.Delete(_Destination); }
+
+                            if (!Directory.Exists(Path.GetDirectoryName(_Destination)))
+                            { Directory.CreateDirectory(Path.GetDirectoryName(_Destination)); }
+
+                            File.Create(_Destination).Close();
                             
-                            await using StreamWriter Writer = new(File.Create(_Destination));
+                            await using StreamWriter Writer = new(_Destination);
+
+                            LuaScript LS = new(){FileLoc = _Destination, PreLoaded = _PreLoad};
                             
                             foreach (KeyValuePair<int, string> Scrpt in Scripts)
                             {
-                                CleanScript(Scrpt.Value);
-                                
                                 using StreamReader Reader = new(Scrpt.Value);
-                                Span<char> Spn = new(new char[1024], 0, 1024);
-
-                                while (!Reader.EndOfStream)
+                                
+                                try
                                 {
-                                    Reader.ReadBlock(Spn);
+                                    while (!Reader.EndOfStream)
+                                    {
+                                        string? ReadData = await Reader.ReadLineAsync();
 
-                                    Spn = Spn.TrimEnd('\0');
-                                    
-                                    Writer.WriteLine(Spn);
+                                        if (ReadData is (null or "") || ReadData.Contains("require("))
+                                        { continue; }
+                                        
+                                        if (_PreLoad)
+                                        { LS.FileData += (ReadData + '\n'); }
+                                        
+                                        await Writer.WriteLineAsync(ReadData);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                    throw;
                                 }
                                 
                                 Reader.Close();
@@ -104,18 +122,30 @@ public partial class LuaScriptAssembler
                             
                             Writer.Close();
                             
-                            return new LuaScript(){FileLoc = _Destination};
+                            return LS;
                         });
     }
 
     static private void CleanScript(string _ScriptLoc) {
         using StreamReader Reader = new(_ScriptLoc);
-        using StreamWriter Writer = new(_ScriptLoc);
 
         string Data = Reader.ReadToEnd();
+        
+        Reader.Close();
 
-        Data = MessageRequireRemover().Replace(Data, "");
+        foreach (Match M in MessageRequireRemover().Matches(Data))
+        {
+            int ReqIndex = M.Index;
+
+            int FinalReq = Data.IndexOf(')', ReqIndex) + 2;
+            
+            Data = string.Concat(Data.AsSpan()[..ReqIndex], "", Data.AsSpan()[FinalReq..]);
+        }
+        
+        using StreamWriter Writer = new(_ScriptLoc);
         
         Writer.Write(Data);
+        
+        Writer.Close();
     }
 }

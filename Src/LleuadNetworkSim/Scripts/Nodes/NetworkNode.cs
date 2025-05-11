@@ -17,6 +17,8 @@ using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
 
+using MoonSharp.Interpreter.Interop;
+
 using MoreLinq;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
@@ -116,15 +118,24 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Packets and messaging
-    private ConcurrentQueue<Message> Backlog = [];
+    private ConcurrentQueue<(Message Msg, int Port)> Backlog = [];
     private LuaController LC = new();
     
-    public Task StartNode(CancellationToken _CT)
-        => Task.Run(() => {                        
-                        LC.LoadScript(LuaScriptAssembler.AssembleScript().Result, this.Name);
+    public Task StartNode(LuaScript _LS, CancellationToken _CT)
+        => Task.Run(() => {
+
+                        LC.LoadDebugServer();
                         
-                        StartProcessing(_CT);
+                        LC.LoadScript(_LS, this.Name);
                         
+                        LC.PortCount = Connections.Count;
+
+                        LC.Backlog = new Queue<(Message Msg, int Port)>(Backlog);
+                        
+                        LC.ExtSendMessage = SendMessage;
+                        LC.PullBacklog = PullFromBacklog;
+
+                        return LC.Start(_CT);
                     }, _CT);
 
     public void DebugSendMessage(string _ID) {
@@ -132,7 +143,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         Message Msg = new(this.Name, _ID, $"Hello from {this.Name}!! This is a payload") 
             { Lifespan = TimeSpan.FromMinutes(2) };
 
-        Backlog.Enqueue(Msg);
+        Backlog.Enqueue((Msg, -1));
     }
 
     private void SendMessage(string _ID, Message _Msg) {
@@ -162,16 +173,8 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
         SendMessage(Conn, _Msg);
     }
-
-    private void StartProcessing(CancellationToken _CT) {
-
-        LC.PortCount = Connections.Count;
-        
-        LC.
-
-    }
     
-    public void PacketReceived(Message _Msg) {
+    public void MessageReceived(Message _Msg) {
 
         Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Received));
         
@@ -188,8 +191,11 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         }
         
         GodotLogger.LogInfo($"{_Msg.ID} was backlog'd by {this.Name}");
+
+        int Port = Connections.Keys.ToList()
+                              .IndexOf(_Msg.LastNodeID);
         
-        Backlog.Enqueue(_Msg);
+        Backlog.Enqueue((_Msg, Port));
     }
 
     private void ConsumeMessage(Message _Msg) {
@@ -210,6 +216,20 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         Debug.WriteLine($"Message was dropped by {this.Name} as it was no longer valid:" +
                         $" {_Msg.Hops} hops, {_Msg.GetAliveTime().TotalSeconds:N2}s alive time." +
                         $". There are {G_TotalMessagesInPlay} messages left");
+    }
+
+    private void PullFromBacklog() {
+
+        if (Backlog.IsEmpty)
+        { return; }
+        
+        for (int I = 0; I < 10; I++)
+        {
+            if (!Backlog.IsEmpty && Backlog.TryDequeue(out (Message Msg, int Port) Msg))
+            { LC.Backlog.Enqueue(Msg); }
+            else
+            { break; }
+        }
     }
     #endregion
 
