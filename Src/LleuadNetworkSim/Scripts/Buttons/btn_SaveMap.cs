@@ -2,14 +2,11 @@ using Godot;
 
 namespace LleuadNetworkSim.Scripts.Buttons;
 
-public partial class btn_SaveMap : Button
+public partial class btn_SaveMap : FileButton
 {
     [Export]
     private Nodes.CollectionNode CollNode = null!;
     
-    [Export]
-    private FileDialog FD = null!;
-
     public override void _Ready() {
 
         FD.FileMode = FileDialog.FileModeEnum.SaveFile;
@@ -17,12 +14,5 @@ public partial class btn_SaveMap : Button
         FD.FileSelected += CollNode.SaveMap;
         
         base._Ready();
-    }
-
-    public override void _Pressed() {
-
-        FD.Popup();
-        
-        base._Pressed();
     }
 }

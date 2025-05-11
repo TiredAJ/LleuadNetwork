@@ -60,4 +60,10 @@ static public class Extensions
 
     static public int ToInt32(this JsonNode _JNode)
         => Convert.ToInt32(_JNode);
+    
+    static public int ToInt(this double _D)
+        => Convert.ToInt32(_D);
+    
+    static public int ToInt(this double? _D)
+        => Convert.ToInt32(_D);
 }

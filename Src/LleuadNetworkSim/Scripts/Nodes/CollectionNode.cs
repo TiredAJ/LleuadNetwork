@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,11 +15,13 @@ using Godot;
 using Godot.Logging;
 
 using LleuadNetworkSim.Models;
+using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
-using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
+
+using MoonSharp.Interpreter;
 
 using MoreLinq;
 
@@ -36,7 +37,17 @@ public partial class CollectionNode : Node, IPersistable
 
     [Export]
     private PackedScene ExceptionPopupTemplate = null!;
-    
+
+    public override void _Ready() {
+        
+        //register Lua UserData types
+        UserData.RegisterType<Message>();
+        UserData.RegisterType<ReadonlyMessage>();
+        UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
+        
+        base._Ready();
+    }
+
     #region Selecting
     readonly private List<NetworkNode> SelectedNodes = [];
 
@@ -414,5 +425,39 @@ public partial class CollectionNode : Node, IPersistable
         => GetChildren()
            .Where(X => !X.IsQueuedForDeletion())
            .OfType<T>();
+    #endregion
+
+    #region Scripts
+    public void LoadScript(params string[] _Paths) {
+        
+        foreach (string P in _Paths)
+        {
+            try
+            {
+                if (IsDir(P))
+                { LoadScriptDir(P).ForEach(LuaScriptAssembler.AddScript); }
+                else if (IsFile(P))
+                { LuaScriptAssembler.AddScript(P); }
+            }
+            catch (Exception Exc)
+            { ExceptionPopupWrapper.Throw(this, Exc); }
+        }
+    }
+
+    static private IEnumerable<string> LoadScriptDir(string _DirPath) {
+
+        List<string> Paths = [];
+        
+        Paths.AddRange(Directory.GetFiles(_DirPath, "*.lua"));
+
+        return Paths;
+    }
+
+    static private bool IsDir(string _Path)
+        => Directory.Exists(_Path) && Path.GetDirectoryName(_Path) == _Path;
+
+    static private bool IsFile(string _Path)
+        => File.Exists(_Path);
+
     #endregion
 }

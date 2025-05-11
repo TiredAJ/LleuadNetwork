@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Logging;
 
+using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
@@ -115,27 +116,16 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Packets and messaging
-
-    public ConcurrentQueue<Message> Backlog = [];
+    private ConcurrentQueue<Message> Backlog = [];
+    private LuaController LC = new();
     
-    public Task StartNode(CancellationToken _Ct)
-        => Task.Run(() => {
-                        while (!_Ct.IsCancellationRequested)
-                        {
-                            if (!Backlog.IsEmpty && Backlog.TryDequeue(out Message? Msg))
-                            {
-                                try
-                                { ProcessMessage(Msg); }
-                                catch (Exception Exc)
-                                {
-                                    DropMessage(Msg);
-                                    Debug.WriteLine($"Processing failed with {Exc.Message}");
-                                }
-                            }
-                            Thread.Sleep(500);
-                        }
-                        return;
-                    }, _Ct);
+    public Task StartNode(CancellationToken _CT)
+        => Task.Run(() => {                        
+                        LC.LoadScript(LuaScriptAssembler.AssembleScript().Result, this.Name);
+                        
+                        StartProcessing(_CT);
+                        
+                    }, _CT);
 
     public void DebugSendMessage(string _ID) {
 
@@ -163,32 +153,22 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         NodeConn.FollowerCount++;
     }
 
-    private void SendMessage(int _Port) {
+    private void SendMessage(int _Port, Message _Msg) {
 
         if (Connections.Count < _Port)
         { GodotLogger.LogWarning("Packet lost due to invalid port"); }
 
         string Conn = Connections.ElementAt(_Port).Key;
 
-        if (Backlog.TryDequeue(out Message? MSg))
-        { SendMessage(Conn, MSg); }
+        SendMessage(Conn, _Msg);
     }
 
-    private void ProcessMessage(Message _Msg) {
-        string? Addr = Connections.ContainsKey(_Msg.DestinationAddress) 
-                           ? _Msg.DestinationAddress 
-                           : Connections.Keys
-                                        .Shuffle()
-                                        .FirstOrDefault(X => X != _Msg.SenderAddress && X != _Msg.LastNodeID);
-        
-        /*
-         * Lua processing here
-         */
+    private void StartProcessing(CancellationToken _CT) {
 
-        if (Addr is null)
-        { DropMessage(_Msg); }
-        else
-        { SendMessage(Addr, _Msg); }
+        LC.PortCount = Connections.Count;
+        
+        LC.
+
     }
     
     public void PacketReceived(Message _Msg) {

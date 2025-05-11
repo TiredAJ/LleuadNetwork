@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=28 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://blwthrbqsbd0t" path="res://Scripts/Buttons/btn_RunChallenge.cs" id="15_hx8n4"]
 [ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
 [ext_resource type="Script" uid="uid://wlpw2251rq8l" path="res://Scripts/Buttons/btn_StopChallenge.cs" id="16_i0j58"]
+[ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
 [ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scenes/win_DetailView.cs" id="21_bpy1e"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
@@ -34,7 +35,7 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
 
 [node name="MainScene" type="Node2D"]
-metadata/_edit_vertical_guides_ = [809.0]
+metadata/_edit_vertical_guides_ = [1000.0]
 
 [node name="CollectionNode" type="Node" parent="."]
 script = ExtResource("6_y4jh7")
@@ -242,10 +243,32 @@ access = 2
 filters = PackedStringArray("*.lnchallenge")
 use_native_dialog = true
 
+[node name="btn_LoadScript" type="Button" parent="Controls" node_paths=PackedStringArray("CollNode", "FD")]
+layout_mode = 0
+offset_left = -283.0
+offset_top = 104.0
+offset_right = -83.0
+offset_bottom = 144.0
+text = "Load script(s)"
+script = ExtResource("20_gyaec")
+CollNode = NodePath("../../CollectionNode")
+FD = NodePath("FileDialog")
+
+[node name="FileDialog" type="FileDialog" parent="Controls/btn_LoadScript"]
+title = "Open a script File or Directory of scripts"
+initial_position = 1
+ok_button_text = "Open"
+mode_overrides_title = false
+file_mode = 3
+access = 2
+filters = PackedStringArray("*.lua")
+use_native_dialog = true
+
 [node name="DetailView" type="Window" parent="."]
 title = "Details"
 position = Vector2i(1008, 0)
 size = Vector2i(400, 790)
+visible = false
 wrap_controls = true
 transient = true
 script = ExtResource("21_bpy1e")

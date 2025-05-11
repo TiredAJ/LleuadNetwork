@@ -15,15 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Test.lua">
+      <Content Include="Lua\**">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Test2.lua">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Test3.lua">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      </Content>
     </ItemGroup>
 
 </Project>

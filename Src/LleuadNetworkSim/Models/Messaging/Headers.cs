@@ -63,4 +63,8 @@ public struct Headers
     public Maybe<string> GetMetadata(string _Header) {
         return IntHeaders.TryGetValue(_Header, out string? Value) ? Value : Maybe.None;
     }
+
+    public Headers Clone() {
+        return new Headers { IntHeaders = new Dictionary<string, string>(this.IntHeaders) };
+    }
 }

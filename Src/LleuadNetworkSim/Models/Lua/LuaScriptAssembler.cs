@@ -1,17 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
+using Godot;
 
 using LleuadNetworkSim.Models.Exceptions;
 using LleuadNetworkSim.Models.Exceptions.Lua;
 
+using static System.Text.RegularExpressions.Regex;
+
 namespace LleuadNetworkSim.Models.Lua;
 
-public class LuaScriptAssembler
+public partial class LuaScriptAssembler
 {
     static private SortedList<int, string> Scripts = [];
     static private int Priority = 0;
+
+    #region Regex
+    [GeneratedRegex("(?=.*?(require))(?=.*?(Message))", RegexOptions.IgnoreCase, "en-gb")]
+    static private partial Regex MessageRequireRemover();
+    #endregion
     
     static public void AddScript(int _Priority, string _FilePath) {
 
@@ -26,6 +36,9 @@ public class LuaScriptAssembler
             { _Priority++; }
             
             Scripts.Add(_Priority, FullPath);
+
+            if (Priority <= _Priority)
+            { Priority = _Priority; }
         }
         catch (Exception e)
         {
@@ -45,11 +58,13 @@ public class LuaScriptAssembler
 
             using StreamReader Reader = new(_FilePath);
 
-            string StrPriority = Reader.ReadLine()?.Trim(' ', '-') ?? $"{LuaScriptAssembler.Priority}";
+            string Line = Reader.ReadLine() ?? "";
+            
+            string StrPriority = Line.Trim(' ', '-') ?? $"{LuaScriptAssembler.Priority}";
             
             int TempPriority = Convert.ToInt32(StrPriority);
 
-            Scripts.Add(TempPriority, FullPath);
+            AddScript(TempPriority, FullPath);
         }
         catch (Exception e)
         {
@@ -70,16 +85,18 @@ public class LuaScriptAssembler
                             
                             foreach (KeyValuePair<int, string> Scrpt in Scripts)
                             {
+                                CleanScript(Scrpt.Value);
+                                
                                 using StreamReader Reader = new(Scrpt.Value);
-                                Memory<char> Mem = new(new char[1024], 0, 1024);
+                                Span<char> Spn = new(new char[1024], 0, 1024);
 
                                 while (!Reader.EndOfStream)
                                 {
-                                    await Reader.ReadBlockAsync(Mem);
+                                    Reader.ReadBlock(Spn);
 
-                                    Mem = Mem.TrimEnd('\0');
+                                    Spn = Spn.TrimEnd('\0');
                                     
-                                    await Writer.WriteLineAsync(Mem);
+                                    Writer.WriteLine(Spn);
                                 }
                                 
                                 Reader.Close();
@@ -89,5 +106,16 @@ public class LuaScriptAssembler
                             
                             return new LuaScript(){FileLoc = _Destination};
                         });
+    }
+
+    static private void CleanScript(string _ScriptLoc) {
+        using StreamReader Reader = new(_ScriptLoc);
+        using StreamWriter Writer = new(_ScriptLoc);
+
+        string Data = Reader.ReadToEnd();
+
+        Data = MessageRequireRemover().Replace(Data, "");
+        
+        Writer.Write(Data);
     }
 }

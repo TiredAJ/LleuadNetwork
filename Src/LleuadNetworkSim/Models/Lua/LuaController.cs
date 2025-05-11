@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 using CSharpFunctionalExtensions;
 
 using Godot;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
+using LleuadNetworkSim.Models.Messaging;
+using LleuadNetworkSim.Utils;
 
 using MoonSharp.Interpreter;
 using MoonSharp.VsCodeDebugger;
@@ -19,11 +24,22 @@ namespace LleuadNetworkSim.Models.Lua;
 
 public class LuaController
 {
+    static private Maybe<MoonSharpVsCodeDebugServer> Server { get; set; } = Maybe<MoonSharpVsCodeDebugServer>.None;
+    
     private Script Scrpt = new(CoreModules.Preset_SoftSandbox);
     private string NodeID = String.Empty;
-    static private Maybe<MoonSharpVsCodeDebugServer> Server = Maybe<MoonSharpVsCodeDebugServer>.None;
     private Dictionary<string, DynValue> DataRegister = [];
     private Dictionary<string, string> ScriptFiles = [];
+    private Dictionary<string, Message> MessagesInProcess = [];
+    
+    private DynValue ProcessFunc = DynValue.Nil;
+    
+    //the number of available ports this node has 
+    public int PortCount { get; set; }
+    public Queue<Message> Backlog = [];
+    required public Action<int, Message> ExtSendMessage { get; init; }
+
+    public int AutoYieldCounter { get; set; } = 60_000;
     
     public void LoadScript(LuaScript _LScript, string _NodeID) {
 
@@ -31,34 +47,58 @@ public class LuaController
         
         Scrpt.DoFile(_LScript.FileLoc);
         LoadGlobals();
+        
+        ProcessFunc = Scrpt.Globals.Get("Process");
     }
 
     private void LoadGlobals() {
         Scrpt.Globals["Reg_Save"] = (Func<string, DynValue, bool>)Save;
         Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)Load;
+        Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetDefaultMessage;
+        Scrpt.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
+        Scrpt.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
+        Scrpt.Globals["Backlog_Count"] = (Func<int>)(() => Backlog.Count);
+        Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
+        Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
     }
 
-    public int Execute(Messaging.Message _Msg) {
-
-        if (Server.HasValue)
-        { Server.Value.AttachToScript(Scrpt, NodeID); }
-
-        DynValue? ProcessFunc = Scrpt.Globals.Get("ProcessMessage");
+    private void RunTest() {
         
         if (ProcessFunc is not { Type: DataType.Function })
         { throw new ScriptMissingRequiredFuncException("N/A", "ProcessMessage"); }
 
         try
         {
-            DynValue Res = ProcessFunc.Function.Call();
+            Message TestMessage = MessageGenerator.DebugMessage;
+            
+            DynValue Res = ProcessFunc.Function.Call(TestMessage);
+
+            if (Res.Type != DataType.Number || Res.CastToNumber().ToInt() == -1)
+            { throw new InvalidScriptFuncResultException(Res.Type, Res); }
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-        
-        return -1;
+        catch (Exception exc)
+        { throw new ScriptTestFuncFailureException(exc); }
+    }
+
+    public async Task Start(CancellationToken _CT) {
+
+        if (Server.HasValue)
+        { Server.Value.AttachToScript(Scrpt, NodeID); }
+
+        await Task.Run(() => {
+                           Stopwatch SW = new();
+                           ProcessFunc.Coroutine.AutoYieldCounter = AutoYieldCounter;
+                           
+                           while (!_CT.IsCancellationRequested)
+                           {
+                               SW.Restart();
+
+                               ProcessFunc.Coroutine.Resume();
+                               
+                               Thread.Sleep(Math.Clamp((500 - SW.Elapsed.Milliseconds), 0, 500));
+                           }
+                       },
+                       _CT);
     }
 
     public void LoadDebugServer() {
@@ -121,5 +161,30 @@ public class LuaController
         catch (Exception e)
         { return DynValue.NewString($"Failed to write to file due to [{e.Message}]"); }
     }
+
+    private Message GetDefaultMessage()
+        => MessageGenerator.DefaultMessage();
+
+    private Message? BacklogGetMessage() {
+
+        if (Backlog.Count == 0)
+        { return null; }
+
+        Message Msg = Backlog.Dequeue();
+        
+        MessagesInProcess.Add(Msg.ID, Msg);
+
+        return Msg;
+    }
+
+    private void SendMessage(int _Port, string _ID) {
+        if (!MessagesInProcess.Remove(_ID, out Message? Msg))
+        { return; }
+
+        ExtSendMessage(_Port, Msg);
+    }
+
+    private void SendMessage(int _Port, Message _Msg)
+        => ExtSendMessage(_Port, _Msg);
     #endregion
 }

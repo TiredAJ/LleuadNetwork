@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System.Diagnostics;
+
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
 using MoonSharp.Interpreter;
@@ -11,13 +13,30 @@ class Program
     
     static void Main(string[] args) {
         //BenchmarkRunner.Run<Benchmarkerer>();
-        UserData.RegisterType<MessageObject>();
+        /*UserData.RegisterType<MessageObject>();
         UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
         
         MoonSharpVsCodeDebugServer server = new();
 
         server.Start();
         
-        Temp.MoonsSharp(server);
+        Temp.MoonsSharp(server);*/
+
+        Script Scrpt = new(CoreModules.Preset_SoftSandbox);
+        Scrpt.DoFile("./Lua/InfiniteLoop.lua");
+        
+        DynValue ProcessFunc = Scrpt.Globals.Get("Run");
+
+        DynValue ProcessCoroutine = Scrpt.CreateCoroutine(ProcessFunc);
+        
+        ProcessCoroutine.Coroutine.AutoYieldCounter = 60000;
+        
+        Task T1 = Task.Run(() => {
+                               DynValue Res = ProcessCoroutine.Coroutine.Resume();
+                               
+                               Console.Write(Res.ToDebugPrintString());
+                           });
+
+        Task.WaitAll([T1]);
     }
 }

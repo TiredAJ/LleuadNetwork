@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 using CSharpFunctionalExtensions;
@@ -11,7 +12,7 @@ namespace LleuadNetworkSim.Models.Messaging;
 
 public class Message
 {
-    private Headers IntHeaders;
+    protected Headers IntHeaders;
 
     readonly public int MaxHops;
     
@@ -139,6 +140,9 @@ public class Message
     }
     #endregion
 
+    public Headers CloneHeaders()
+        => IntHeaders.Clone();
+    
     #endregion
 
     public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50) {
