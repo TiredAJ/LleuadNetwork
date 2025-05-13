@@ -31,7 +31,7 @@ public class LuaController
         Options = {
             ScriptLoader = new FileSystemScriptLoader() {
                 IgnoreLuaPathGlobal = true,
-                ModulePaths = ["/usr/lib/lua/5.4"] 
+                ModulePaths = ["/usr/lib/lua/5.4/"] 
             }
         }
     };

@@ -4,6 +4,8 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Loaders;
+using MoonSharp.Interpreter.REPL;
 using MoonSharp.VsCodeDebugger;
 
 namespace LuaTest;
@@ -22,13 +24,19 @@ class Program
         
         Temp.MoonsSharp(server);*/
 
-        Script Scrpt = new(CoreModules.Preset_SoftSandbox);
+        Script Scrpt = new(CoreModules.Preset_SoftSandbox) {
+            Options = {
+                ScriptLoader = new ReplInterpreterScriptLoader() {
+                IgnoreLuaPathGlobal = true
+                }
+            }
+        };
+        
+        Scrpt.Globals["Get_Value"] = (Func<int>)(() => 12);
         
         Scrpt.DoFile("./Lua/InfiniteLoop.lua");
         
         DynValue ProcessFunc = Scrpt.Globals.Get("Run");
-
-        Scrpt.Globals["Get_Value"] = (Func<int>)(() => 12);
 
         DynValue ProcessCoroutine = Scrpt.CreateCoroutine(ProcessFunc);
         
