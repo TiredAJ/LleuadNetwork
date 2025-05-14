@@ -17,13 +17,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Lua\Boilerplate.lua" />
-    <Content Include="Misc\ExampleFiles\2NodeMap.lnmap" />
-    <Content Include="Misc\ExampleFiles\Map.lnmap" />
-    <Content Include="Misc\ExampleFiles\Map2.lnmap" />
-    <Content Include="Misc\ExampleFiles\Map3.lnmap" />
+    <Content Include="Misc\ExampleFiles\Maps\2NodeMap.lnmap" />
+    <Content Include="Misc\ExampleFiles\Maps\Map.lnmap" />
+    <Content Include="Misc\ExampleFiles\Maps\Map2.lnmap" />
+    <Content Include="Misc\ExampleFiles\Maps\Map3.lnmap" />
   </ItemGroup>
   
   <ItemGroup>
     <Using Include="LleuadNetworkSim.Utils.Globals" Static="true" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Misc\ExampleFiles\Lua Files\" />
   </ItemGroup>
 </Project>
