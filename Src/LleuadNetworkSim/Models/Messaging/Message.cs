@@ -15,6 +15,8 @@ public class Message
     protected Headers IntHeaders;
 
     readonly public int MaxHops;
+
+    public int Port { get; set; } = 0;
     
     #region Headers
 
@@ -165,19 +167,21 @@ public class Message
         get;
         set {
             if (value.HasValue)
-            {
-                int Size = SizeInBytes(value.Value);
-
-                if (Size > MaxMessageSize)
-                { throw new PayloadTooLargeException(Size, MaxMessageSize); }
-
-                MessageSize = Size;
-            }
+            { ValidatePayload(value.Value); }
             
             field = value;
         }
     } = string.Empty;
 
+    public void SetPayload(string _str) {
+        ValidatePayload(_str);
+
+        Payload = _str;
+    }
+
+    public string? GetPayload() 
+        => Payload.GetValueOrDefault();
+    
     public bool IsValid() {
         if (SenderAddress == Headers.DEFAULT_VAL
             || DestinationAddress == Headers.DEFAULT_VAL
@@ -188,6 +192,15 @@ public class Message
     }
 
     private int SizeInBytes(string _Value) => MessageEncoding.GetByteCount(_Value);
+
+    private void ValidatePayload(string _Value) {
+        int Size = SizeInBytes(_Value);
+
+        if (Size > MaxMessageSize)
+        { throw new PayloadTooLargeException(Size, MaxMessageSize); }
+
+        MessageSize = Size;
+    }
 
     public Message Clone() {
         return new Message(SenderAddress, DestinationAddress, Payload.GetValueOrDefault())

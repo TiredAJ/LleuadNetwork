@@ -14,14 +14,10 @@ class Program
     static private Benchmarkerer Temp = new Benchmarkerer();
     
     static void Main(string[] args) {
-        //BenchmarkRunner.Run<Benchmarkerer>();
         /*UserData.RegisterType<MessageObject>();
         UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
-        
         MoonSharpVsCodeDebugServer server = new();
-
         server.Start();
-        
         Temp.MoonsSharp(server);*/
 
         Script Scrpt = new() {
@@ -29,12 +25,7 @@ class Program
                 ScriptLoader = new ReplInterpreterScriptLoader() {
                     IgnoreLuaPathGlobal = true,
                     ModulePaths = [
-                        "/usr/lib/lua/5.4/",
-                        "/home/aj/.luarocks/lib/luarocks/rocks-5.4",
-                        "/home/aj/.luarocks/lib/lua/5.4/?.so",
-                        "/home/aj/.luarocks/share/lua/5.4/cjson/util.lua",
-                        "/home/aj/.luarocks/share/lua/5.4/json2lua.lua",
-                        "/home/aj/.luarocks/share/lua/5.4/lua2json.lua"
+                        "./Lib/?.lua"
                     ]
                 }
             }
@@ -42,7 +33,8 @@ class Program
         
         Scrpt.Globals["Get_Value"] = (Func<int>)(() => 12);
         
-        Scrpt.DoFile("./Lua/InfiniteLoop.lua");
+        Scrpt.DoFile("./Lua/JsonTest.lua");
+        //Scrpt.DoFile("./Lua/InfiniteLoop.lua");
         
         DynValue ProcessFunc = Scrpt.Globals.Get("Run");
 

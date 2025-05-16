@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 
 using Godot;
+using Godot.Logging;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
 using LleuadNetworkSim.Models.Messaging;
@@ -42,13 +43,13 @@ public class LuaController
     private string NodeID = string.Empty;
     readonly private Dictionary<string, DynValue> DataRegister = [];
     readonly private Dictionary<string, string> ScriptFiles = [];
-    readonly private Dictionary<string, (Message Msg, int Port)> MessagesInProcess = [];
+    readonly private Dictionary<string, Message> MessagesInProcess = [];
     
     private DynValue ProcessCoroutine = DynValue.Nil;
     
     //the number of available ports this node has 
     public int PortCount { get; set; }
-    public Queue<(Message Msg, int Port)> Backlog = [];
+    public Queue<Message> Backlog = [];
     public Action<int, Message> ExtSendMessage { get; set; }
     public Action PullBacklog { get; set; }
 
@@ -64,28 +65,26 @@ public class LuaController
                                ? Scrpt.DoString(_LS.FileData) 
                                : Scrpt.LoadFile(_LS.FileLoc);
         
-        DynValue ProcessFunc = Scrpt.Globals.Get("Process");
-
-        this.ProcessCoroutine = Scrpt.CreateCoroutine(ProcessFunc);
+        this.ProcessCoroutine = Scrpt.Globals.Get("Process");
+        
+        if (ProcessCoroutine is not { Type: DataType.Function })
+        { throw new ScriptMissingRequiredFuncException("N/A", "ProcessMessage"); }
     }
 
     private void LoadGlobals() {
         Scrpt.Globals["Reg_Save"] = (Func<string, DynValue, bool>)Save;
         Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)(Load);
         Scrpt.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
-        Scrpt.Globals["Backlog_Get"] = (Func<(Message Msg, int Port)?>)BacklogGetMessage;
+        Scrpt.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
         Scrpt.Globals["Backlog_GetCount"] = (Func<int>)(() => Backlog.Count);
         Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetNewMessage;
         Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
         Scrpt.Globals["Node_ID"] = NodeID;
+        Scrpt.Globals["print"] = (Action<string>)Log;
     }
 
     private void RunTest() {
-        
-        if (ProcessCoroutine is not { Type: DataType.Function })
-        { throw new ScriptMissingRequiredFuncException("N/A", "ProcessMessage"); }
-
         try
         {
             Message TestMessage = MessageGenerator.DebugMessage;
@@ -104,15 +103,23 @@ public class LuaController
         if (Server.HasValue)
         { Server.Value.AttachToScript(Scrpt, NodeID); }
 
+        Coroutine Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine;
+        
         await Task.Run(() => {
                            Stopwatch SW = new();
-                           ProcessCoroutine.Coroutine.AutoYieldCounter = AutoYieldCounter;
+                           Crtn.AutoYieldCounter = AutoYieldCounter;
                            
                            while (!_CT.IsCancellationRequested)
                            {
+                               if (Crtn.State == CoroutineState.Dead)
+                               { Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine; }
+                               
                                SW.Restart();
 
-                               ProcessCoroutine.Coroutine.Resume();
+                               try
+                               { _ = Crtn.Resume(DynValue.Nil); }
+                               catch (ScriptRuntimeException e)
+                               { GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}"); }
                                
                                Thread.Sleep(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500));
 
@@ -131,7 +138,6 @@ public class LuaController
         catch (Exception Exc)
         {
             Debug.WriteLine($"Couldn't load debug server due to {Exc.Message}");
-            throw;
         }
     }
 
@@ -142,8 +148,13 @@ public class LuaController
     /// <param name="_Key">The key to save the value to.</param>
     /// <param name="_Val">The value to save.</param>
     /// <returns><c>true</c> if saved successfully, <c>false</c> otherwise.</returns>
-    private bool Save(string _Key, DynValue _Val) 
-        => DataRegister.TryAdd(_Key, _Val);
+    private bool Save(string _Key, DynValue _Val) {
+        if (!DataRegister.ContainsKey(_Key))
+        { return DataRegister.TryAdd(_Key, _Val); }
+
+        DataRegister[_Key] = _Val;
+        return true;
+    }
 
     /// <summary>
     /// Attempts to retrieve a value from the data register with a given key. Returns <see cref="DynValue.Nil"/>
@@ -202,14 +213,14 @@ public class LuaController
     /// Allows the script to retrieve a <see cref="Message"/> from the backlog
     /// </summary>
     /// <returns>A <see cref="Message"/> if one is available, null otherwise</returns>
-    private (Message Msg, int Port)? BacklogGetMessage() {
+    private Message? BacklogGetMessage() {
 
         if (Backlog.Count == 0)
         { return null; }
 
-        (Message Msg, int Port) Msg = Backlog.Dequeue();
+        Message Msg = Backlog.Dequeue();
         
-        MessagesInProcess.Add(Msg.Msg.ID, Msg);
+        MessagesInProcess.Add(Msg.ID, Msg);
 
         return Msg;
     }
@@ -221,10 +232,10 @@ public class LuaController
     /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
     /// <param name="_ID">The ID of the message.</param>
     private void SendMessage(int _Port, string _ID) {
-        if (!MessagesInProcess.Remove(_ID, out (Message Msg, int _) Msg))
+        if (!MessagesInProcess.Remove(_ID, out Message Msg))
         { return; }
 
-        ExtSendMessage(_Port, Msg.Msg);
+        ExtSendMessage(_Port, Msg);
     }
 
     /// <summary>
@@ -236,5 +247,12 @@ public class LuaController
         
         ExtSendMessage(_Port, _Msg);
     }
+
+    /// <summary>
+    /// Allows the script to log information.
+    /// </summary>
+    /// <param name="_Data">Loggable data.</param>
+    private void Log(string _Data)
+        => GodotLogger.LogInfo(_Data);
     #endregion
 }

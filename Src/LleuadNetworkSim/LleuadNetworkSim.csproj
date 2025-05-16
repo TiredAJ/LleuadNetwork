@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Lua\Boilerplate.lua" />
+    <Content Include="Misc\ExampleFiles\LuaFiles\Main.lua" />
     <Content Include="Misc\ExampleFiles\LuaFiles\ModulesTesting.lua" />
     <Content Include="Misc\ExampleFiles\Maps\2NodeMap.lnmap" />
     <Content Include="Misc\ExampleFiles\Maps\Map.lnmap" />

@@ -118,19 +118,19 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Packets and messaging
-    private ConcurrentQueue<(Message Msg, int Port)> Backlog = [];
+    private ConcurrentQueue<Message> Backlog = [];
     private LuaController LC = new();
     
     public Task StartNode(LuaScript _LS, CancellationToken _CT)
         => Task.Run(() => {
 
-                        LC.LoadDebugServer();
+                        //LC.LoadDebugServer();
                         
                         LC.LoadScript(_LS, this.Name);
                         
                         LC.PortCount = Connections.Count;
 
-                        LC.Backlog = new Queue<(Message Msg, int Port)>(Backlog);
+                        LC.Backlog = new Queue<Message>(Backlog);
                         
                         LC.ExtSendMessage = SendMessage;
                         LC.PullBacklog = PullFromBacklog;
@@ -143,7 +143,9 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         Message Msg = new(this.Name, _ID, $"Hello from {this.Name}!! This is a payload") 
             { Lifespan = TimeSpan.FromMinutes(2) };
 
-        Backlog.Enqueue((Msg, -1));
+        Msg.Port = -1;
+        
+        Backlog.Enqueue(Msg);
     }
 
     private void SendMessage(string _ID, Message _Msg) {
@@ -194,8 +196,10 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
         int Port = Connections.Keys.ToList()
                               .IndexOf(_Msg.LastNodeID);
+
+        _Msg.Port = Port;
         
-        Backlog.Enqueue((_Msg, Port));
+        Backlog.Enqueue(_Msg);
     }
 
     private void ConsumeMessage(Message _Msg) {
@@ -225,7 +229,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         
         for (int I = 0; I < 10; I++)
         {
-            if (!Backlog.IsEmpty && Backlog.TryDequeue(out (Message Msg, int Port) Msg))
+            if (!Backlog.IsEmpty && Backlog.TryDequeue(out Message? Msg))
             { LC.Backlog.Enqueue(Msg); }
             else
             { break; }

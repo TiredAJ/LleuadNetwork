@@ -102,7 +102,7 @@ public partial class NodeConnection : Path2D
 
     public void SendMessage(Message _Msg) {
         Task.Run(async () => {
-                    Debug.WriteLine($"Sent Message to {_Msg.DestinationAddress}");
+                    //Debug.WriteLine($"Sent Message to {_Msg.DestinationAddress}");
                     await CommsOutput.WriteAsync(_Msg);
                 });
     }
