@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Lua\Boilerplate.lua" />
+    <Content Include="Misc\ExampleFiles\LuaFiles\ModulesTesting.lua" />
     <Content Include="Misc\ExampleFiles\Maps\2NodeMap.lnmap" />
     <Content Include="Misc\ExampleFiles\Maps\Map.lnmap" />
     <Content Include="Misc\ExampleFiles\Maps\Map2.lnmap" />
@@ -25,9 +26,5 @@
   
   <ItemGroup>
     <Using Include="LleuadNetworkSim.Utils.Globals" Static="true" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Misc\ExampleFiles\Lua Files\" />
   </ItemGroup>
 </Project>

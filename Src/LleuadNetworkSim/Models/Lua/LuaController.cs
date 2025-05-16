@@ -30,8 +30,11 @@ public class LuaController
     readonly private Script Scrpt = new(/*CoreModules.Preset_SoftSandbox*/) {
         Options = {
             ScriptLoader = new FileSystemScriptLoader() {
-                IgnoreLuaPathGlobal = true,
-                ModulePaths = ["/usr/lib/lua/5.4/"] 
+                IgnoreLuaPathGlobal = false,
+                ModulePaths = [
+                    "/usr/lib/lua/5.4/",
+                    "/home/aj/.luarocks/lib/luarocks/rocks-5.4"
+                ]
             }
         }
     };

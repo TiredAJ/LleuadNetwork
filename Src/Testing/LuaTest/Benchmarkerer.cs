@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Loaders;
 using MoonSharp.VsCodeDebugger;
 
 namespace LuaTest;
@@ -77,7 +78,13 @@ public class Benchmarkerer
         
         try
         {
-            Script script = new Script();
+            Script script = new Script() {
+                Options = {
+                    ScriptLoader = new FileSystemScriptLoader() {
+                        IgnoreLuaPathGlobal = true
+                    }
+                }
+            };
             
             script.Globals["Reg_Save"] = (Action<string, DynValue>)Save;
             script.Globals["Reg_Load"] = (Func<string, DynValue>)Load;

@@ -6,6 +6,8 @@
 
 local cjson = require "cjson"
 
+print("hello!");
+
 i = Get_Value();
 
 function Run()

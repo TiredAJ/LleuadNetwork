@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipelines;
 using System.Text;
@@ -121,6 +122,8 @@ public partial class LuaScriptAssembler
                             }
                             
                             Writer.Close();
+                            
+                            Debug.WriteLine($"saved to [{_Destination}]");
                             
                             return LS;
                         });

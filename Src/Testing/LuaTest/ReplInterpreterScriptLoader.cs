@@ -40,6 +40,13 @@ public class ReplInterpreterScriptLoader : FileSystemScriptLoader
 			if (!string.IsNullOrEmpty(env)) ModulePaths = UnpackStringPaths(env);
 		}
 
+        ModulePaths ??= [
+            "/usr/lib/lua/5.4/",
+            "/home/aj/.luarocks/lib/luarocks/rocks-5.4",
+            "/home/aj/.luarocks/share/lua/5.4/cjson/util.lua",
+            "/home/aj/.luarocks/share/lua/5.4/json2lua.lua",
+            "/home/aj/.luarocks/share/lua/5.4/lua2json.lua"
+        ];
 		ModulePaths ??= UnpackStringPaths("?;?.lua");
 	}
 

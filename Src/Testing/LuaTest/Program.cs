@@ -24,10 +24,18 @@ class Program
         
         Temp.MoonsSharp(server);*/
 
-        Script Scrpt = new(CoreModules.Preset_SoftSandbox) {
+        Script Scrpt = new() {
             Options = {
                 ScriptLoader = new ReplInterpreterScriptLoader() {
-                IgnoreLuaPathGlobal = true
+                    IgnoreLuaPathGlobal = true,
+                    ModulePaths = [
+                        "/usr/lib/lua/5.4/",
+                        "/home/aj/.luarocks/lib/luarocks/rocks-5.4",
+                        "/home/aj/.luarocks/lib/lua/5.4/?.so",
+                        "/home/aj/.luarocks/share/lua/5.4/cjson/util.lua",
+                        "/home/aj/.luarocks/share/lua/5.4/json2lua.lua",
+                        "/home/aj/.luarocks/share/lua/5.4/lua2json.lua"
+                    ]
                 }
             }
         };
