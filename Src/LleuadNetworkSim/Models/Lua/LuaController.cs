@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Godot.Logging;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
 using LleuadNetworkSim.Models.Messaging;
+using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Utils;
 
 using MoonSharp.Interpreter;
@@ -49,7 +51,7 @@ public class LuaController
     
     //the number of available ports this node has 
     public int PortCount { get; set; }
-    public Queue<Message> Backlog = [];
+    public List<Message> Backlog = [];
     public Action<int, Message> ExtSendMessage { get; set; }
     public Action PullBacklog { get; set; }
 
@@ -76,6 +78,7 @@ public class LuaController
         Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)(Load);
         Scrpt.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
         Scrpt.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
+        Scrpt.Globals["Backlog_Return"] = (Func<Message, string>)ReturnToBacklog;
         Scrpt.Globals["Backlog_GetCount"] = (Func<int>)(() => Backlog.Count);
         Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetNewMessage;
         Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
@@ -231,7 +234,8 @@ public class LuaController
         if (Backlog.Count == 0)
         { return null; }
 
-        Message Msg = Backlog.Dequeue();
+        Message Msg = Backlog[0];
+        Backlog.RemoveAt(0);
         
         MessagesInProcess.Add(Msg.ID, Msg);
 
@@ -248,7 +252,7 @@ public class LuaController
         if (!MessagesInProcess.Remove(_ID, out Message? Msg))
         { return; }
 
-        ExtSendMessage(_Port, Msg);
+        ExtSendMessage(_Port - 1, Msg);
     }
 
     /// <summary>
@@ -266,5 +270,24 @@ public class LuaController
     /// <param name="_Data">Loggable data.</param>
     static private void Log(string _ID, string _Data)
         => GodotLogger.LogInfo($"[{_ID}]: {_Data}");
+
+    /// <summary>
+    /// If a packet can't be processed at the moment, it can be put to the back of the backlog for now
+    /// </summary>
+    /// <param name="_Msg"></param>
+    private string ReturnToBacklog(Message _Msg) {
+        if (!MessagesInProcess.TryGetValue(_Msg.ID, out Message? Msg))
+        { return "Does not exist"; }
+
+        if (MessageValidator.MessageValid(Msg))
+        //if (MessageValidator.MessageValid(Msg, _Msg))
+        {
+            Backlog.Add(Msg);
+            MessagesInProcess.Remove(_Msg.ID);
+            return "Backlog'd";
+        }
+
+        return "Message failed Validation";
+    }
     #endregion
 }

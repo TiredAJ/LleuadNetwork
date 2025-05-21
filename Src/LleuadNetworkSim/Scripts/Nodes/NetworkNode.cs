@@ -130,7 +130,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
                         
                         LC.PortCount = Connections.Count;
 
-                        LC.Backlog = new Queue<Message>(Backlog);
+                        LC.Backlog = new List<Message>(Backlog);
                         
                         LC.ExtSendMessage = SendMessage;
                         LC.PullBacklog = PullFromBacklog;
@@ -187,7 +187,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
             return;
         }
         
-        if (!NodeValidator.MessageValid(_Msg))
+        if (!MessageValidator.MessageValid(_Msg))
         {
             DropMessage(_Msg);
             return;
@@ -231,7 +231,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         for (int I = 0; I < 10; I++)
         {
             if (!Backlog.IsEmpty && Backlog.TryDequeue(out Message? Msg))
-            { LC.Backlog.Enqueue(Msg); }
+            { LC.Backlog.Add(Msg); }
             else
             { break; }
         }

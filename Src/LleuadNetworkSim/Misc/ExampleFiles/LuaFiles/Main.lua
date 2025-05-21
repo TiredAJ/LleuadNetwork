@@ -6,23 +6,16 @@ require("_Definitions/Message");
 local NodePorts = { };
 
 local HasSentDiscovery = false;
+local DiscoveryPacketsSent = 0;
+local DiscoveryPacketsReturned = 0;
 
 local function SetupNodePorts()
     for i = 0, (Port_GetCount() -1) do
         NodePorts[i] = { 
-            key = "Unknown" 
+            Key = "Unknown",
+            Addrs = { }
         };
     end
-    
-    table.remove(NodePorts, "D");
-end
-
-local function Size(tbl)
-    local count = 0
-    for _ in pairs(table) do
-        count = count + 1
-    end
-    return count;
 end
 
 local function HandleDiscovery(Msg)
@@ -40,6 +33,8 @@ local function HandleDiscovery(Msg)
 end
 
 local function HandleDiscoveryResponse(Msg)
+    
+    DiscoveryPacketsReturned = DiscoveryPacketsReturned + 1; 
     
     print("Handling discovery response - " .. Msg.GetPayload());
 
@@ -59,6 +54,20 @@ local function HandleDiscoveryResponse(Msg)
     end
     
     print(json.serialize(NodePorts));
+end
+
+local function SearchAddress(Addr)
+    for key, value in ipairs(NodePorts) do
+        if key ~= nil and value.Key ~= Addr and value.Addrs ~= nil then
+            for key2, value2 in ipairs(value.Addrs) do
+                if key2 ~= nil and value2.Key == Addr then
+                    return key;
+                end
+            end
+        elseif value.Key == Addr then
+            return key;
+        end
+    end
 end
 
 ---@param Msg Message
@@ -90,7 +99,7 @@ local function Discover()
         --wait    
     end
 
-    for i = 0, (Port_GetCount() -1) do
+    for i = 1, Port_GetCount() do
         Msg = Msg_GetNewMessage();
         Msg.SenderAddress = Node_ID;
         Msg.ResponseRequired = true;
@@ -99,29 +108,47 @@ local function Discover()
         print("sending discovery message on port " .. i);
         
         Msg_Send(i, Msg);
+        
+        DiscoveryPacketsSent = DiscoveryPacketsSent + 1; 
     end
 
     HasSentDiscovery = true;
 end
 
 local function Load()
-    NodePorts = Reg_Load("NodePorts") or {D = -1};
+    tempNodePorts = Reg_Load("NodePorts");
+
+    if tempNodePorts ~= nil then
+        NodePorts = tempNodePorts;    
+    end
     
     HasSentDiscovery = Reg_Load("SentDiscovery") or false;
+    DiscoveryPacketsSent = Reg_Load("DiscoveryPacketsSent") or 0;
+    DiscoveryPacketsReturned = Reg_Load("DiscoveryPacketsReturned") or 0;
+end
+
+local function IsReadyToStartProcessing()
+    if DiscoveryPacketsSent > 0 and DiscoveryPacketsReturned == DiscoveryPacketsSent then
+        return true;
+    else
+        return false;
+    end
 end
 
 local function Save()
-    npRes = Reg_Save("NodePorts", NodePorts);
-    sdRes = Reg_Save("SentDiscovery", HasSentDiscovery);
+    Reg_Save("NodePorts", NodePorts);
+    Reg_Save("SentDiscovery", HasSentDiscovery);
+    Reg_Save("DiscoveryPacketsSent", DiscoveryPacketsSent);
+    Reg_Save("DiscoveryPacketsReturned", DiscoveryPacketsReturned);
 end
 
 function Process(_, FirstLoad)
 
-    Load();
-
     if FirstLoad then
         SetupNodePorts();
         Discover();
+    else
+        Load();
     end
 
     if not HasSentDiscovery then Discover() end;
