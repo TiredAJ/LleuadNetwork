@@ -19,10 +19,12 @@ public class MapChallenge
     public string Name { get; set; }
 
     public MapChallenge(string _FilePath) {
+        Name = Path.GetFileName(_FilePath);
         LoadFile(_FilePath);
     }
     
     public MapChallenge(List<string> _NodeAddresses, Dictionary<Msg, int> _Distribution) {
+        Name = "N/A";
         NodeAddresses = _NodeAddresses;
         Distribution = _Distribution;
     }
@@ -63,7 +65,7 @@ public class MapChallenge
     private Msg[] DistributeMessages() {
         List<Msg> AllMessages = [];
 
-        foreach (var KVP in Distribution)
+        foreach (KeyValuePair<Msg, int> KVP in Distribution)
         {
             for (int i = 0; i < KVP.Value; i++)
             { AllMessages.Add(KVP.Key.Clone()); }
@@ -73,13 +75,11 @@ public class MapChallenge
     }
 
     private void LoadFile(string _Path) {
-
-        Name = Path.GetFileName(_Path);
         
         using Stream Reader = new FileStream(_Path, FileMode.Open);
 
         Dictionary<Msg, int>? Data = JsonSerializer.Deserialize<Dictionary<Msg, int>>(Reader);
 
-        Distribution = Data;
+        Distribution = Data ?? new Dictionary<Msg, int>();
     }
 }

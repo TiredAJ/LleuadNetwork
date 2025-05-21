@@ -1,15 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://dv7ve2sluedit"]
+[gd_scene load_steps=4 format=3 uid="uid://dv7ve2sluedit"]
 
 [ext_resource type="Script" uid="uid://d0ug84317ipkf" path="res://Scripts/Nodes/Packet.cs" id="1_0sr6c"]
 [ext_resource type="Texture2D" uid="uid://drp7ejwtv474q" path="res://Assets/Sprites/Blehh.png" id="1_7wo6q"]
+[ext_resource type="Texture2D" uid="uid://yv0kdre7sxhj" path="res://Assets/Sprites/ehhhhh.jpg" id="3_0sr6c"]
 
-[node name="Packet" type="PathFollow2D"]
+[node name="Packet" type="PathFollow2D" node_paths=PackedStringArray("Sprite")]
 z_index = 1000
 v_offset = 20.0
 cubic_interp = false
 loop = false
 script = ExtResource("1_0sr6c")
-Speed = 50.0
+PacketTextures = [ExtResource("1_7wo6q"), ExtResource("3_0sr6c")]
+Sprite = NodePath("Sprite2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.111111, 0.111111)

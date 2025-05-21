@@ -158,6 +158,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         _Msg.LastNodeID = this.Name;
         
         Packet Packet = PacketTemplate.Instantiate<Packet>();
+        Packet.SetType(_Msg.MessageType);
 
         Packet.ZIndex -= NodeConn.FollowerCount;
         

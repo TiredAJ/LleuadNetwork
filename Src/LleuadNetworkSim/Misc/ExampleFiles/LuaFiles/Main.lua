@@ -3,11 +3,19 @@
 require("./Misc");
 require("_Definitions/Message");
 
-local NodePorts = {
-    D = -1
-};
+local NodePorts = { };
 
 local HasSentDiscovery = false;
+
+local function SetupNodePorts()
+    for i = 0, (Port_GetCount() -1) do
+        NodePorts[i] = { 
+            key = "Unknown" 
+        };
+    end
+    
+    table.remove(NodePorts, "D");
+end
 
 local function Size(tbl)
     local count = 0
@@ -36,7 +44,6 @@ local function HandleDiscoveryResponse(Msg)
     print("Handling discovery response - " .. Msg.GetPayload());
 
     if Msg.GetPayload() == nil then
-        
         print("Payload was null")
         
         return;
@@ -79,6 +86,10 @@ local function Discover()
         return;
     end
 
+    for i = 0, math.random(20, 80) do
+        --wait    
+    end
+
     for i = 0, (Port_GetCount() -1) do
         Msg = Msg_GetNewMessage();
         Msg.SenderAddress = Node_ID;
@@ -104,9 +115,16 @@ local function Save()
     sdRes = Reg_Save("SentDiscovery", HasSentDiscovery);
 end
 
-function Process(_)
+function Process(_, FirstLoad)
 
     Load();
+
+    if FirstLoad then
+        SetupNodePorts();
+        Discover();
+    end
+
+    if not HasSentDiscovery then Discover() end;
     
     if Backlog_GetCount() ~= 0 then
         Msg = Backlog_Get();
@@ -119,11 +137,9 @@ function Process(_)
             Msg_DirectToPort(Port, Msg.ID);
         end
     else
-        print("No messages to process");
+        --print("No messages to process");
     end
     
-    if not HasSentDiscovery then Discover() end;
-
     Save();
     
     return nil;

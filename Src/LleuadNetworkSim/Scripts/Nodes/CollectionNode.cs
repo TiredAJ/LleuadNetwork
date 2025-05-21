@@ -364,13 +364,13 @@ public partial class CollectionNode : Node, IPersistable
 
     private Maybe<MapChallenge> Challenge = Maybe.None;
     private bool IsRunningchallenge = false;
-    private CancellationTokenSource CTSource;
+    private CancellationTokenSource CTSource = null!;
     
     public async Task RunChallenge() {
-        CTSource = new();
-        
         if (IsRunningchallenge)
         { ClearChallenge(); }
+        
+        CTSource = new CancellationTokenSource();
 
         IsRunningchallenge = true;
 
@@ -405,6 +405,7 @@ public partial class CollectionNode : Node, IPersistable
     private void ClearChallenge() {
         GetChildren<NodeConnection>().ForEach(X => X.ClearMessages());
         CTSource.Cancel();
+        CTSource.Dispose();
         IsRunningchallenge = false;
     }
 

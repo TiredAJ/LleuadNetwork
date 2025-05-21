@@ -5,7 +5,7 @@ namespace LleuadNetworkSim.Scripts.Buttons;
 public partial class btn_Connect : Button
 {
     [Export]
-    private Nodes.CollectionNode CollNode;
+    private Nodes.CollectionNode CollNode = null!;
 
     public override void _Pressed() {
         

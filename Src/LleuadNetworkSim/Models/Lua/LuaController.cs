@@ -61,9 +61,9 @@ public class LuaController
         
         LoadGlobals();
 
-        DynValue? Loaded = _LS.PreLoaded 
-                               ? Scrpt.DoString(_LS.FileData) 
-                               : Scrpt.LoadFile(_LS.FileLoc);
+        _ = _LS.PreLoaded 
+               ? Scrpt.DoString(_LS.FileData) 
+               : Scrpt.LoadFile(_LS.FileLoc);
         
         this.ProcessCoroutine = Scrpt.Globals.Get("Process");
         
@@ -81,7 +81,7 @@ public class LuaController
         Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
         Scrpt.Globals["Node_ID"] = NodeID;
-        Scrpt.Globals["print"] = (Action<string>)Log;
+        Scrpt.Globals["print"] = (Action<string, string>)Log;
     }
 
     private void RunTest() {
@@ -108,6 +108,8 @@ public class LuaController
         await Task.Run(() => {
                            Stopwatch SW = new();
                            Crtn.AutoYieldCounter = AutoYieldCounter;
+
+                           bool FirstLoad = true;
                            
                            while (!_CT.IsCancellationRequested)
                            {
@@ -117,15 +119,24 @@ public class LuaController
                                SW.Restart();
 
                                try
-                               { _ = Crtn.Resume(DynValue.Nil); }
+                               {
+                                   _ = Crtn.Resume(DynValue.Nil, DynValue.NewBoolean(FirstLoad));
+                               }
                                catch (ScriptRuntimeException e)
-                               { GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}"); }
+                               {
+                                   GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}");
+                                   break;
+                               }
+
+                               FirstLoad = false;
                                
                                Thread.Sleep(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500));
 
                                if (Backlog.Count == 0)
                                { PullBacklog(); }
                            }
+                           
+                           GodotLogger.LogWarning("LuaController Finished!");
                        },
                        _CT);
     }
@@ -142,6 +153,8 @@ public class LuaController
     }
 
     #region Passthrough
+    private Random? Rnd = null;
+    
     /// <summary>
     /// Attempts to save a value to the data register with a given key.
     /// </summary>
@@ -232,7 +245,7 @@ public class LuaController
     /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
     /// <param name="_ID">The ID of the message.</param>
     private void SendMessage(int _Port, string _ID) {
-        if (!MessagesInProcess.Remove(_ID, out Message Msg))
+        if (!MessagesInProcess.Remove(_ID, out Message? Msg))
         { return; }
 
         ExtSendMessage(_Port, Msg);
@@ -244,7 +257,6 @@ public class LuaController
     /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
     /// <param name="_Msg">The <see cref="Message"/> to send.</param>
     private void SendMessage(int _Port, Message _Msg) {
-        
         ExtSendMessage(_Port, _Msg);
     }
 
@@ -252,7 +264,7 @@ public class LuaController
     /// Allows the script to log information.
     /// </summary>
     /// <param name="_Data">Loggable data.</param>
-    private void Log(string _Data)
-        => GodotLogger.LogInfo(_Data);
+    static private void Log(string _ID, string _Data)
+        => GodotLogger.LogInfo($"[{_ID}]: {_Data}");
     #endregion
 }

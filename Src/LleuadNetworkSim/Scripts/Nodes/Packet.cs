@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Godot;
+using Godot.Logging;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
@@ -8,6 +10,12 @@ public partial class Packet : PathFollow2D
 {
     [Export]
     private float Speed = 250f;
+
+    [Export]
+    private CompressedTexture2D[] PacketTextures = [];
+
+    [Export]
+    private Sprite2D Sprite = null!;
 
     private float PathLength = -1;
     
@@ -24,8 +32,7 @@ public partial class Packet : PathFollow2D
             PathLength = (Parent as NodeConnection)!.Length;
         }
         
-        GetChild<Sprite2D>(0)
-            .SetGlobalRotationDegrees(0);
+        Sprite.SetGlobalRotationDegrees(0);
         
         base._EnterTree();
     }
@@ -53,5 +60,17 @@ public partial class Packet : PathFollow2D
 
         GetChild<Sprite2D>(0)
             .GlobalRotation = 0;
+    }
+
+    public void SetType(string _Type) {
+
+        string Type = _Type.ToLower();
+        
+        if (Type.Contains("discovery"))
+        { Sprite.Texture = PacketTextures[1]; }
+        else
+        { Sprite.Texture = PacketTextures[0]; }
+        
+        GodotLogger.LogInfo($"Set type to {_Type}");
     }
 }
