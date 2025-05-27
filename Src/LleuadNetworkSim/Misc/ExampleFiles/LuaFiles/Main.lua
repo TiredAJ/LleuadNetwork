@@ -5,7 +5,7 @@ require("_Definitions/Message");
 
 local NodePorts = { };
 
-local HasSentDiscovery = false;
+local ShouldSendDiscovery = true;
 local DiscoveryPacketsSent = 0;
 local DiscoveryPacketsReturned = 0;
 
@@ -53,6 +53,8 @@ local function HandleDiscoveryResponse(Msg)
         };
     end
     
+    ShouldSendDiscovery = true;
+    
     print(json.serialize(NodePorts));
 end
 
@@ -90,13 +92,11 @@ end
 
 local function Discover()
 
+    print("Discovering");
+    
     if Port_GetCount() == 0 then
         print("no ports to discover");
         return;
-    end
-
-    for i = 0, math.random(20, 80) do
-        --wait    
     end
 
     for i = 1, Port_GetCount() do
@@ -112,17 +112,20 @@ local function Discover()
         DiscoveryPacketsSent = DiscoveryPacketsSent + 1; 
     end
 
-    HasSentDiscovery = true;
+    ShouldSendDiscovery = false;
 end
 
 local function Load()
+    print("loading");
+    
     tempNodePorts = Reg_Load("NodePorts");
 
     if tempNodePorts ~= nil then
         NodePorts = tempNodePorts;    
     end
     
-    HasSentDiscovery = Reg_Load("SentDiscovery") or false;
+    ShouldSendDiscovery = Reg_Load("ShouldSendDiscovery") or true;
+    print(ShouldSendDiscovery)
     DiscoveryPacketsSent = Reg_Load("DiscoveryPacketsSent") or 0;
     DiscoveryPacketsReturned = Reg_Load("DiscoveryPacketsReturned") or 0;
 end
@@ -136,22 +139,32 @@ local function IsReadyToStartProcessing()
 end
 
 local function Save()
+    print("saving");
+    
     Reg_Save("NodePorts", NodePorts);
-    Reg_Save("SentDiscovery", HasSentDiscovery);
+    Reg_Save("ShouldSendDiscovery", ShouldSendDiscovery);
+    print(ShouldSendDiscovery);    
     Reg_Save("DiscoveryPacketsSent", DiscoveryPacketsSent);
     Reg_Save("DiscoveryPacketsReturned", DiscoveryPacketsReturned);
 end
 
-function Process(_, FirstLoad)
+function Process(NilVal, FirstLoad)
 
     if FirstLoad then
+        print("First load")
         SetupNodePorts();
+        print("First time discovering");
         Discover();
     else
+        print("Not first load")
         Load();
     end
 
-    if not HasSentDiscovery then Discover() end;
+    if ShouldSendDiscovery then
+        Discover()
+    else
+        print("Not sending discovery");
+    end;
     
     if Backlog_GetCount() ~= 0 then
         Msg = Backlog_Get();
@@ -172,4 +185,3 @@ function Process(_, FirstLoad)
     return nil;
 end
 
-Process();

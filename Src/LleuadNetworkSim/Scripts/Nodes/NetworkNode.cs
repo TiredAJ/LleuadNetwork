@@ -169,8 +169,13 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
     private void SendMessage(int _Port, Message _Msg) {
 
+        _Port -= 1;
+        
         if (Connections.Count < _Port)
-        { GodotLogger.LogWarning("Packet lost due to invalid port"); }
+        {
+            GodotLogger.LogWarning("Packet lost due to invalid port");
+            return;
+        }
 
         string Conn = Connections.ElementAt(_Port).Key;
 
@@ -196,7 +201,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         GodotLogger.LogInfo($"{_Msg.ID} was backlog'd by {this.Name}");
 
         int Port = Connections.Keys.ToList()
-                              .IndexOf(_Msg.LastNodeID);
+                              .IndexOf(_Msg.LastNodeID) + 1;
 
         _Msg.Port = Port;
         

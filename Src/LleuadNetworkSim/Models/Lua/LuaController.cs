@@ -84,7 +84,7 @@ public class LuaController
         Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
         Scrpt.Globals["Node_ID"] = NodeID;
-        Scrpt.Globals["print"] = (Action<string, string>)Log;
+        Scrpt.Globals["print"] = (Action<string>)Log;
     }
 
     private void RunTest() {
@@ -122,9 +122,7 @@ public class LuaController
                                SW.Restart();
 
                                try
-                               {
-                                   _ = Crtn.Resume(DynValue.Nil, DynValue.NewBoolean(FirstLoad));
-                               }
+                               { _ = Crtn.Resume(DynValue.Nil, FirstLoad); }
                                catch (ScriptRuntimeException e)
                                {
                                    GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}");
@@ -268,8 +266,8 @@ public class LuaController
     /// Allows the script to log information.
     /// </summary>
     /// <param name="_Data">Loggable data.</param>
-    static private void Log(string _ID, string _Data)
-        => GodotLogger.LogInfo($"[{_ID}]: {_Data}");
+    private void Log(string _Data)
+        => GodotLogger.LogInfo($"[{NodeID}]: {_Data}");
 
     /// <summary>
     /// If a packet can't be processed at the moment, it can be put to the back of the backlog for now
