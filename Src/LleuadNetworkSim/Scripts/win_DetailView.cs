@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Godot;
 
@@ -7,6 +8,8 @@ using LiteDB;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
+
+using MoreLinq;
 
 namespace LleuadNetworkSim.Scripts;
 
@@ -19,7 +22,8 @@ public partial class win_DetailView : Window
     private ILiteCollection<ChallengeRecord> ChallengeRecord;
     private List<string> NodeIDs = [];
     private Views Selectedview = Views.LuaProcess;
-    
+    private ObjectId? LastRecordID = null;
+    private bool IsRunning = false;
 
     [Export]
     private OptionButton NodeList = null!;
@@ -39,17 +43,35 @@ public partial class win_DetailView : Window
         base._Ready();
     }
 
-    public override void _Process(double delta) {
+    public override void _Process(double _Delta) {
+
+        if (IsRunning && LPRCollection.Count() > 0)
+        {
+            List<LuaProcessRecord> LPRecords = LPRCollection.FindAll().Take(DBConf.MaxPageSize).ToList();
+
+            if (LastRecordID is not null && LastRecordID != LPRecords?[-1].ID)
+            {
+                DetailsList.Clear();
+                
+                LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
+
+                Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");                
+            }
+
+            LastRecordID = LPRecords?[-1].ID;
+        }
         
-        
-        
-        base._Process(delta);
+        base._Process(_Delta);
     }
 
     public void UpdateNodes(List<string> _NodeIDs) {
         NodeIDs = _NodeIDs;
 
         SetupNodeList();
+    }
+
+    public void UpdateRunning(bool _IsRunning) {
+        IsRunning = _IsRunning;
     }
 
     private void SetupNodeList() {

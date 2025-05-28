@@ -40,11 +40,12 @@
 [node name="MainScene" type="Node2D"]
 metadata/_edit_vertical_guides_ = [1000.0]
 
-[node name="CollectionNode" type="Node" parent="."]
+[node name="CollectionNode" type="Node" parent="." node_paths=PackedStringArray("DetailView")]
 script = ExtResource("6_y4jh7")
 ConnectionTemplate = ExtResource("7_q68mp")
 NetworkNodeTemplate = ExtResource("4_qxria")
 ExceptionPopupTemplate = ExtResource("4_enc0b")
+DetailView = NodePath("../DetailView")
 
 [node name="TextureRect" type="TextureRect" parent="CollectionNode"]
 z_index = -2
@@ -271,7 +272,7 @@ access = 2
 filters = PackedStringArray("*.lua")
 use_native_dialog = true
 
-[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList")]
+[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList")]
 title = "Details"
 position = Vector2i(926, 36)
 size = Vector2i(400, 790)
@@ -279,6 +280,7 @@ wrap_controls = true
 transient = true
 script = ExtResource("21_bpy1e")
 NodeList = NodePath("VBoxContainer/VBoxContainer/OptionButton")
+DetailsList = NodePath("VBoxContainer/ItemList")
 
 [node name="TextureRect" type="TextureRect" parent="DetailView"]
 z_index = -2

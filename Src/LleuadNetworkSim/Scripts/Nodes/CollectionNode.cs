@@ -403,6 +403,8 @@ public partial class CollectionNode : Node, IPersistable
         List<Task> NodesStartup = [];
         NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(LS, CT)));
 
+        DetailView.UpdateRunning(true);
+        
         await Task.WhenAll(NodesStartup);
         IsRunningchallenge = false;
     }
@@ -417,6 +419,7 @@ public partial class CollectionNode : Node, IPersistable
     public void StopChallenge() {
         CTSource.Cancel();
         ClearChallenge();
+        DetailView.UpdateRunning(false);
     }
     
     #endregion

@@ -18,4 +18,7 @@ static public class DBConf
     
     static public string FinalMessageCollName 
         => "FinalMessageCollection";
+
+    static public int MaxPageSize
+        => 200;
 }

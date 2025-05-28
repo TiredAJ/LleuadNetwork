@@ -57,7 +57,11 @@ public class LuaController
 
     public LuaController(string _Connection) {
         LDB = new LiteDatabase(_Connection);
+
+        Console.WriteLine(_Connection);
+        
         LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
+        LPRCollection.EnsureIndex(X => X.NodeID);
     }
     
     //the number of available ports this node has 
@@ -128,16 +132,22 @@ public class LuaController
                            
                            while (!_CT.IsCancellationRequested)
                            {
+                               LDB.BeginTrans();
+                               
                                if (Crtn.State == CoroutineState.Dead)
                                { Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine; }
                                
                                SW.Restart();
 
                                try
-                               { _ = Crtn.Resume(DynValue.Nil, FirstLoad); }
+                               {
+                                   _ = Crtn.Resume(DynValue.Nil, FirstLoad); 
+                                   LDB.Commit();
+                               }
                                catch (ScriptRuntimeException e)
                                {
                                    GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}");
+                                   LDB.Rollback();
                                    break;
                                }
 
@@ -304,7 +314,7 @@ public class LuaController
     }
 
     private void DBLog(string _Type, string _Message) {
-        
+        LPRCollection.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message });
     }
     #endregion
 

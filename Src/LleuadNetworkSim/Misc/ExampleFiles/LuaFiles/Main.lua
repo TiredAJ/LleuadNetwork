@@ -144,6 +144,8 @@ end
 
 function Process(NilVal, FirstLoad)
 
+    Log("Reporting", "Hello!");
+    
     if FirstLoad then
         print("First load")
         SetupNodePorts();
