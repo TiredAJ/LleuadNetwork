@@ -28,4 +28,8 @@
   <ItemGroup>
     <Using Include="LleuadNetworkSim.Utils.Globals" Static="true" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Scenes\" />
+  </ItemGroup>
 </Project>

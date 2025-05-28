@@ -116,16 +116,13 @@ local function Discover()
 end
 
 local function Load()
-    print("loading");
-    
     tempNodePorts = Reg_Load("NodePorts");
 
     if tempNodePorts ~= nil then
         NodePorts = tempNodePorts;    
     end
     
-    ShouldSendDiscovery = Reg_Load("ShouldSendDiscovery") or true;
-    print(ShouldSendDiscovery)
+    ShouldSendDiscovery = Reg_Load("ShouldSendDiscovery");
     DiscoveryPacketsSent = Reg_Load("DiscoveryPacketsSent") or 0;
     DiscoveryPacketsReturned = Reg_Load("DiscoveryPacketsReturned") or 0;
 end
@@ -139,11 +136,8 @@ local function IsReadyToStartProcessing()
 end
 
 local function Save()
-    print("saving");
-    
     Reg_Save("NodePorts", NodePorts);
     Reg_Save("ShouldSendDiscovery", ShouldSendDiscovery);
-    print(ShouldSendDiscovery);    
     Reg_Save("DiscoveryPacketsSent", DiscoveryPacketsSent);
     Reg_Save("DiscoveryPacketsReturned", DiscoveryPacketsReturned);
 end

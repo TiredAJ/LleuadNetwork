@@ -12,8 +12,12 @@ using CSharpFunctionalExtensions;
 using Godot;
 using Godot.Logging;
 
+using LiteDB;
+
+using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Exceptions.Lua;
 using LleuadNetworkSim.Models.Messaging;
+using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Utils;
 
@@ -46,8 +50,15 @@ public class LuaController
     readonly private Dictionary<string, DynValue> DataRegister = [];
     readonly private Dictionary<string, string> ScriptFiles = [];
     readonly private Dictionary<string, Message> MessagesInProcess = [];
+    readonly private LiteDatabase LDB;
+    readonly private ILiteCollection<LuaProcessRecord> LPRCollection;
     
     private DynValue ProcessCoroutine = DynValue.Nil;
+
+    public LuaController(string _Connection) {
+        LDB = new LiteDatabase(_Connection);
+        LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
+    }
     
     //the number of available ports this node has 
     public int PortCount { get; set; }
@@ -85,6 +96,7 @@ public class LuaController
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
         Scrpt.Globals["Node_ID"] = NodeID;
         Scrpt.Globals["print"] = (Action<string>)Log;
+        Scrpt.Globals["Log"] = (Action<string, string>)DBLog;
     }
 
     private void RunTest() {
@@ -176,8 +188,11 @@ public class LuaController
     /// </summary>
     /// <param name="_Key">The key of the value to get.</param>
     /// <returns>The value if present, otherwise <see cref="DynValue.Nil"/>.</returns>
-    private DynValue Load(string _Key)
-        => DataRegister.TryGetValue(_Key, out DynValue? Val) ? Val : DynValue.Nil;
+    private DynValue Load(string _Key) {
+        DataRegister.TryGetValue(_Key, out DynValue? Val);
+
+        return Val ?? DynValue.Nil;
+    }
 
     /// <summary>
     /// Attempts to write a string to a file in the game's user's folder.
@@ -287,5 +302,13 @@ public class LuaController
 
         return "Message failed Validation";
     }
+
+    private void DBLog(string _Type, string _Message) {
+        
+    }
     #endregion
+
+    public void Close() {
+        LDB.Dispose();
+    }
 }

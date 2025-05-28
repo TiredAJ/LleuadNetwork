@@ -38,6 +38,9 @@ public partial class CollectionNode : Node, IPersistable
     [Export]
     private PackedScene ExceptionPopupTemplate = null!;
 
+    [Export]
+    private win_DetailView DetailView = null!;
+
     public override void _Ready() {
         
         //register Lua UserData types
@@ -281,8 +284,10 @@ public partial class CollectionNode : Node, IPersistable
 
         foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
         { ConnectLoadedNodes(NN); }
+
+        UpdateDetailView(CollNodeVO.NetworkNodes.Select(X => X.Name).ToList());
     }
-    
+
     public void SaveMap(string _Path) {
 
         if (!Path.HasExtension(_Path))
@@ -414,6 +419,12 @@ public partial class CollectionNode : Node, IPersistable
         ClearChallenge();
     }
     
+    #endregion
+
+    #region DetailsView
+    private void UpdateDetailView(List<string> _NodeIDs) {
+        DetailView.UpdateNodes(_NodeIDs);
+    }
     #endregion
     
     #region Utils

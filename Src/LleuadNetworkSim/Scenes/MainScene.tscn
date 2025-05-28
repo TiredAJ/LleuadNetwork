@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=30 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -20,7 +20,8 @@
 [ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
 [ext_resource type="Script" uid="uid://wlpw2251rq8l" path="res://Scripts/Buttons/btn_StopChallenge.cs" id="16_i0j58"]
 [ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
-[ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scenes/win_DetailView.cs" id="21_bpy1e"]
+[ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="21_bpy1e"]
+[ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="22_bpy1e"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -33,6 +34,8 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f140w"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_gyaec"]
 
 [node name="MainScene" type="Node2D"]
 metadata/_edit_vertical_guides_ = [1000.0]
@@ -268,14 +271,14 @@ access = 2
 filters = PackedStringArray("*.lua")
 use_native_dialog = true
 
-[node name="DetailView" type="Window" parent="."]
+[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList")]
 title = "Details"
-position = Vector2i(1008, 0)
+position = Vector2i(926, 36)
 size = Vector2i(400, 790)
-visible = false
 wrap_controls = true
 transient = true
 script = ExtResource("21_bpy1e")
+NodeList = NodePath("VBoxContainer/VBoxContainer/OptionButton")
 
 [node name="TextureRect" type="TextureRect" parent="DetailView"]
 z_index = -2
@@ -307,6 +310,31 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 fit_to_longest_item = false
 
+[node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+layout_mode = 2
+button_pressed = true
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Script Output"
+script = ExtResource("22_bpy1e")
+metadata/View = "Script_Output"
+
+[node name="CheckBox2" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Message Journey"
+script = ExtResource("22_bpy1e")
+metadata/View = "Message_Journey"
+
+[node name="CheckBox3" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Challenge Output"
+script = ExtResource("22_bpy1e")
+metadata/View = "Challenge_Output"
+
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
@@ -316,9 +344,15 @@ size_flags_vertical = 0
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search"
+editable = false
 select_all_on_focus = true
 
 [node name="Button" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
+disabled = true
 text = "Search"
+
+[node name="ItemList" type="ItemList" parent="DetailView/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3

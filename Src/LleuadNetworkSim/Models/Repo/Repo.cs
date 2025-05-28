@@ -2,6 +2,8 @@ using Godot;
 
 using LiteDB;
 
+using LleuadNetworkSim.Config;
+
 namespace LleuadNetworkSim.Models.Repo;
 
 public class Repo
@@ -11,16 +13,13 @@ public class Repo
     static readonly private LiteDatabase DB_INSTANCE = new(DefaultLocation);
 
     static private ILiteCollection<MessageJourneyRecord>? JourneyColl;
-    private const string JOURNEY_COLL_NAME = "MessageJourneyCollection";
 
     static private ILiteCollection<FinalMessageRecord>? FinalMsgColl;
-    private const string FINAL_MSG_COLL_NAME = "FinalMessageCollection";
 
     static private ILiteCollection<ChallengeRecord>? ChallengeColl;
-    private const string CHALLENGE_COLL_NAME = "ChallengeRecordCollection";
 
     static private void CreateJourneyInstance() {
-        JourneyColl = DB_INSTANCE.GetCollection<MessageJourneyRecord>(JOURNEY_COLL_NAME);
+        JourneyColl = DB_INSTANCE.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
 
         JourneyColl.EnsureIndex(X => X.MessageID);
         JourneyColl.EnsureIndex(X => X.Sender);
@@ -29,7 +28,7 @@ public class Repo
     }
 
     static private void CreateFinalMsgInstance() {
-        FinalMsgColl = DB_INSTANCE.GetCollection<FinalMessageRecord>(FINAL_MSG_COLL_NAME);
+        FinalMsgColl = DB_INSTANCE.GetCollection<FinalMessageRecord>(DBConf.FinalMessageCollName);
         
         FinalMsgColl.EnsureIndex(X => X.MessageID);
         FinalMsgColl.EnsureIndex(X => X.Sender);
@@ -38,7 +37,7 @@ public class Repo
     }
 
     static private void CreateChallengeInstance() {
-        ChallengeColl = DB_INSTANCE.GetCollection<ChallengeRecord>(CHALLENGE_COLL_NAME);
+        ChallengeColl = DB_INSTANCE.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
 
         ChallengeColl.EnsureIndex(X => X.ChallengeName);
     }
