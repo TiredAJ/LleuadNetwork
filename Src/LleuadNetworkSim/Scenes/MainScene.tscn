@@ -274,8 +274,8 @@ use_native_dialog = true
 
 [node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList")]
 title = "Details"
-position = Vector2i(926, 36)
-size = Vector2i(400, 790)
+position = Vector2i(923, 36)
+size = Vector2i(463, 790)
 wrap_controls = true
 transient = true
 script = ExtResource("21_bpy1e")
@@ -315,7 +315,10 @@ fit_to_longest_item = false
 [node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+[node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
 layout_mode = 2
 button_pressed = true
 button_group = SubResource("ButtonGroup_gyaec")
@@ -323,19 +326,48 @@ text = "Script Output"
 script = ExtResource("22_bpy1e")
 metadata/View = "Script_Output"
 
-[node name="CheckBox2" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+[node name="CheckBox2" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
 layout_mode = 2
 button_group = SubResource("ButtonGroup_gyaec")
 text = "Message Journey"
 script = ExtResource("22_bpy1e")
 metadata/View = "Message_Journey"
 
-[node name="CheckBox3" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+[node name="CheckBox3" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
 layout_mode = 2
 button_group = SubResource("ButtonGroup_gyaec")
 text = "Challenge Output"
 script = ExtResource("22_bpy1e")
 metadata/View = "Challenge_Output"
+
+[node name="Container" type="Container" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HFlowContainer2" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+alignment = 2
+
+[node name="Button" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Refresh
+"
+
+[node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 4
+popup/item_0/text = "Manual"
+popup/item_0/id = 0
+popup/item_1/text = "1 Second"
+popup/item_1/id = 1
+popup/item_2/text = "5 Second"
+popup/item_2/id = 2
+popup/item_3/text = "10 Second"
+popup/item_3/id = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 60)
