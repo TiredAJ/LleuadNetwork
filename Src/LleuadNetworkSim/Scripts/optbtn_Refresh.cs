@@ -1,0 +1,25 @@
+using Godot;
+using System;
+
+using LleuadNetworkSim.Scripts;
+
+public partial class optbtn_Refresh : OptionButton
+{
+    [Export]
+    private win_DetailView DetailView;
+    
+    public override void _Ready() {
+
+        ItemSelected += _Index => DetailView.SetAutoRefresh((DetailViewRefreshMode)_Index);
+        
+        base._Ready();
+    }
+}
+
+public enum DetailViewRefreshMode
+{
+    Manual,
+    OneSec,
+    FiveSec,
+    TenSec
+}

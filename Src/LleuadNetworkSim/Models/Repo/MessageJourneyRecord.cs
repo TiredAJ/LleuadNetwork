@@ -5,17 +5,24 @@ namespace LleuadNetworkSim.Models.Repo;
 /// <summary>
 /// A point in the journey of a message. Should be generated on message reception.
 /// </summary>
-public record MessageJourneyRecord(
-    ObjectId? ChallengeID,
-    string MessageID,
-    string Sender,
-    string Destination,
-    string Type,
-    int Hops,
-    string CurrentLocation,
-    RecordAction Action
-    ) {
-    public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action)
-        : this(G_ChallengeID, _Msg.ID, _Msg.SenderAddress, _Msg.DestinationAddress, _Msg.MessageType, 
-               _Msg.Hops, _CurrentLoc, _Action) {}
+public record MessageJourneyRecord : BaseRecord {
+    public ObjectId? ChallengeID { get; set; }
+    public string MessageID { get; set; }
+    public string Sender { get; set; }
+    public string Destination { get; set; }
+    public string Type { get; set; }
+    public int Hops { get; set; }
+    public string CurrentLocation { get; set; }
+    public RecordAction Action { get; set; }
+
+    public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action) : base() {
+        ChallengeID = G_ChallengeID;
+        MessageID = _Msg.ID;
+        Sender = _Msg.SenderAddress;
+        Destination = _Msg.DestinationAddress;
+        Type = _Msg.MessageType;
+        Hops = _Msg.Hops;
+        CurrentLocation = _CurrentLoc;
+        Action = _Action;
+    }
 };

@@ -2,7 +2,7 @@ using LiteDB;
 
 namespace LleuadNetworkSim.Models.Repo;
 
-public record LuaProcessRecord
+public record LuaProcessRecord : BaseRecord
 {
     [BsonId]
     public ObjectId ID { get; set; }
@@ -10,6 +10,8 @@ public record LuaProcessRecord
     public string? Action { get; set; }
     public string? Information { get; set; }
 
+    public LuaProcessRecord() : base() { }
+
     public override string ToString()
-        => $"[{NodeID}]: {Action ?? ""} - {Information ?? ""}";
+        => $"[{NodeID} @ {RecordCreationTime:s}]: {Action ?? ""} - {Information ?? ""}";
 }

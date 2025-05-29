@@ -132,8 +132,6 @@ public class LuaController
                            
                            while (!_CT.IsCancellationRequested)
                            {
-                               LDB.BeginTrans();
-                               
                                if (Crtn.State == CoroutineState.Dead)
                                { Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine; }
                                
@@ -141,13 +139,11 @@ public class LuaController
 
                                try
                                {
-                                   _ = Crtn.Resume(DynValue.Nil, FirstLoad); 
-                                   LDB.Commit();
+                                   _ = Crtn.Resume(DynValue.Nil, FirstLoad);
                                }
                                catch (ScriptRuntimeException e)
                                {
                                    GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}");
-                                   LDB.Rollback();
                                    break;
                                }
 
@@ -176,8 +172,6 @@ public class LuaController
     }
 
     #region Passthrough
-    private Random? Rnd = null;
-    
     /// <summary>
     /// Attempts to save a value to the data register with a given key.
     /// </summary>
@@ -314,7 +308,15 @@ public class LuaController
     }
 
     private void DBLog(string _Type, string _Message) {
-        LPRCollection.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message });
+        Console.WriteLine($"{NodeID} writing to db");
+
+        try
+        { LPRCollection.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message }); }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
     #endregion
 

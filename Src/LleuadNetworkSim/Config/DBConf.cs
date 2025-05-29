@@ -21,4 +21,19 @@ static public class DBConf
 
     static public int MaxPageSize
         => 200;
+
+    static public int LPRecordVersion
+        => 2;
+
+    static public int ChallengeRecordVersion
+        => 2;
+    
+    static public int JourneyRecordVersion 
+        => 2;
+    
+    static public int FinalMessageRecordVersion 
+        => 2;
+
+    static public int RecordVersion
+        => LPRecordVersion | ChallengeRecordVersion | JourneyRecordVersion | FinalMessageRecordVersion;
 }

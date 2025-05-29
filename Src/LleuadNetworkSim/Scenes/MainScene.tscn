@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=32 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -22,6 +22,8 @@
 [ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
 [ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="21_bpy1e"]
 [ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="22_bpy1e"]
+[ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="23_3va76"]
+[ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/optbtn_Refresh.cs" id="24_wmecs"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -274,7 +276,7 @@ use_native_dialog = true
 
 [node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList")]
 title = "Details"
-position = Vector2i(923, 36)
+position = Vector2i(1010, 36)
 size = Vector2i(463, 790)
 wrap_controls = true
 transient = true
@@ -349,13 +351,15 @@ custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 alignment = 2
 
-[node name="Button" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2"]
+[node name="Button" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Refresh
 "
+script = ExtResource("23_3va76")
+DetailView = NodePath("../../../../..")
 
-[node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2"]
+[node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 size_flags_horizontal = 3
 selected = 0
@@ -368,6 +372,8 @@ popup/item_2/text = "5 Second"
 popup/item_2/id = 2
 popup/item_3/text = "10 Second"
 popup/item_3/id = 3
+script = ExtResource("24_wmecs")
+DetailView = NodePath("../../../../..")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 60)

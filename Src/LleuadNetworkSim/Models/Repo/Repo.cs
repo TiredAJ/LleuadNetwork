@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Godot;
 
 using LiteDB;
@@ -11,12 +13,11 @@ public class Repo
     static private string DefaultLocation => ProjectSettings.GlobalizePath("user://Data.db");
 
     static readonly private LiteDatabase DB_INSTANCE = new(DefaultLocation);
-
+    
     static private ILiteCollection<MessageJourneyRecord>? JourneyColl;
-
     static private ILiteCollection<FinalMessageRecord>? FinalMsgColl;
-
     static private ILiteCollection<ChallengeRecord>? ChallengeColl;
+    static private ILiteCollection<DBConfRecord>? DBConfColl;
 
     static private void CreateJourneyInstance() {
         JourneyColl = DB_INSTANCE.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
@@ -40,6 +41,18 @@ public class Repo
         ChallengeColl = DB_INSTANCE.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
 
         ChallengeColl.EnsureIndex(X => X.ChallengeName);
+    }
+
+    static private void StartupCheck() {
+        DBConfColl = DB_INSTANCE.GetCollection<DBConfRecord>(nameof(DBConfRecord));
+
+        DBConfRecord? Conf = DBConfColl.FindAll().Last();
+
+        if (Conf is null)
+        { DBConfColl.Insert(DBConfRecord.CurrentConf()); }
+
+        if (!Conf.CheckVersions())
+        { DB_INSTANCE.Rebuild(); }
     }
 
     static public void LogEvent(MessageJourneyRecord _MJR) {

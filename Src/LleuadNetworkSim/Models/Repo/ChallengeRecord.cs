@@ -2,12 +2,17 @@ using System;
 
 namespace LleuadNetworkSim.Models.Repo;
 
-public record ChallengeRecord(
-    int TotalNodesInvolved,
-    int TotalMessagesInvolved,
-    string ChallengeName,
-    DateTime StartTime,
-    TimeSpan RunTime = new TimeSpan()) {
-    public ChallengeRecord(int _TotalNodesInvolved, int _TotalMessagesInvolved, string _ChallengeName) 
-        : this(_TotalNodesInvolved, _TotalMessagesInvolved, _ChallengeName, DateTime.UtcNow) {}
+public record ChallengeRecord : BaseRecord 
+{
+    public int TotalNodesInvolved { get; set; }
+    public int TotalMessagesInvolved { get; set; }
+    public string ChallengeName { get; set; }
+    public DateTime StartTime { get; set; }
+    public TimeSpan RunTime { get; set; } = TimeSpan.Zero;
+
+    public ChallengeRecord(int _TotalNodesInvolved, int _TotalMessagesInvolved, string _ChallengeName) : base() {
+        TotalNodesInvolved = _TotalNodesInvolved;
+        TotalMessagesInvolved = _TotalMessagesInvolved;
+        ChallengeName = _ChallengeName;
+    }
 };

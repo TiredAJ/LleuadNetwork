@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Godot;
 
@@ -9,7 +10,7 @@ using LiteDB;
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
 
-using MoreLinq;
+using Timer = System.Threading.Timer;
 
 namespace LleuadNetworkSim.Scripts;
 
@@ -23,6 +24,7 @@ public partial class win_DetailView : Window
     private List<string> NodeIDs = [];
     private Views Selectedview = Views.LuaProcess;
     private bool IsAutoRefreshing = false;
+    private Timer RefreshTimer;
 
     [Export]
     private OptionButton NodeList = null!;
@@ -34,10 +36,14 @@ public partial class win_DetailView : Window
 
         LDB = new LiteDatabase($"Filename={DBConf.ConnectionString};ReadOnly=true");
 
+        Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
+        
         LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
         MsgJourneyCollection = LDB.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
         FinalMsgCollection = LDB.GetCollection<FinalMessageRecord>(DBConf.FinalMessageCollName);
         ChallengeRecord = LDB.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
+
+        RefreshTimer = new Timer(_Refresh);
         
         base._Ready();
     }
@@ -91,17 +97,44 @@ public partial class win_DetailView : Window
         if (IsAutoRefreshing)
         { IsAutoRefreshing = false; }
         
-        _Refresh();
+        _Refresh(null);
     }
 
-    private void _Refresh() {
+    public void SetAutoRefresh(DetailViewRefreshMode _Mode) {
+
+        Console.WriteLine($"Autorefresh set to {_Mode}");
+        
+        if (_Mode == DetailViewRefreshMode.Manual)
+        {
+            RefreshTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            IsAutoRefreshing = false;
+            return;
+        }
+
+        long Interval = _Mode switch {
+            DetailViewRefreshMode.OneSec => 1000,
+            DetailViewRefreshMode.FiveSec => 5000,
+            DetailViewRefreshMode.TenSec => 10000,
+            _ => 1000L
+        };
+
+        RefreshTimer.Change(500, Interval);
+    }
+
+    private void _Refresh(object? _) {
+
+        Console.WriteLine("refreshing");
+
         if (LPRCollection.Count() <= 0)
-        { return; }
+        {
+            Console.WriteLine("no records to load");
+            return;
+        }
 
         List<LuaProcessRecord> LPRecords = LPRCollection.FindAll().Take(DBConf.MaxPageSize).ToList();
 
         DetailsList.Clear();
-                
+        
         LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
 
         Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");

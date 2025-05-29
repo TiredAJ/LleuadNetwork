@@ -45,8 +45,11 @@ local function HandleDiscoveryResponse(Msg)
     end
     
     if NodePorts[Msg.Port] ~= nil then
+        print("adding to Addrs of " .. Msg.Port);
+        
         NodePorts[Msg.Port].Addrs.Insert(json.deserialize(Msg.GetPayload()));
     else
+        print("Creating new nested object for port " .. Msg.Port);
         NodePorts[Msg.Port] = {
             Key = Msg.SenderAddress,
             Addrs = {}
@@ -152,14 +155,11 @@ function Process(NilVal, FirstLoad)
         print("First time discovering");
         Discover();
     else
-        print("Not first load")
         Load();
     end
 
     if ShouldSendDiscovery then
         Discover()
-    else
-        print("Not sending discovery");
     end;
     
     if Backlog_GetCount() ~= 0 then
