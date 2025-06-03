@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 
 using Godot;
+using Godot.Logging;
 
 using LiteDB;
 
@@ -43,16 +45,25 @@ public class Repo
         ChallengeColl.EnsureIndex(X => X.ChallengeName);
     }
 
-    static private void StartupCheck() {
+    static public void StartupCheck() {
         DBConfColl = DB_INSTANCE.GetCollection<DBConfRecord>(nameof(DBConfRecord));
 
-        DBConfRecord? Conf = DBConfColl.FindAll().Last();
+        DBConfRecord? Conf = DBConfColl.FindAll().LastOrDefault();
 
         if (Conf is null)
-        { DBConfColl.Insert(DBConfRecord.CurrentConf()); }
+        {
+            DBConfColl.Insert(DBConfRecord.CurrentConf());
+            GodotLogger.LogWarning("No DBConf found, inserting...");
+            return;
+        }
 
         if (!Conf.CheckVersions())
-        { DB_INSTANCE.Rebuild(); }
+        {
+            DB_INSTANCE.Rebuild();
+            GodotLogger.LogWarning("DBConf mismatch. Rebuilding...");
+        }
+
+        DBConfColl.Upsert(DBConfRecord.CurrentConf());
     }
 
     static public void LogEvent(MessageJourneyRecord _MJR) {

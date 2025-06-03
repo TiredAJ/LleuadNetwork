@@ -1,12 +1,11 @@
 using Godot;
-using System;
 
-using LleuadNetworkSim.Scripts;
+namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class optbtn_Refresh : OptionButton
 {
     [Export]
-    private win_DetailView DetailView;
+    private win_DetailView DetailView = null!;
     
     public override void _Ready() {
 

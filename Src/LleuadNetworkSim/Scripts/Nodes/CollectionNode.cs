@@ -17,6 +17,7 @@ using Godot.Logging;
 using LleuadNetworkSim.Models;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
+using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -47,6 +48,8 @@ public partial class CollectionNode : Node, IPersistable
         UserData.RegisterType<Message>();
         UserData.RegisterType<ReadonlyMessage>();
         UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
+        
+        Repo.StartupCheck();
         
         base._Ready();
     }
@@ -368,7 +371,7 @@ public partial class CollectionNode : Node, IPersistable
     #region Challenges
 
     private Maybe<MapChallenge> Challenge = Maybe.None;
-    private bool IsRunningchallenge = false;
+    private bool IsRunningchallenge;
     private CancellationTokenSource CTSource = null!;
     
     public async Task RunChallenge() {

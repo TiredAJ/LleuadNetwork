@@ -85,7 +85,7 @@ public partial class LuaScriptAssembler
                             { File.Delete(_Destination); }
 
                             if (!Directory.Exists(Path.GetDirectoryName(_Destination)))
-                            { Directory.CreateDirectory(Path.GetDirectoryName(_Destination)); }
+                            { Directory.CreateDirectory(Path.GetDirectoryName(_Destination)!); }
 
                             File.Create(_Destination).Close();
                             

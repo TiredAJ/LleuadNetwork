@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=33 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -23,7 +23,8 @@
 [ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="21_bpy1e"]
 [ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="22_bpy1e"]
 [ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="23_3va76"]
-[ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/optbtn_Refresh.cs" id="24_wmecs"]
+[ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
+[ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -274,15 +275,16 @@ access = 2
 filters = PackedStringArray("*.lua")
 use_native_dialog = true
 
-[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList")]
+[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList", "dbg_btn_Clear")]
 title = "Details"
-position = Vector2i(1010, 36)
+initial_position = 2
 size = Vector2i(463, 790)
 wrap_controls = true
 transient = true
 script = ExtResource("21_bpy1e")
 NodeList = NodePath("VBoxContainer/VBoxContainer/OptionButton")
 DetailsList = NodePath("VBoxContainer/ItemList")
+dbg_btn_Clear = NodePath("VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2/Button2")
 
 [node name="TextureRect" type="TextureRect" parent="DetailView"]
 z_index = -2
@@ -320,26 +322,29 @@ layout_mode = 2
 [node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
 layout_mode = 2
 
-[node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
+[node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 button_pressed = true
 button_group = SubResource("ButtonGroup_gyaec")
 text = "Script Output"
 script = ExtResource("22_bpy1e")
+DetailView = NodePath("../../../../..")
 metadata/View = "Script_Output"
 
-[node name="CheckBox2" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
+[node name="CheckBox2" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 button_group = SubResource("ButtonGroup_gyaec")
 text = "Message Journey"
 script = ExtResource("22_bpy1e")
+DetailView = NodePath("../../../../..")
 metadata/View = "Message_Journey"
 
-[node name="CheckBox3" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer"]
+[node name="CheckBox3" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 button_group = SubResource("ButtonGroup_gyaec")
 text = "Challenge Output"
 script = ExtResource("22_bpy1e")
+DetailView = NodePath("../../../../..")
 metadata/View = "Challenge_Output"
 
 [node name="Container" type="Container" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
@@ -362,6 +367,7 @@ DetailView = NodePath("../../../../..")
 [node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2" node_paths=PackedStringArray("DetailView")]
 layout_mode = 2
 size_flags_horizontal = 3
+alignment = 1
 selected = 0
 item_count = 4
 popup/item_0/text = "Manual"
@@ -373,6 +379,13 @@ popup/item_2/id = 2
 popup/item_3/text = "10 Second"
 popup/item_3/id = 3
 script = ExtResource("24_wmecs")
+DetailView = NodePath("../../../../..")
+
+[node name="Button2" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DEBUG - Clear"
+script = ExtResource("25_wmecs")
 DetailView = NodePath("../../../../..")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="DetailView/VBoxContainer/VBoxContainer"]

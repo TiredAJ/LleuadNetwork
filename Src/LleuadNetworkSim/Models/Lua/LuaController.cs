@@ -67,8 +67,8 @@ public class LuaController
     //the number of available ports this node has 
     public int PortCount { get; set; }
     public List<Message> Backlog = [];
-    public Action<int, Message> ExtSendMessage { get; set; }
-    public Action PullBacklog { get; set; }
+    public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
+    public Action PullBacklog { get; set; } = () => { };
 
     public int AutoYieldCounter { get; set; } = 60_000;
     

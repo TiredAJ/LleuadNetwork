@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading;
 
 using Godot;
+using Godot.Logging;
 
 using LiteDB;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Scripts.Buttons;
 
 using Timer = System.Threading.Timer;
 
@@ -16,21 +18,25 @@ namespace LleuadNetworkSim.Scripts;
 
 public partial class win_DetailView : Window
 {
-    private LiteDatabase LDB;
-    private ILiteCollection<LuaProcessRecord> LPRCollection;
-    private ILiteCollection<MessageJourneyRecord> MsgJourneyCollection;
-    private ILiteCollection<FinalMessageRecord> FinalMsgCollection;
-    private ILiteCollection<ChallengeRecord> ChallengeRecord;
+    private LiteDatabase LDB = null!;
+    private ILiteCollection<LuaProcessRecord> LPRCollection = null!;
+    private ILiteCollection<MessageJourneyRecord> MsgJourneyCollection = null!;
+    private ILiteCollection<FinalMessageRecord> FinalMsgCollection = null!;
+    private ILiteCollection<ChallengeRecord> ChallengeRecordCollection = null!;
     private List<string> NodeIDs = [];
     private Views Selectedview = Views.LuaProcess;
     private bool IsAutoRefreshing = false;
-    private Timer RefreshTimer;
+    private Timer RefreshTimer = null!;
 
     [Export]
     private OptionButton NodeList = null!;
 
     [Export]
     private ItemList DetailsList = null!;
+
+    [Export]
+    // ReSharper disable once InconsistentNaming
+    private Button dbg_btn_Clear = null!;
 
     public override void _Ready() {
 
@@ -41,9 +47,13 @@ public partial class win_DetailView : Window
         LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
         MsgJourneyCollection = LDB.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
         FinalMsgCollection = LDB.GetCollection<FinalMessageRecord>(DBConf.FinalMessageCollName);
-        ChallengeRecord = LDB.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
+        ChallengeRecordCollection = LDB.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
 
         RefreshTimer = new Timer(_Refresh);
+
+#if DEBUG
+        dbg_btn_Clear.Visible = true;
+#endif
         
         base._Ready();
     }
@@ -138,5 +148,28 @@ public partial class win_DetailView : Window
         LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
 
         Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");
+    }
+
+    public void Clear() {
+
+        int TotalDeletedRecords = 0;
+        
+        switch (Selectedview)
+        {
+            case Views.LuaProcess:
+                TotalDeletedRecords = LPRCollection.DeleteAll();
+                break;
+            case Views.MsgJourney:
+                TotalDeletedRecords = MsgJourneyCollection.DeleteAll();
+                break;
+            case Views.FinalMessage:
+                TotalDeletedRecords = FinalMsgCollection.DeleteAll();
+                break;
+            case Views.ChallengeRecord:
+                TotalDeletedRecords = ChallengeRecordCollection.DeleteAll();
+                break;
+        }
+        
+        GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
     }
 }

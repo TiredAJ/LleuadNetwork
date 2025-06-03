@@ -1,3 +1,5 @@
+using LiteDB;
+
 using LleuadNetworkSim.Config;
 
 using NJsonSchema;
@@ -6,6 +8,9 @@ namespace LleuadNetworkSim.Models.Repo;
 
 public record DBConfRecord
 {
+    [BsonId]
+    public int ID { get; } = -1;
+    
     public int LPRecordVersion { get; set; }
     public int ChallengeRecordVersion { get; set; }
     public int JourneyRecordVersion { get; set; }

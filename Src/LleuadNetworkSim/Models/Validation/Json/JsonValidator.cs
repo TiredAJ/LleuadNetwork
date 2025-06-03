@@ -61,7 +61,7 @@ public class JsonValidator
             Exc = new JsonSchemaVersionException("CollectionNodeVO", CollectionNodeVO.SchemaVersion, 
                                                _JData["_ObjVersion"]!.ToInt32()); 
         }
-        else if (_JData["NetworkNodes"]!.AsArray().Any(X => X!["_ObjVersion"].ToInt32() != NetworkNodeVO.SchemaVersion))
+        else if (_JData["NetworkNodes"]!.AsArray().Any(X => X!["_ObjVersion"]!.ToInt32() != NetworkNodeVO.SchemaVersion))
         { Exc = new JsonSchemaVersionException("CollectionNodeVO", NetworkNodeVO.SchemaVersion); }
 
         if (Exc is not null)
