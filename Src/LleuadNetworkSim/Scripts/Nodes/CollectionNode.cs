@@ -396,8 +396,8 @@ public partial class CollectionNode : Node, IPersistable
         foreach (KeyValuePair<string, NetworkNode> KVP in NNs)
         { KVP.Value.Backlog = new ConcurrentQueue<Message>(Data[KVP.Key]); }
 
-        G_TotalMessagesInPlay = Data.Sum(X => X.Value.Count);
-        G_ChallengeID = Repo.LogEvent(new ChallengeRecord(Data.Count, G_TotalMessagesInPlay, Challenge.Value.Name));
+        G_TotalMessagesInPlay = Data.Sum(X => X.Value.LPRecordCount);
+        G_ChallengeID = Repo.LogEvent(new ChallengeRecord(Data.LPRecordCount, G_TotalMessagesInPlay, Challenge.Value.Name));
         */
         CancellationToken CT = CTSource.Token;
 
@@ -479,5 +479,15 @@ public partial class CollectionNode : Node, IPersistable
     static private bool IsFile(string _Path)
         => File.Exists(_Path);
 
+    #endregion
+
+    #region Misc
+    public override void _Notification(int _NotificationID) {
+
+        if (_NotificationID == NotificationWMCloseRequest)
+        { Repo.Dispose(); }
+        
+        base._Notification(_NotificationID);
+    }
     #endregion
 }

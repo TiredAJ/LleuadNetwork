@@ -1,7 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
-using Godot;
 using Godot.Logging;
 
 using LiteDB;
@@ -10,16 +11,15 @@ using LleuadNetworkSim.Config;
 
 namespace LleuadNetworkSim.Models.Repo;
 
-public class Repo
+//Temporary until I can be bothered to get DI working. 
+static public class Repo
 {
-    static private string DefaultLocation => ProjectSettings.GlobalizePath("user://Data.db");
-
-    static readonly private LiteDatabase DB_INSTANCE = new(DefaultLocation);
+    static readonly private LiteDatabase DB_INSTANCE = new(DBConf.ConnectionString);
     
     static private ILiteCollection<MessageJourneyRecord>? JourneyColl;
     static private ILiteCollection<FinalMessageRecord>? FinalMsgColl;
     static private ILiteCollection<ChallengeRecord>? ChallengeColl;
-    static private ILiteCollection<DBConfRecord>? DBConfColl;
+    static private ILiteCollection<LuaProcessRecord>? LPRColl;
 
     static private void CreateJourneyInstance() {
         JourneyColl = DB_INSTANCE.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
@@ -45,8 +45,18 @@ public class Repo
         ChallengeColl.EnsureIndex(X => X.ChallengeName);
     }
 
+    static private void CreateLPRInstance() {
+        LPRColl = DB_INSTANCE.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
+        
+        LPRColl.EnsureIndex(X => X.NodeID);
+    }
+
+    static public void Dispose() {
+        DB_INSTANCE.Dispose();
+    }
+
     static public void StartupCheck() {
-        DBConfColl = DB_INSTANCE.GetCollection<DBConfRecord>(nameof(DBConfRecord));
+        ILiteCollection<DBConfRecord>? DBConfColl = DB_INSTANCE.GetCollection<DBConfRecord>(nameof(DBConfRecord));
 
         DBConfRecord? Conf = DBConfColl.FindAll().LastOrDefault();
 
@@ -86,5 +96,85 @@ public class Repo
 
         return ChallengeColl!.Insert(_CR)["_id"].AsObjectId;
     }
+
+    #region Deletion
+    static public int DeleteAllLPRecords() {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }
+
+        int DeleteCount = LPRColl!.DeleteAll(); 
+        
+        DB_INSTANCE.Commit();
+        
+        return DeleteCount;
+    }
+
+    static public int DeleteAllJourneyRecords() {
+        if (JourneyColl is null)
+        { CreateJourneyInstance(); }
+
+        return JourneyColl!.DeleteAll();
+    }
+
+    static public int DeleteAllFinalMsgRecords() {
+        if (FinalMsgColl is null)
+        { CreateFinalMsgInstance(); }
+
+        return FinalMsgColl!.DeleteAll();
+    }
+
+    static public int DeleteAllChallengeRecords() {
+        if (ChallengeColl is null)
+        { CreateChallengeInstance(); }
+
+        return ChallengeColl!.DeleteAll();
+    }
+    #endregion
+
+    #region Get
+    static public IEnumerable<LuaProcessRecord> FindAll(int _Max = -1) {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }
+        
+        return LPRColl!.FindAll()
+                      .Take(_Max == -1 ? DBConf.MaxPageSize : _Max);
+    }
+    #endregion
+
+    #region Count
+    static public long LPRecordCount() {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }
+        
+        return LPRColl!.LongCount();
+    }
+    #endregion
+
+    #region Insert
+    static public BsonValue Insert(LuaProcessRecord _LPR) {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }
+
+        return LPRColl!.Insert(_LPR);
+    }
+    #endregion
+
+    #region Find
+    static public IEnumerable<LuaProcessRecord> FindBy(Expression<Func<LuaProcessRecord, bool>> _Predicate) {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }
+        
+        return LPRColl!.Find(_Predicate);
+    }
+    #endregion
+
+    #region RawAccess
+    static public ILiteCollection<LuaProcessRecord> GetLPRCollection() {
+        if (LPRColl is null)
+        { CreateLPRInstance(); }        
+        
+        return LPRColl;
+    }
+    #endregion
 }
 

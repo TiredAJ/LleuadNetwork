@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=34 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
 [ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="21_bpy1e"]
 [ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="22_bpy1e"]
+[ext_resource type="Script" uid="uid://dbi4ymdmfrac3" path="res://Scripts/Buttons/optbtn_NodeSelection.cs" id="22_mymud"]
 [ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="23_3va76"]
 [ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
 [ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
@@ -311,10 +312,13 @@ size_flags_horizontal = 3
 [node name="VBoxContainer" type="VBoxContainer" parent="DetailView/VBoxContainer"]
 layout_mode = 2
 
-[node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer"]
+[node name="OptionButton" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer" node_paths=PackedStringArray("DetailView")]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 fit_to_longest_item = false
+allow_reselect = true
+script = ExtResource("22_mymud")
+DetailView = NodePath("../../..")
 
 [node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
 layout_mode = 2

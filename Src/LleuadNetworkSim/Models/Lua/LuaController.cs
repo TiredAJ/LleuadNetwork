@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +11,6 @@ using CSharpFunctionalExtensions;
 using Godot;
 using Godot.Logging;
 
-using LiteDB;
-
-using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Exceptions.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
@@ -27,6 +23,7 @@ using MoonSharp.VsCodeDebugger;
 
 using FileAccess = System.IO.FileAccess;
 using Script = MoonSharp.Interpreter.Script;
+using LeRepo = LleuadNetworkSim.Models.Repo.Repo;
 
 namespace LleuadNetworkSim.Models.Lua;
 
@@ -50,19 +47,8 @@ public class LuaController
     readonly private Dictionary<string, DynValue> DataRegister = [];
     readonly private Dictionary<string, string> ScriptFiles = [];
     readonly private Dictionary<string, Message> MessagesInProcess = [];
-    readonly private LiteDatabase LDB;
-    readonly private ILiteCollection<LuaProcessRecord> LPRCollection;
     
     private DynValue ProcessCoroutine = DynValue.Nil;
-
-    public LuaController(string _Connection) {
-        LDB = new LiteDatabase(_Connection);
-
-        Console.WriteLine(_Connection);
-        
-        LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
-        LPRCollection.EnsureIndex(X => X.NodeID);
-    }
     
     //the number of available ports this node has 
     public int PortCount { get; set; }
@@ -311,7 +297,7 @@ public class LuaController
         Console.WriteLine($"{NodeID} writing to db");
 
         try
-        { LPRCollection.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message }); }
+        { LeRepo.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message }); }
         catch (Exception e)
         {
             Console.WriteLine(e);
@@ -319,8 +305,4 @@ public class LuaController
         }
     }
     #endregion
-
-    public void Close() {
-        LDB.Dispose();
-    }
 }

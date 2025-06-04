@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
+using CSharpFunctionalExtensions;
+
 using Godot;
 using Godot.Logging;
-
-using LiteDB;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
@@ -18,15 +18,11 @@ namespace LleuadNetworkSim.Scripts;
 
 public partial class win_DetailView : Window
 {
-    private LiteDatabase LDB = null!;
-    private ILiteCollection<LuaProcessRecord> LPRCollection = null!;
-    private ILiteCollection<MessageJourneyRecord> MsgJourneyCollection = null!;
-    private ILiteCollection<FinalMessageRecord> FinalMsgCollection = null!;
-    private ILiteCollection<ChallengeRecord> ChallengeRecordCollection = null!;
     private List<string> NodeIDs = [];
     private Views Selectedview = Views.LuaProcess;
     private bool IsAutoRefreshing = false;
     private Timer RefreshTimer = null!;
+    private Maybe<string> _SelectedNodeID = Maybe<string>.None;
 
     [Export]
     private OptionButton NodeList = null!;
@@ -39,17 +35,9 @@ public partial class win_DetailView : Window
     private Button dbg_btn_Clear = null!;
 
     public override void _Ready() {
-
-        LDB = new LiteDatabase($"Filename={DBConf.ConnectionString};ReadOnly=true");
-
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
-        
-        LPRCollection = LDB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
-        MsgJourneyCollection = LDB.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
-        FinalMsgCollection = LDB.GetCollection<FinalMessageRecord>(DBConf.FinalMessageCollName);
-        ChallengeRecordCollection = LDB.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
 
-        RefreshTimer = new Timer(_Refresh);
+        RefreshTimer = new Timer((_) => CallDeferredThreadGroup(nameof(_Refresh)));
 
 #if DEBUG
         dbg_btn_Clear.Visible = true;
@@ -85,13 +73,9 @@ public partial class win_DetailView : Window
             _ => Selectedview
         };
     }
-    
-    public override void _Notification(int _Notification)
-    {
-        if (_Notification == NotificationWMCloseRequest)
-        { LDB.Dispose(); }
-        
-        base._Notification(_Notification);
+
+    public void ChangeSelectedNode(string? _Selection) {
+        _SelectedNodeID = _Selection;
     }
     
     private enum Views
@@ -107,7 +91,7 @@ public partial class win_DetailView : Window
         if (IsAutoRefreshing)
         { IsAutoRefreshing = false; }
         
-        _Refresh(null);
+        _Refresh();
     }
 
     public void SetAutoRefresh(DetailViewRefreshMode _Mode) {
@@ -131,19 +115,32 @@ public partial class win_DetailView : Window
         RefreshTimer.Change(500, Interval);
     }
 
-    private void _Refresh(object? _) {
+    private void _Refresh() {
 
         Console.WriteLine("refreshing");
 
-        if (LPRCollection.Count() <= 0)
+        DetailsList.Clear();
+
+        if (Repo.LPRecordCount() <= 0)
         {
             Console.WriteLine("no records to load");
             return;
         }
 
-        List<LuaProcessRecord> LPRecords = LPRCollection.FindAll().Take(DBConf.MaxPageSize).ToList();
+        var RawLinq = Repo.FindAll()
+                          .Where(X => X.NodeID == _SelectedNodeID.Value)
+                          .ToList();
 
-        DetailsList.Clear();
+        var LDB = Repo.GetLPRCollection()
+                      .Find(X => X.NodeID == _SelectedNodeID.Value)
+                      .ToList();
+
+        var LDB2 = Repo.FindBy(X => X.NodeID == _SelectedNodeID.Value)
+                       .ToList();
+        
+        List<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
+                                               ? Repo.FindAll().ToList() 
+                                               : Repo.GetLPRCollection().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
         
         LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
 
@@ -157,19 +154,21 @@ public partial class win_DetailView : Window
         switch (Selectedview)
         {
             case Views.LuaProcess:
-                TotalDeletedRecords = LPRCollection.DeleteAll();
+                TotalDeletedRecords = Repo.DeleteAllLPRecords();
                 break;
             case Views.MsgJourney:
-                TotalDeletedRecords = MsgJourneyCollection.DeleteAll();
+                TotalDeletedRecords = Repo.DeleteAllJourneyRecords();
                 break;
             case Views.FinalMessage:
-                TotalDeletedRecords = FinalMsgCollection.DeleteAll();
+                TotalDeletedRecords = Repo.DeleteAllFinalMsgRecords();
                 break;
             case Views.ChallengeRecord:
-                TotalDeletedRecords = ChallengeRecordCollection.DeleteAll();
+                TotalDeletedRecords = Repo.DeleteAllChallengeRecords();
                 break;
         }
         
         GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
+        
+        _Refresh();
     }
 }

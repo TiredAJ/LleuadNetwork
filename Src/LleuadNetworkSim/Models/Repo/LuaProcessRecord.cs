@@ -6,7 +6,7 @@ public record LuaProcessRecord : BaseRecord
 {
     [BsonId]
     public ObjectId? ID { get; set; }
-    required public string NodeID { get; set; }
+    public string NodeID { get; set; }
     public string? Action { get; set; }
     public string? Information { get; set; }
 

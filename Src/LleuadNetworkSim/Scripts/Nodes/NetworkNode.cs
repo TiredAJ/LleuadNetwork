@@ -116,19 +116,11 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         
         base._InputEvent(_Viewport, _Event, _ShapeIdx);
     }
-    
-    public override void _Notification(int _Notification)
-    {
-        if (_Notification == NotificationWMCloseRequest)
-        { LC.Close(); }
-        
-        base._Notification(_Notification);
-    }
     #endregion
 
     #region Packets and messaging
     private ConcurrentQueue<Message> Backlog = [];
-    private LuaController LC = new(DBConf.ConnectionString);
+    private LuaController LC = new();
     
     public Task StartNode(LuaScript _LS, CancellationToken _CT)
         => Task.Run(() => {
