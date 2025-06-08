@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=35 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -26,6 +26,7 @@
 [ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="23_3va76"]
 [ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
 [ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
+[ext_resource type="Script" uid="uid://beary1w3x86qc" path="res://Scripts/DependencyRegistrationNode.cs" id="27_4sso6"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -413,3 +414,6 @@ text = "Search"
 [node name="ItemList" type="ItemList" parent="DetailView/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="DI" type="Node" parent="."]
+script = ExtResource("27_4sso6")

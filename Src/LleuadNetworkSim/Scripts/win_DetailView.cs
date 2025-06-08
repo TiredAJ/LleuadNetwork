@@ -6,6 +6,7 @@ using System.Threading;
 using CSharpFunctionalExtensions;
 
 using Godot;
+using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
 
 using LleuadNetworkSim.Config;
@@ -33,6 +34,10 @@ public partial class win_DetailView : Window
     [Export]
     // ReSharper disable once InconsistentNaming
     private Button dbg_btn_Clear = null!;
+
+    [Inject]
+    public IDBWrapper DB;
+    
 
     public override void _Ready() {
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
@@ -126,21 +131,10 @@ public partial class win_DetailView : Window
             Console.WriteLine("no records to load");
             return;
         }
-
-        var RawLinq = Repo.FindAll()
-                          .Where(X => X.NodeID == _SelectedNodeID.Value)
-                          .ToList();
-
-        var LDB = Repo.GetLPRCollection()
-                      .Find(X => X.NodeID == _SelectedNodeID.Value)
-                      .ToList();
-
-        var LDB2 = Repo.FindBy(X => X.NodeID == _SelectedNodeID.Value)
-                       .ToList();
         
         List<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
-                                               ? Repo.FindAll().ToList() 
-                                               : Repo.GetLPRCollection().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
+           ? DB.LPRColl().FindAll().ToList() 
+           : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
         
         LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
 
