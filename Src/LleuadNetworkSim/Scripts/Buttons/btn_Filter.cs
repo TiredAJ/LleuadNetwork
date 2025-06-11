@@ -1,21 +1,20 @@
 using Godot;
-using System;
 
 using LleuadNetworkSim.Scripts;
 
-public partial class btn_Search : Button
+public partial class btn_Filter : Button
 {
     [Export]
-    public LineEdit SearchBar = null!;
+    public LineEdit FilterBar = null!;
 
     [Export]
     public win_DetailView DetailView = null!;
     
     public override void _Pressed() {
         
-        string? SearchQ = SearchBar.Text;
+        string? FilterQ = FilterBar.Text;
         
-        DetailView.ChangeSearchCriteria(SearchQ == string.Empty ? null : SearchQ);
+        DetailView.ChangeFilterCriteria(FilterQ == string.Empty ? null : FilterQ);
         
         base._Pressed();
     }

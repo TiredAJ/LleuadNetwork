@@ -65,14 +65,17 @@ public class LuaController
         
         LoadGlobals();
 
-        _ = _LS.PreLoaded 
-               ? Scrpt.DoString(_LS.FileData) 
-               : Scrpt.LoadFile(_LS.FileLoc);
+        if (_LS.PreLoaded)
+        { Scrpt.DoString(_LS.FileData); }
+        else
+        { Scrpt.LoadFile(_LS.FileLoc); }
+
+        DynValue TempProcess = Scrpt.Globals.Get("Process");
         
-        this.ProcessCoroutine = Scrpt.Globals.Get("Process");
+        if (TempProcess is not { Type: DataType.Function })
+        { throw new ScriptMissingRequiredFuncException(Path.GetFileName(_LS.FileLoc), "ProcessMessage"); }
         
-        if (ProcessCoroutine is not { Type: DataType.Function })
-        { throw new ScriptMissingRequiredFuncException("N/A", "ProcessMessage"); }
+        this.ProcessCoroutine = TempProcess;
     }
 
     private void LoadGlobals() {

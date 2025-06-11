@@ -25,7 +25,7 @@ public partial class win_DetailView : Window
     private bool IsAutoRefreshing = false;
     private Timer RefreshTimer = null!;
     private Maybe<string> _SelectedNodeID = Maybe<string>.None;
-    private Maybe<string> _SearchCriteria = Maybe<string>.None; 
+    private Maybe<string> _FilterCriteria = Maybe<string>.None; 
 
     [Export]
     private OptionButton NodeList = null!;
@@ -84,8 +84,8 @@ public partial class win_DetailView : Window
         _SelectedNodeID = _Selection;
     }
 
-    public void ChangeSearchCriteria(string? _SearchQ) {
-        _SearchCriteria = _SearchQ;
+    public void ChangeFilterCriteria(string? _FilterQ) {
+        _FilterCriteria = _FilterQ;
     }
     
     private enum Views
@@ -137,19 +137,18 @@ public partial class win_DetailView : Window
         
         DetailsList.Clear();
 
-        List<string> RecordData = [];
-        
         IEnumerable<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
            ? DB.LPRColl().FindAll() 
            : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value);
 
-        if (_SearchCriteria.HasValue)
-        {
-            //RecordData = LPRecords.Where(X => X.Action)
-            
-        }
+        List<string> RecordData = _FilterCriteria.HasValue
+                                      ? LPRecords.Where(X => X.Action == _FilterCriteria.Value)
+                                                 .Select(X => X.ToString())
+                                                 .ToList()
+                                      : LPRecords.Select(X => X.ToString())
+                                                 .ToList();
         
-        RecordData?.ForEach(X => DetailsList.AddItem(X.ToString()));
+        RecordData?.ForEach(X => DetailsList.AddItem(X));
         
         Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");
     }

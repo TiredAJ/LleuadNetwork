@@ -404,20 +404,20 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="txt_SearchBar" type="LineEdit" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="txt_FilterBar" type="LineEdit" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search"
 editable = false
 select_all_on_focus = true
 
-[node name="btn_Search" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("SearchBar", "DetailView")]
+[node name="btn_Filter" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("SearchBar", "DetailView")]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 disabled = true
 text = "Search"
 script = ExtResource("28_r0vnq")
-SearchBar = NodePath("../txt_SearchBar")
+SearchBar = NodePath("../txt_FilterBar")
 DetailView = NodePath("../../../..")
 
 [node name="ItemList" type="ItemList" parent="DetailView/VBoxContainer"]
