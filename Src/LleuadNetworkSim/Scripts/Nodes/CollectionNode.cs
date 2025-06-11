@@ -17,7 +17,6 @@ using Godot.Logging;
 using LleuadNetworkSim.Models;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
-using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -48,8 +47,6 @@ public partial class CollectionNode : Node, IPersistable
         UserData.RegisterType<Message>();
         UserData.RegisterType<ReadonlyMessage>();
         UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
-        
-        Repo.StartupCheck();
         
         base._Ready();
     }
@@ -479,15 +476,5 @@ public partial class CollectionNode : Node, IPersistable
     static private bool IsFile(string _Path)
         => File.Exists(_Path);
 
-    #endregion
-
-    #region Misc
-    public override void _Notification(int _NotificationID) {
-
-        if (_NotificationID == NotificationWMCloseRequest)
-        { Repo.Dispose(); }
-        
-        base._Notification(_NotificationID);
-    }
     #endregion
 }

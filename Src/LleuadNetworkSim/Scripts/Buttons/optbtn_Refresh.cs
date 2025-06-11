@@ -17,8 +17,8 @@ public partial class optbtn_Refresh : OptionButton
 
 public enum DetailViewRefreshMode
 {
-    Manual,
-    OneSec,
-    FiveSec,
-    TenSec
+    MANUAL,
+    ONE_SEC,
+    FIVE_SEC,
+    TEN_SEC
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=36 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -27,6 +27,7 @@
 [ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
 [ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
 [ext_resource type="Script" uid="uid://beary1w3x86qc" path="res://Scripts/DependencyRegistrationNode.cs" id="27_4sso6"]
+[ext_resource type="Script" uid="uid://bdr11g2sgmcab" path="res://Scripts/Buttons/btn_Search.cs" id="28_r0vnq"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -44,6 +45,11 @@
 
 [node name="MainScene" type="Node2D"]
 metadata/_edit_vertical_guides_ = [1000.0]
+
+[node name="DI" type="Node" parent="."]
+process_priority = -1
+process_physics_priority = -1
+script = ExtResource("27_4sso6")
 
 [node name="CollectionNode" type="Node" parent="." node_paths=PackedStringArray("DetailView")]
 script = ExtResource("6_y4jh7")
@@ -398,22 +404,22 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="LineEdit" type="LineEdit" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="txt_SearchBar" type="LineEdit" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search"
 editable = false
 select_all_on_focus = true
 
-[node name="Button" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="btn_Search" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("SearchBar", "DetailView")]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 disabled = true
 text = "Search"
+script = ExtResource("28_r0vnq")
+SearchBar = NodePath("../txt_SearchBar")
+DetailView = NodePath("../../../..")
 
 [node name="ItemList" type="ItemList" parent="DetailView/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="DI" type="Node" parent="."]
-script = ExtResource("27_4sso6")

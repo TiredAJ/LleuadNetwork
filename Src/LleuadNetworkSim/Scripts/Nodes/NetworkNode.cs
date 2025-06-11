@@ -8,19 +8,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Godot;
+using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
 
-using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
-
-using MoonSharp.Interpreter.Interop;
-
-using MoreLinq;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
@@ -122,6 +118,9 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private ConcurrentQueue<Message> Backlog = [];
     private LuaController LC = new();
     
+    [Inject]
+    public IDBWrapper DB;
+    
     public Task StartNode(LuaScript _LS, CancellationToken _CT)
         => Task.Run(() => {
 
@@ -133,6 +132,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
                         LC.Backlog = new List<Message>(Backlog);
                         
+                        LC.DB = DB;
                         LC.ExtSendMessage = SendMessage;
                         LC.PullBacklog = PullFromBacklog;
 
@@ -185,7 +185,8 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     
     public void MessageReceived(Message _Msg) {
 
-        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Received));
+        DB.JourneyColl()
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Received));
         
         if (_Msg.DestinationAddress == this.Name)
         {
@@ -210,8 +211,12 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     }
 
     private void ConsumeMessage(Message _Msg) {
-        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Consumed));
-        Repo.LogEvent(new FinalMessageRecord(_Msg, this.Name, true));
+
+        DB.JourneyColl()
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Consumed));
+
+        DB.FinalMsgColl()
+          .Insert(new FinalMessageRecord(_Msg, this.Name, true));
 
         Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
         
@@ -219,8 +224,12 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     }
 
     private void DropMessage(Message _Msg) {
-        Repo.LogEvent(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Dropped));
-        Repo.LogEvent(new FinalMessageRecord(_Msg, this.Name, false));
+
+        DB.JourneyColl()
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Dropped));
+
+        DB.FinalMsgColl()
+          .Insert(new FinalMessageRecord(_Msg, this.Name, false));
         
         Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
         

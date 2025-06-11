@@ -1,16 +1,17 @@
 using Godot;
-
 using Godot.DependencyInjection;
 
 using LleuadNetworkSim.Models.Repo;
 
 using Microsoft.Extensions.DependencyInjection;
 
+namespace LleuadNetworkSim.Scripts;
+
 public partial class DependencyRegistrationNode : Node, IServicesConfigurator
 {
-    public void ConfigureServices(IServiceCollection services) {
+    public void ConfigureServices(IServiceCollection _Services) {
 
-        services.AddGodotServices();
-        services.AddSingleton<IDBWrapper, DBWrapper>();
+        _Services.AddGodotServices();
+        _Services.AddSingleton<IDBWrapper, Repo>();
     }
 }

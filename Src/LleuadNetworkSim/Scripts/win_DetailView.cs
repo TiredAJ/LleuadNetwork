@@ -17,13 +17,15 @@ using Timer = System.Threading.Timer;
 
 namespace LleuadNetworkSim.Scripts;
 
+// ReSharper disable once InconsistentNaming
 public partial class win_DetailView : Window
 {
     private List<string> NodeIDs = [];
-    private Views Selectedview = Views.LuaProcess;
+    private Views Selectedview = Views.LUA_PROCESS;
     private bool IsAutoRefreshing = false;
     private Timer RefreshTimer = null!;
     private Maybe<string> _SelectedNodeID = Maybe<string>.None;
+    private Maybe<string> _SearchCriteria = Maybe<string>.None; 
 
     [Export]
     private OptionButton NodeList = null!;
@@ -38,7 +40,6 @@ public partial class win_DetailView : Window
     [Inject]
     public IDBWrapper DB;
     
-
     public override void _Ready() {
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
 
@@ -72,9 +73,9 @@ public partial class win_DetailView : Window
 
     public void ChangeView(string _SelectedView) {
         Selectedview = _SelectedView switch {
-            "Script_Output" => Views.LuaProcess,
-            "Challenge_Output" => Views.ChallengeRecord,
-            "Message_Journey" => Views.MsgJourney,
+            "Script_Output" => Views.LUA_PROCESS,
+            "Challenge_Output" => Views.CHALLENGE_RECORD,
+            "Message_Journey" => Views.MSG_JOURNEY,
             _ => Selectedview
         };
     }
@@ -82,13 +83,17 @@ public partial class win_DetailView : Window
     public void ChangeSelectedNode(string? _Selection) {
         _SelectedNodeID = _Selection;
     }
+
+    public void ChangeSearchCriteria(string? _SearchQ) {
+        _SearchCriteria = _SearchQ;
+    }
     
     private enum Views
     {
-        LuaProcess,
-        MsgJourney,
-        FinalMessage,
-        ChallengeRecord
+        LUA_PROCESS,
+        MSG_JOURNEY,
+        FINAL_MESSAGE,
+        CHALLENGE_RECORD
     }
 
     public void Refresh() {
@@ -103,7 +108,7 @@ public partial class win_DetailView : Window
 
         Console.WriteLine($"Autorefresh set to {_Mode}");
         
-        if (_Mode == DetailViewRefreshMode.Manual)
+        if (_Mode == DetailViewRefreshMode.MANUAL)
         {
             RefreshTimer.Change(Timeout.Infinite, Timeout.Infinite);
             IsAutoRefreshing = false;
@@ -111,9 +116,9 @@ public partial class win_DetailView : Window
         }
 
         long Interval = _Mode switch {
-            DetailViewRefreshMode.OneSec => 1000,
-            DetailViewRefreshMode.FiveSec => 5000,
-            DetailViewRefreshMode.TenSec => 10000,
+            DetailViewRefreshMode.ONE_SEC => 1000,
+            DetailViewRefreshMode.FIVE_SEC => 5000,
+            DetailViewRefreshMode.TEN_SEC => 10000,
             _ => 1000L
         };
 
@@ -124,20 +129,28 @@ public partial class win_DetailView : Window
 
         Console.WriteLine("refreshing");
 
-        DetailsList.Clear();
-
-        if (Repo.LPRecordCount() <= 0)
+        if (DB.LPRColl().Count() <= 0)
         {
             Console.WriteLine("no records to load");
             return;
         }
         
-        List<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
-           ? DB.LPRColl().FindAll().ToList() 
-           : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
-        
-        LPRecords?.ForEach(X => DetailsList.AddItem(X.ToString()));
+        DetailsList.Clear();
 
+        List<string> RecordData = [];
+        
+        IEnumerable<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
+           ? DB.LPRColl().FindAll() 
+           : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value);
+
+        if (_SearchCriteria.HasValue)
+        {
+            //RecordData = LPRecords.Where(X => X.Action)
+            
+        }
+        
+        RecordData?.ForEach(X => DetailsList.AddItem(X.ToString()));
+        
         Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");
     }
 
@@ -147,17 +160,17 @@ public partial class win_DetailView : Window
         
         switch (Selectedview)
         {
-            case Views.LuaProcess:
-                TotalDeletedRecords = Repo.DeleteAllLPRecords();
+            case Views.LUA_PROCESS:
+                TotalDeletedRecords = DB.LPRColl().DeleteAll();
                 break;
-            case Views.MsgJourney:
-                TotalDeletedRecords = Repo.DeleteAllJourneyRecords();
+            case Views.MSG_JOURNEY:
+                TotalDeletedRecords = DB.JourneyColl().DeleteAll();
                 break;
-            case Views.FinalMessage:
-                TotalDeletedRecords = Repo.DeleteAllFinalMsgRecords();
+            case Views.FINAL_MESSAGE:
+                TotalDeletedRecords = DB.FinalMsgColl().DeleteAll();
                 break;
-            case Views.ChallengeRecord:
-                TotalDeletedRecords = Repo.DeleteAllChallengeRecords();
+            case Views.CHALLENGE_RECORD:
+                TotalDeletedRecords = DB.ChallengeColl().DeleteAll();
                 break;
         }
         

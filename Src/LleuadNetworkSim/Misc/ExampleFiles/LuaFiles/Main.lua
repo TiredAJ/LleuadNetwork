@@ -21,6 +21,7 @@ end
 local function HandleDiscovery(Msg)
 
     print("Handling discovery on port " .. Msg.Port .. " from " .. Msg.SenderAddress);
+    Log("Discovery", "Handling discovery on port " .. Msg.Port .. " from " .. Msg.SenderAddress)
     
     NewMsg = Msg_GetNewMessage();
         
@@ -109,6 +110,7 @@ local function Discover()
         Msg.MessageType = "Discovery"
 
         print("sending discovery message on port " .. i);
+        Log("Discovery", "All discovery packets returned");
         
         Msg_Send(i, Msg);
         
@@ -132,6 +134,7 @@ end
 
 local function IsReadyToStartProcessing()
     if DiscoveryPacketsSent > 0 and DiscoveryPacketsReturned == DiscoveryPacketsSent then
+        Log("Discovery", "All discovery packets returned!");
         return true;
     else
         return false;
@@ -147,8 +150,6 @@ end
 
 function Process(NilVal, FirstLoad)
 
-    Log("Reporting", "Hello!");
-    
     if FirstLoad then
         print("First load")
         SetupNodePorts();
@@ -166,6 +167,7 @@ function Process(NilVal, FirstLoad)
         Msg = Backlog_Get();
         
         print("Message received from " .. Msg.SenderAddress)
+        Log("Reporting", "Message received from" .. Msg.SenderAddress);
 
         Port = ProcessMessage(Msg);
 

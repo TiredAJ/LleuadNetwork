@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 
 using Godot;
+using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
@@ -23,7 +24,6 @@ using MoonSharp.VsCodeDebugger;
 
 using FileAccess = System.IO.FileAccess;
 using Script = MoonSharp.Interpreter.Script;
-using LeRepo = LleuadNetworkSim.Models.Repo.Repo;
 
 namespace LleuadNetworkSim.Models.Lua;
 
@@ -55,8 +55,9 @@ public class LuaController
     public List<Message> Backlog = [];
     public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
     public Action PullBacklog { get; set; } = () => { };
-
     public int AutoYieldCounter { get; set; } = 60_000;
+
+    public IDBWrapper DB;
     
     public void LoadScript(LuaScript _LS, string _NodeID) {
 
@@ -297,7 +298,10 @@ public class LuaController
         Console.WriteLine($"{NodeID} writing to db");
 
         try
-        { LeRepo.Insert(new LuaProcessRecord() { NodeID = NodeID, Action = _Type, Information = _Message }); }
+        {
+            DB.LPRColl()
+              .Insert(new LuaProcessRecord { NodeID = NodeID, Action = _Type, Information = _Message });
+        }
         catch (Exception e)
         {
             Console.WriteLine(e);
