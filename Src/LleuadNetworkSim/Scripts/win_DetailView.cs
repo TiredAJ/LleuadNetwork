@@ -11,6 +11,7 @@ using Godot.Logging;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Scripts.Buttons;
 
 using Timer = System.Threading.Timer;
@@ -25,7 +26,11 @@ public partial class win_DetailView : Window
     private bool IsAutoRefreshing = false;
     private Timer RefreshTimer = null!;
     private Maybe<string> _SelectedNodeID = Maybe<string>.None;
-    private Maybe<string> _FilterCriteria = Maybe<string>.None; 
+    private Maybe<string> _FilterCriteria = Maybe<string>.None;
+    private List<LuaProcessRecord> LPRData = [];
+    private List<MessageJourneyRecord> JourneyData = [];
+    private List<FinalMessageRecord> FinalMessageData = [];
+    private List<ChallengeRecord> ChallengeData = [];
 
     [Export]
     private OptionButton NodeList = null!;
@@ -38,7 +43,7 @@ public partial class win_DetailView : Window
     private Button dbg_btn_Clear = null!;
 
     [Inject]
-    public IDBWrapper DB;
+    public IDBWrapper DB = null!;
     
     public override void _Ready() {
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
@@ -137,22 +142,64 @@ public partial class win_DetailView : Window
         
         DetailsList.Clear();
 
-        IEnumerable<LuaProcessRecord> LPRecords = _SelectedNodeID == Maybe<string>.None 
-           ? DB.LPRColl().FindAll() 
-           : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value);
+        List<string> RecordData;
 
-        List<string> RecordData = _FilterCriteria.HasValue
-                                      ? LPRecords.Where(X => X.Action == _FilterCriteria.Value)
-                                                 .Select(X => X.ToString())
-                                                 .ToList()
-                                      : LPRecords.Select(X => X.ToString())
-                                                 .ToList();
+        switch (Selectedview)
+        {
+            default:
+            case Views.LUA_PROCESS:
+                RecordData = GetLPRData();
+                break;
+            case Views.MSG_JOURNEY:
+                RecordData = GetJourneyData();
+                break;
+            case Views.FINAL_MESSAGE:
+                RecordData = GetFinalMessageData();
+                break;
+            case Views.CHALLENGE_RECORD:
+                RecordData = GetChallengeData();
+                break;
+        }
         
-        RecordData?.ForEach(X => DetailsList.AddItem(X));
+        RecordData.ForEach(X => DetailsList.AddItem(X));
         
-        Console.WriteLine($"Loaded {DetailsList.ItemCount} process messages.");
+        Console.WriteLine($"Loaded {DetailsList.ItemCount} messages.");
     }
 
+    #region DataSources
+
+    private List<string> GetLPRData() {
+        LPRData = _SelectedNodeID == Maybe<string>.None 
+           ? DB.LPRColl().FindAll().ToList()
+           : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
+        
+        return _FilterCriteria.HasValue
+            ? LPRData.Where(X => X.Action == _FilterCriteria.Value)
+                       .Select(X => X.ToString())
+                       .ToList()
+            : LPRData.Select(X => X.ToString())
+                       .ToList();
+    }
+
+    private List<string> GetJourneyData() {
+        JourneyData = _SelectedNodeID == Maybe<string>.None
+          ? DB.JourneyColl().FindAll().ToList()
+          : DB.JourneyColl()
+              .Find(X => X.Sender == _SelectedNodeID.Value || X.Destination == _SelectedNodeID.Value).ToList();
+
+        return JourneyData.Select(X => X.ToString()).ToList();
+    }
+
+    private List<string> GetFinalMessageData() {
+        return [];
+    }
+
+    private List<string> GetChallengeData() {
+        return [];
+    }
+    #endregion
+    
+    
     public void Clear() {
 
         int TotalDeletedRecords = 0;

@@ -2,7 +2,7 @@ using System;
 
 using LiteDB;
 
-namespace LleuadNetworkSim.Models.Repo;
+namespace LleuadNetworkSim.Models.Repo.Entities;
 
 /// <summary>
 /// Records the state of a message once it's dropped/consumed.
@@ -23,6 +23,8 @@ public record FinalMessageRecord {
     public int Hops { get; set; }
     public bool Consumed { get; set; }
 
+    public FinalMessageRecord(){}
+    
     public FinalMessageRecord(Messaging.Message _Msg, string _CurLoc, bool _Consumed) : base() {
         ChallengeID = G_ChallengeID;
         MessageID = _Msg.ID;

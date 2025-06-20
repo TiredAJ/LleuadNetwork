@@ -1,6 +1,6 @@
 using LiteDB;
 
-namespace LleuadNetworkSim.Models.Repo;
+namespace LleuadNetworkSim.Models.Repo.Entities;
 
 /// <summary>
 /// A point in the journey of a message. Should be generated on message reception.
@@ -15,6 +15,8 @@ public record MessageJourneyRecord : BaseRecord {
     public string CurrentLocation { get; set; }
     public RecordAction Action { get; set; }
 
+    public MessageJourneyRecord(){}
+    
     public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action) : base() {
         ChallengeID = G_ChallengeID;
         MessageID = _Msg.ID;

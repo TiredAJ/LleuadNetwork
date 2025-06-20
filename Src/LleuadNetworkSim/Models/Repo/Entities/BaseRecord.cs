@@ -1,6 +1,6 @@
 using System;
 
-namespace LleuadNetworkSim.Models.Repo;
+namespace LleuadNetworkSim.Models.Repo.Entities;
 
 public record BaseRecord
 {

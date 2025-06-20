@@ -2,6 +2,8 @@ using System;
 
 using LiteDB;
 
+using LleuadNetworkSim.Models.Repo.Entities;
+
 namespace LleuadNetworkSim.Models.Repo;
 
 public interface IDBWrapper : IDisposable

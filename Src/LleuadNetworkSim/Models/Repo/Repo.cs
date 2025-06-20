@@ -3,6 +3,7 @@ using System;
 using LiteDB;
 
 using LleuadNetworkSim.Config;
+using LleuadNetworkSim.Models.Repo.Entities;
 
 namespace LleuadNetworkSim.Models.Repo;
 
@@ -37,6 +38,7 @@ public sealed class Repo : IDBWrapper
 
     private void SetupColls() {
         _LPRColl.EnsureIndex(X => X.NodeID);
+        _LPRColl.EnsureIndex(X => X.Action);
         
         _JourneyColl.EnsureIndex(X => X.MessageID);
         _JourneyColl.EnsureIndex(X => X.Sender);

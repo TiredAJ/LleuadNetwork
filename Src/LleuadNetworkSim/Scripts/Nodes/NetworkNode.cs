@@ -14,6 +14,7 @@ using Godot.Logging;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -119,7 +120,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private LuaController LC = new();
     
     [Inject]
-    public IDBWrapper DB;
+    public IDBWrapper DB = null!;
     
     public Task StartNode(LuaScript _LS, CancellationToken _CT)
         => Task.Run(() => {
@@ -186,7 +187,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     public void MessageReceived(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Received));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.RECEIVED));
         
         if (_Msg.DestinationAddress == this.Name)
         {
@@ -213,7 +214,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private void ConsumeMessage(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Consumed));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED));
 
         DB.FinalMsgColl()
           .Insert(new FinalMessageRecord(_Msg, this.Name, true));
@@ -226,7 +227,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private void DropMessage(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.Dropped));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.DROPPED));
 
         DB.FinalMsgColl()
           .Insert(new FinalMessageRecord(_Msg, this.Name, false));

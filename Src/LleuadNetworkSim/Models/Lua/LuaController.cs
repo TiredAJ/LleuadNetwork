@@ -15,6 +15,7 @@ using Godot.Logging;
 using LleuadNetworkSim.Models.Exceptions.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Utils;
 
@@ -57,7 +58,7 @@ public class LuaController
     public Action PullBacklog { get; set; } = () => { };
     public int AutoYieldCounter { get; set; } = 60_000;
 
-    public IDBWrapper DB;
+    public IDBWrapper DB = null!;
     
     public void LoadScript(LuaScript _LS, string _NodeID) {
 

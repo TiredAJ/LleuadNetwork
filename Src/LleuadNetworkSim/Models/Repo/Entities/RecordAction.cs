@@ -1,8 +1,8 @@
-namespace LleuadNetworkSim.Models.Repo;
+namespace LleuadNetworkSim.Models.Repo.Entities;
 
 public enum RecordAction {
-    Received,
-    Consumed,
-    Dropped,
-    Sent
+    RECEIVED,
+    CONSUMED,
+    DROPPED,
+    SENT
 }
