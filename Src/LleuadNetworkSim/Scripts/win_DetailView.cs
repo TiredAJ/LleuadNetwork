@@ -13,6 +13,7 @@ using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Scripts.Buttons;
+using LleuadNetworkSim.Scripts.UI;
 
 using Timer = System.Threading.Timer;
 
@@ -42,6 +43,12 @@ public partial class win_DetailView : Window
     // ReSharper disable once InconsistentNaming
     private Button dbg_btn_Clear = null!;
 
+    [Export]
+    private Control RecordDisplayParent = null!;
+
+    [Export]
+    private PackedScene FMRDisplay = null!;
+    
     [Inject]
     public IDBWrapper DB = null!;
     
@@ -77,12 +84,29 @@ public partial class win_DetailView : Window
     }
 
     public void ChangeView(string _SelectedView) {
-        Selectedview = _SelectedView switch {
-            "Script_Output" => Views.LUA_PROCESS,
-            "Challenge_Output" => Views.CHALLENGE_RECORD,
-            "Message_Journey" => Views.MSG_JOURNEY,
-            _ => Selectedview
-        };
+
+        BaseRecordDisplay ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+        
+        switch (_SelectedView)
+        {
+            case "Script_Output":
+                //ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+                Selectedview = Views.LUA_PROCESS;
+                break;
+            case "Challenge_Output":
+                Selectedview = Views.CHALLENGE_RECORD;
+                break;
+            case "Message_Journey":
+                Selectedview = Views.MSG_JOURNEY;
+                break;
+            default:
+                Selectedview = Selectedview;
+                break;
+        }
+        
+        RecordDisplayParent.RemoveChild(RecordDisplayParent.GetChild(0));
+        RecordDisplayParent.AddChild(ChosenDisplay!);
+        
     }
 
     public void ChangeSelectedNode(string? _Selection) {
@@ -191,11 +215,19 @@ public partial class win_DetailView : Window
     }
 
     private List<string> GetFinalMessageData() {
-        return [];
+        FinalMessageData = DB.FinalMsgColl()
+                             .FindAll()
+                             .ToList();
+        
+        return FinalMessageData.Select(X => X.ToString()).ToList();
     }
 
     private List<string> GetChallengeData() {
-        return [];
+        ChallengeData = DB.ChallengeColl()
+                          .FindAll()
+                          .ToList();
+        
+        return ChallengeData.Select(X => X.ToString()).ToList();
     }
     #endregion
     

@@ -1,0 +1,138 @@
+[gd_scene load_steps=2 format=3 uid="uid://dog7v7afs11qw"]
+
+[ext_resource type="Script" uid="uid://lwux1o3dd43s" path="res://Scripts/UI/FinalMessageDisplay.cs" id="1_82bgu"]
+
+[node name="FinalMessageDisplay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_82bgu")
+
+[node name="FlowContainer" type="FlowContainer" parent="."]
+layout_mode = 2
+offset_right = 768.0
+offset_bottom = 248.0
+vertical = true
+
+[node name="cntr_ChallengeID" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_ChallengeID"]
+layout_mode = 2
+text = "Challenge ID"
+
+[node name="txt_ChallengeID" type="LineEdit" parent="FlowContainer/cntr_ChallengeID"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_MessageID" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_MessageID"]
+layout_mode = 2
+text = "Message ID"
+
+[node name="txt_MessageID" type="LineEdit" parent="FlowContainer/cntr_MessageID"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Sender" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_Sender"]
+layout_mode = 2
+text = "Sender"
+
+[node name="txt_Sender" type="LineEdit" parent="FlowContainer/cntr_Sender"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Destination" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_Destination"]
+layout_mode = 2
+text = "Destination"
+
+[node name="txt_Destination" type="LineEdit" parent="FlowContainer/cntr_Destination"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_FinalDest" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_FinalDest"]
+layout_mode = 2
+text = "Final Destination"
+
+[node name="txt_FinalDestination" type="LineEdit" parent="FlowContainer/cntr_FinalDest"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Type" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_Type"]
+layout_mode = 2
+text = "Message Type"
+
+[node name="txt_Type" type="LineEdit" parent="FlowContainer/cntr_Type"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Index" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_Index"]
+layout_mode = 2
+text = "Message Index"
+
+[node name="txt_Index" type="LineEdit" parent="FlowContainer/cntr_Index"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_CreationTime" type="VBoxContainer" parent="FlowContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FlowContainer/cntr_CreationTime"]
+layout_mode = 2
+text = "Creation Time"
+
+[node name="txt_CreationTime" type="LineEdit" parent="FlowContainer/cntr_CreationTime"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false

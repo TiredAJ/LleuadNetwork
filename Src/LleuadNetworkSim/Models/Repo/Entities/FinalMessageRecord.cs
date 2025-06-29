@@ -7,7 +7,7 @@ namespace LleuadNetworkSim.Models.Repo.Entities;
 /// <summary>
 /// Records the state of a message once it's dropped/consumed.
 /// </summary>
-public record FinalMessageRecord {
+public record FinalMessageRecord : BaseRecord {
     [BsonId]
     public ObjectId? ChallengeID { get; set; }
     public string MessageID { get; set; }
