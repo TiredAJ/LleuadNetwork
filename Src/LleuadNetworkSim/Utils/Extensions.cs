@@ -66,4 +66,26 @@ static public class Extensions
     
     static public int ToInt(this double? _D)
         => Convert.ToInt32(_D);
+
+    /// <summary>
+    /// Returns an alternate string if this string is empty.
+    /// </summary>
+    /// <param name="_Alternate">Alternative to return if the provided string is empty.</param>
+    static public string Or(this string _Str, string _Alternate)
+        => _Str is "" or " " ? _Alternate : _Str;
+
+    /// <summary>
+    /// Returns an alternate value if the given int is less than 0.
+    /// </summary>
+    /// <param name="_Alternate">Alternative to return if the provided int is &lt; 0.</param>
+    static public int Or(this int _Val, int _Alternate)
+        => _Val < 0 ? _Alternate : _Val;
+
+    /// <summary>
+    /// Returns an alternate value if the given int is &lt; _LessThan.
+    /// </summary>
+    /// <param name="_LessThan">A value to compare the provided int against.</param>
+    /// <param name="_Alternate">Alternative to return if the provided int is &lt; 0.</param>
+    static public int Or(this int _Val, int _LessThan, int _Alternate)
+        => _Val < _LessThan ? _Alternate : _Val;
 }

@@ -1,6 +1,7 @@
 using Godot;
 
 using LleuadNetworkSim.Models.Repo.Entities;
+using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Scripts.UI;
 
@@ -34,15 +35,16 @@ public partial class FinalMessageDisplay : BaseRecordDisplay
     public FinalMessageRecord InitRecord { set => SetData(value); }
     
     public new void SetData(FinalMessageRecord _FMR) {
-        Sender.Text = _FMR.Sender;
-        Destination.Text = _FMR.Destination;
-        FinalDestination.Text = _FMR.FinalDestination;
-        Type.Text = _FMR.Type;
+        MessageID.Text = _FMR.MessageID;
+        Sender.Text = _FMR.Sender.Or("Missing Sender.");
+        Destination.Text = _FMR.Destination.Or("Missing Destination.");
+        FinalDestination.Text = _FMR.FinalDestination.Or("Disappeared.");
+        Type.Text = _FMR.Type.Or("Missing.");
         Index.Text = _FMR.Index.ToString();
-        CreationTime.Text = _FMR.CreationTime.ToString("g");
+        CreationTime.Text = _FMR.CreationTime.ToString("G");
         LifeSpan.Text = _FMR.LifeSpan.ToString("g");
         ActiveTime.Text = _FMR.ActiveTime.ToString("g");
-        EndTime.Text = _FMR.EndTime.ToString("g");
+        EndTime.Text = _FMR.EndTime.ToString("G");
         Hops.Text = _FMR.Hops.ToString();
         Consumed.Text = _FMR.Consumed ? "true" : "false";
     }

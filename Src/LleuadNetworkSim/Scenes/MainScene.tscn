@@ -335,6 +335,7 @@ DetailView = NodePath("../../..")
 layout_mode = 2
 
 [node name="HFlowContainer" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
 [node name="CheckBox" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer" node_paths=PackedStringArray("DetailView")]
@@ -361,6 +362,14 @@ text = "Challenge Output"
 script = ExtResource("22_bpy1e")
 DetailView = NodePath("../../../../..")
 metadata/View = "Challenge_Output"
+
+[node name="CheckBox4" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Final Message"
+script = ExtResource("22_bpy1e")
+DetailView = NodePath("../../../../..")
+metadata/View = "Final_Message"
 
 [node name="Container" type="Container" parent="DetailView/VBoxContainer/VBoxContainer/HFlowContainer"]
 layout_mode = 2
@@ -423,8 +432,8 @@ text = "Search"
 script = ExtResource("28_r0vnq")
 DetailView = NodePath("../../../..")
 
-[node name="RecordDisplayNode" type="Control" parent="DetailView/VBoxContainer"]
-custom_minimum_size = Vector2(0, 240)
+[node name="RecordDisplayNode" type="VBoxContainer" parent="DetailView/VBoxContainer"]
+custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
 
 [node name="ItemList" type="ItemList" parent="DetailView/VBoxContainer" node_paths=PackedStringArray("ParentDetailView")]

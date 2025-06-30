@@ -4,8 +4,8 @@
 
 [node name="FinalMessageDisplay" type="HFlowContainer" node_paths=PackedStringArray("MessageID", "Sender", "Destination", "FinalDestination", "Type", "Index", "CreationTime", "LifeSpan", "ActiveTime", "EndTime", "Hops", "Consumed")]
 custom_minimum_size = Vector2(600, 0)
-offset_right = 584.0
-offset_bottom = 184.0
+offset_right = 600.0
+offset_bottom = 244.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
@@ -134,9 +134,26 @@ layout_mode = 2
 text = "Created"
 
 [node name="txt_CreationTime" type="LineEdit" parent="cntr_CreationTime"]
-custom_minimum_size = Vector2(90, 0)
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
 tooltip_text = "The time/date this record was created."
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_EndTime" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_EndTime"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "End"
+
+[node name="txt_EndTime" type="LineEdit" parent="cntr_EndTime"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The date/time the message stopped traveling."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
@@ -151,7 +168,7 @@ size_flags_horizontal = 0
 text = "Lifespan"
 
 [node name="txt_LifeSpan" type="LineEdit" parent="cntr_LifeSpan"]
-custom_minimum_size = Vector2(90, 0)
+custom_minimum_size = Vector2(92, 0)
 layout_mode = 2
 tooltip_text = "How long this message is supposed to live for."
 editable = false
@@ -168,26 +185,9 @@ size_flags_horizontal = 0
 text = "Active"
 
 [node name="txt_ActiveTime" type="LineEdit" parent="cntr_ActiveTime"]
-custom_minimum_size = Vector2(90, 0)
+custom_minimum_size = Vector2(92, 0)
 layout_mode = 2
 tooltip_text = "How long the message has been traveling."
-editable = false
-emoji_menu_enabled = false
-virtual_keyboard_enabled = false
-middle_mouse_paste_enabled = false
-
-[node name="cntr_EndTime" type="VBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="cntr_EndTime"]
-layout_mode = 2
-size_flags_horizontal = 0
-text = "End"
-
-[node name="txt_EndTime" type="LineEdit" parent="cntr_EndTime"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-tooltip_text = "The date/time the message stopped traveling."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false

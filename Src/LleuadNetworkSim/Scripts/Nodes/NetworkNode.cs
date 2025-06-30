@@ -195,7 +195,9 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
             return;
         }
         
-        if (!MessageValidator.MessageValid(_Msg))
+        if (_Msg.DestinationAddress == string.Empty)
+        { ConsumeDeadEndMessage(_Msg); }
+        else if (!MessageValidator.MessageValid(_Msg))
         {
             DropMessage(_Msg);
             return;
@@ -209,6 +211,18 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
         _Msg.Port = Port;
         
         Backlog.Enqueue(_Msg);
+    }
+
+    private void ConsumeDeadEndMessage(Message _Msg) {
+        DB.JourneyColl()
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED));
+
+        DB.FinalMsgColl()
+          .Insert(new FinalMessageRecord(_Msg, this.Name, true));
+        
+        Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
+        
+        Debug.WriteLine($"Dead-end message consumed from {_Msg.SenderAddress} of type {_Msg.MessageType}.");
     }
 
     private void ConsumeMessage(Message _Msg) {

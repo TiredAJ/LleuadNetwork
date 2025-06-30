@@ -2,6 +2,8 @@ using System;
 
 using LiteDB;
 
+using LleuadNetworkSim.Utils;
+
 namespace LleuadNetworkSim.Models.Repo.Entities;
 
 /// <summary>

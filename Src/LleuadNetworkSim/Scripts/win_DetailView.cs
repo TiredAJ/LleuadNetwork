@@ -262,14 +262,24 @@ public partial class win_DetailView : Window
     }
 
     public void SelectRecord(int _Index) {
-        SelectedRecord = Selectedview switch {
-            Views.LUA_PROCESS => LPRData[_Index],
-            Views.MSG_JOURNEY => JourneyData[_Index],
-            Views.FINAL_MESSAGE => FinalMessageData[_Index],
-            Views.CHALLENGE_RECORD => ChallengeData[_Index]
-        };
-        
-        ChosenDisplay?.SetData(SelectedRecord);
+        switch (Selectedview)
+        {
+            case Views.LUA_PROCESS:
+                SelectedRecord = LPRData[_Index];
+                break;
+            case Views.MSG_JOURNEY:
+                SelectedRecord = JourneyData[_Index];
+                break;
+            case Views.FINAL_MESSAGE:
+                //SelectedRecord = FinalMessageData[_Index];
+                (ChosenDisplay as FinalMessageDisplay)?.SetData(FinalMessageData[_Index]);
+                break;
+            case Views.CHALLENGE_RECORD:
+                SelectedRecord = ChallengeData[_Index];
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Selectedview));
+        }
     }
 
     private void SetRecordDisplay() {
