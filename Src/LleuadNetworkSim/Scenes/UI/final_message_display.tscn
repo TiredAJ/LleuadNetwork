@@ -2,136 +2,228 @@
 
 [ext_resource type="Script" uid="uid://lwux1o3dd43s" path="res://Scripts/UI/FinalMessageDisplay.cs" id="1_82bgu"]
 
-[node name="FinalMessageDisplay" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="FinalMessageDisplay" type="HFlowContainer" node_paths=PackedStringArray("MessageID", "Sender", "Destination", "FinalDestination", "Type", "Index", "CreationTime", "LifeSpan", "ActiveTime", "EndTime", "Hops", "Consumed")]
+custom_minimum_size = Vector2(600, 0)
+offset_right = 584.0
+offset_bottom = 184.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+last_wrap_alignment = 2
 script = ExtResource("1_82bgu")
+MessageID = NodePath("cntr_MessageID/txt_MessageID")
+Sender = NodePath("cntr_Sender/txt_Sender")
+Destination = NodePath("cntr_Destination/txt_Destination")
+FinalDestination = NodePath("cntr_FinalDest/txt_FinalDestination")
+Type = NodePath("cntr_Type/txt_Type")
+Index = NodePath("cntr_Index/txt_Index")
+CreationTime = NodePath("cntr_CreationTime/txt_CreationTime")
+LifeSpan = NodePath("cntr_LifeSpan/txt_LifeSpan")
+ActiveTime = NodePath("cntr_ActiveTime/txt_ActiveTime")
+EndTime = NodePath("cntr_EndTime/txt_EndTime")
+Hops = NodePath("cntr_Hops/txt_Hops")
+Consumed = NodePath("cntr_Consumed/txt_Consumed")
 
-[node name="FlowContainer" type="FlowContainer" parent="."]
-layout_mode = 2
-offset_right = 768.0
-offset_bottom = 248.0
-vertical = true
-
-[node name="cntr_ChallengeID" type="VBoxContainer" parent="FlowContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="FlowContainer/cntr_ChallengeID"]
-layout_mode = 2
-text = "Challenge ID"
-
-[node name="txt_ChallengeID" type="LineEdit" parent="FlowContainer/cntr_ChallengeID"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-editable = false
-emoji_menu_enabled = false
-virtual_keyboard_enabled = false
-middle_mouse_paste_enabled = false
-
-[node name="cntr_MessageID" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_MessageID" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_MessageID"]
+[node name="Label" type="Label" parent="cntr_MessageID"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Message ID"
 
-[node name="txt_MessageID" type="LineEdit" parent="FlowContainer/cntr_MessageID"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_MessageID" type="LineEdit" parent="cntr_MessageID"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The ID of the currently selected Message."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_Sender" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_Sender" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_Sender"]
+[node name="Label" type="Label" parent="cntr_Sender"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Sender"
 
-[node name="txt_Sender" type="LineEdit" parent="FlowContainer/cntr_Sender"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_Sender" type="LineEdit" parent="cntr_Sender"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The ID of the node that spaned and originally sent this message."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_Destination" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_Destination" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_Destination"]
+[node name="Label" type="Label" parent="cntr_Destination"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Destination"
 
-[node name="txt_Destination" type="LineEdit" parent="FlowContainer/cntr_Destination"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_Destination" type="LineEdit" parent="cntr_Destination"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The intended destination of this message."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_FinalDest" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_FinalDest" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_FinalDest"]
+[node name="Label" type="Label" parent="cntr_FinalDest"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Final Destination"
 
-[node name="txt_FinalDestination" type="LineEdit" parent="FlowContainer/cntr_FinalDest"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_FinalDestination" type="LineEdit" parent="cntr_FinalDest"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The location this message ended up at."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_Type" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_Type" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_Type"]
+[node name="Label" type="Label" parent="cntr_Type"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Message Type"
 
-[node name="txt_Type" type="LineEdit" parent="FlowContainer/cntr_Type"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_Type" type="LineEdit" parent="cntr_Type"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The type of the message."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_Index" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_Index" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_Index"]
+[node name="Label" type="Label" parent="cntr_Index"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Message Index"
 
-[node name="txt_Index" type="LineEdit" parent="FlowContainer/cntr_Index"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_Index" type="LineEdit" parent="cntr_Index"]
+custom_minimum_size = Vector2(185, 0)
 layout_mode = 2
+tooltip_text = "The Index of the message (if it's part of a data blob)."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 
-[node name="cntr_CreationTime" type="VBoxContainer" parent="FlowContainer"]
+[node name="cntr_CreationTime" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FlowContainer/cntr_CreationTime"]
+[node name="Label" type="Label" parent="cntr_CreationTime"]
 layout_mode = 2
-text = "Creation Time"
+text = "Created"
 
-[node name="txt_CreationTime" type="LineEdit" parent="FlowContainer/cntr_CreationTime"]
-custom_minimum_size = Vector2(200, 0)
+[node name="txt_CreationTime" type="LineEdit" parent="cntr_CreationTime"]
+custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
+tooltip_text = "The time/date this record was created."
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_LifeSpan" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_LifeSpan"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Lifespan"
+
+[node name="txt_LifeSpan" type="LineEdit" parent="cntr_LifeSpan"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+tooltip_text = "How long this message is supposed to live for."
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_ActiveTime" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_ActiveTime"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Active"
+
+[node name="txt_ActiveTime" type="LineEdit" parent="cntr_ActiveTime"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+tooltip_text = "How long the message has been traveling."
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_EndTime" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_EndTime"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "End"
+
+[node name="txt_EndTime" type="LineEdit" parent="cntr_EndTime"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+tooltip_text = "The date/time the message stopped traveling."
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Hops" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="cntr_Hops"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Hops"
+
+[node name="txt_Hops" type="LineEdit" parent="cntr_Hops"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "How many hops this message took to get to \"Final Destination\""
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Consumed" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Consumed"]
+layout_mode = 2
+text = "Consumed?"
+
+[node name="txt_Consumed" type="LineEdit" parent="cntr_Consumed"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+tooltip_text = "Whether the message was consumed (true) or dropped (false)."
 editable = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false

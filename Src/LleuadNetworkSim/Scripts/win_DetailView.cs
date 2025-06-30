@@ -32,6 +32,8 @@ public partial class win_DetailView : Window
     private List<MessageJourneyRecord> JourneyData = [];
     private List<FinalMessageRecord> FinalMessageData = [];
     private List<ChallengeRecord> ChallengeData = [];
+    private BaseRecord? SelectedRecord;
+    private BaseRecordDisplay ChosenDisplay;
 
     [Export]
     private OptionButton NodeList = null!;
@@ -60,6 +62,10 @@ public partial class win_DetailView : Window
 #if DEBUG
         dbg_btn_Clear.Visible = true;
 #endif
+
+        ChosenDisplay = FMRDisplay.Instantiate() as FinalMessageDisplay;
+
+        SetRecordDisplay();
         
         base._Ready();
     }
@@ -85,12 +91,13 @@ public partial class win_DetailView : Window
 
     public void ChangeView(string _SelectedView) {
 
-        BaseRecordDisplay ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+        //ChosenDisplay = (FMRDisplay.Instantiate() as BaseRecordDisplay<BaseRecord>)!;
         
         switch (_SelectedView)
         {
             case "Script_Output":
-                //ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+            default:
+                ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
                 Selectedview = Views.LUA_PROCESS;
                 break;
             case "Challenge_Output":
@@ -99,14 +106,12 @@ public partial class win_DetailView : Window
             case "Message_Journey":
                 Selectedview = Views.MSG_JOURNEY;
                 break;
-            default:
-                Selectedview = Selectedview;
+            case "Final_Message":
+                Selectedview = Views.FINAL_MESSAGE;
                 break;
         }
         
-        RecordDisplayParent.RemoveChild(RecordDisplayParent.GetChild(0));
-        RecordDisplayParent.AddChild(ChosenDisplay!);
-        
+        SetRecordDisplay();
     }
 
     public void ChangeSelectedNode(string? _Selection) {
@@ -231,7 +236,6 @@ public partial class win_DetailView : Window
     }
     #endregion
     
-    
     public void Clear() {
 
         int TotalDeletedRecords = 0;
@@ -255,5 +259,26 @@ public partial class win_DetailView : Window
         GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
         
         _Refresh();
+    }
+
+    public void SelectRecord(int _Index) {
+        SelectedRecord = Selectedview switch {
+            Views.LUA_PROCESS => LPRData[_Index],
+            Views.MSG_JOURNEY => JourneyData[_Index],
+            Views.FINAL_MESSAGE => FinalMessageData[_Index],
+            Views.CHALLENGE_RECORD => ChallengeData[_Index]
+        };
+        
+        ChosenDisplay?.SetData(SelectedRecord);
+    }
+
+    private void SetRecordDisplay() {
+        if (SelectedRecord is not null)
+        { ChosenDisplay.SetData(SelectedRecord); }
+
+        if (RecordDisplayParent.GetChildCount() > 0)
+        { RecordDisplayParent.RemoveChild(RecordDisplayParent.GetChild(0)); }
+        
+        RecordDisplayParent.AddChild(ChosenDisplay!);
     }
 }

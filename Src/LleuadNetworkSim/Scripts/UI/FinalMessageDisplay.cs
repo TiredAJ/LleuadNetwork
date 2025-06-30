@@ -4,10 +4,8 @@ using LleuadNetworkSim.Models.Repo.Entities;
 
 namespace LleuadNetworkSim.Scripts.UI;
 
-public partial class FinalMessageDisplay : BaseRecordDisplay<FinalMessageRecord>
+public partial class FinalMessageDisplay : BaseRecordDisplay
 {
-    [Export]
-    private LineEdit ChallengeID = null!;
     [Export]
     private LineEdit MessageID = null!;
     [Export]
@@ -36,7 +34,6 @@ public partial class FinalMessageDisplay : BaseRecordDisplay<FinalMessageRecord>
     public FinalMessageRecord InitRecord { set => SetData(value); }
     
     public new void SetData(FinalMessageRecord _FMR) {
-        ChallengeID.Text = _FMR.ChallengeID?.ToString();
         Sender.Text = _FMR.Sender;
         Destination.Text = _FMR.Destination;
         FinalDestination.Text = _FMR.FinalDestination;
