@@ -32,8 +32,6 @@ public partial class FinalMessageDisplay : BaseRecordDisplay
     [Export]
     private LineEdit Consumed = null!;
 
-    public FinalMessageRecord InitRecord { set => SetData(value); }
-    
     public new void SetData(FinalMessageRecord _FMR) {
         MessageID.Text = _FMR.MessageID;
         Sender.Text = _FMR.Sender.Or("Missing Sender.");

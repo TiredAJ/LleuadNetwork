@@ -33,7 +33,7 @@ public partial class win_DetailView : Window
     private List<FinalMessageRecord> FinalMessageData = [];
     private List<ChallengeRecord> ChallengeData = [];
     private BaseRecord? SelectedRecord;
-    private BaseRecordDisplay ChosenDisplay;
+    private BaseRecordDisplay? ChosenDisplay;
 
     [Export]
     private OptionButton NodeList = null!;
@@ -50,6 +50,9 @@ public partial class win_DetailView : Window
 
     [Export]
     private PackedScene FMRDisplay = null!;
+
+    [Export]
+    private PackedScene LPRDisplay = null!;
     
     [Inject]
     public IDBWrapper DB = null!;
@@ -63,7 +66,7 @@ public partial class win_DetailView : Window
         dbg_btn_Clear.Visible = true;
 #endif
 
-        ChosenDisplay = FMRDisplay.Instantiate() as FinalMessageDisplay;
+        ChosenDisplay = LPRDisplay.Instantiate() as LPRDisplay;
 
         SetRecordDisplay();
         
@@ -97,7 +100,7 @@ public partial class win_DetailView : Window
         {
             case "Script_Output":
             default:
-                ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+                ChosenDisplay = LPRDisplay.Instantiate() as BaseRecordDisplay;
                 Selectedview = Views.LUA_PROCESS;
                 break;
             case "Challenge_Output":
@@ -107,6 +110,7 @@ public partial class win_DetailView : Window
                 Selectedview = Views.MSG_JOURNEY;
                 break;
             case "Final_Message":
+                ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
                 Selectedview = Views.FINAL_MESSAGE;
                 break;
         }
@@ -258,31 +262,35 @@ public partial class win_DetailView : Window
         
         GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
         
-        _Refresh();
+        DetailsList.Clear();
     }
 
     public void SelectRecord(int _Index) {
         switch (Selectedview)
         {
             case Views.LUA_PROCESS:
+                (ChosenDisplay as LPRDisplay)?.SetData(LPRData[_Index]);
                 SelectedRecord = LPRData[_Index];
                 break;
             case Views.MSG_JOURNEY:
                 SelectedRecord = JourneyData[_Index];
                 break;
             case Views.FINAL_MESSAGE:
-                //SelectedRecord = FinalMessageData[_Index];
                 (ChosenDisplay as FinalMessageDisplay)?.SetData(FinalMessageData[_Index]);
                 break;
             case Views.CHALLENGE_RECORD:
                 SelectedRecord = ChallengeData[_Index];
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(Selectedview));
+                GodotLogger.LogWarning("Unspecified view seleeted.");
+                break;
         }
     }
 
     private void SetRecordDisplay() {
+        if (ChosenDisplay is null)
+        { return; }
+        
         if (SelectedRecord is not null)
         { ChosenDisplay.SetData(SelectedRecord); }
 

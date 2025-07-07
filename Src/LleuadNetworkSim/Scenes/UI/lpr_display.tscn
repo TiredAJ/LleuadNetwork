@@ -1,0 +1,72 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkupr6ewuc0b1"]
+
+[ext_resource type="Script" uid="uid://d1s0fhjo0hpjo" path="res://Scripts/UI/LPRDisplay.cs" id="1_qky0l"]
+[ext_resource type="StyleBox" uid="uid://bio2foaka3dsa" path="res://Styles/Text/TextBackground.tres" id="2_v33ig"]
+
+[node name="LPRDisplay" type="HFlowContainer" node_paths=PackedStringArray("RecordID", "NodeID", "Action", "Information")]
+custom_minimum_size = Vector2(500, 244)
+offset_right = 600.0
+offset_bottom = 244.0
+alignment = 1
+script = ExtResource("1_qky0l")
+RecordID = NodePath("RecordID/LineEdit")
+NodeID = NodePath("NodeID/LineEdit")
+Action = NodePath("Action/RichTextLabel")
+Information = NodePath("Information/RichTextLabel")
+
+[node name="RecordID" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RecordID"]
+layout_mode = 2
+text = "Record ID"
+
+[node name="LineEdit" type="LineEdit" parent="RecordID"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+theme_override_styles/normal = ExtResource("2_v33ig")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+
+[node name="NodeID" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="NodeID"]
+layout_mode = 2
+text = "Node ID"
+
+[node name="LineEdit" type="LineEdit" parent="NodeID"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+theme_override_styles/normal = ExtResource("2_v33ig")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+
+[node name="Action" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Action"]
+layout_mode = 2
+text = "Action"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Action"]
+custom_minimum_size = Vector2(275, 150)
+layout_mode = 2
+theme_override_styles/background = ExtResource("2_v33ig")
+theme_override_styles/normal = ExtResource("2_v33ig")
+
+[node name="Information" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Information"]
+layout_mode = 2
+text = "Information"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Information"]
+custom_minimum_size = Vector2(275, 150)
+layout_mode = 2
+theme_override_styles/fill = ExtResource("2_v33ig")
+theme_override_styles/focus = ExtResource("2_v33ig")
+theme_override_styles/normal = ExtResource("2_v33ig")

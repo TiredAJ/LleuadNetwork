@@ -167,7 +167,7 @@ function Process(NilVal, FirstLoad)
         Msg = Backlog_Get();
         
         print("Message received from " .. Msg.SenderAddress)
-        Log("Reporting", "Message received from" .. Msg.SenderAddress);
+        Log("Reporting", "Message received from " .. Msg.SenderAddress);
 
         Port = ProcessMessage(Msg);
 
