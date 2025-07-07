@@ -118,6 +118,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #region Packets and messaging
     private ConcurrentQueue<Message> Backlog = [];
     private LuaController LC = new();
+    private ChallengeRecord? Challenge;
     
     [Inject]
     public IDBWrapper DB = null!;
@@ -125,6 +126,11 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     public Task StartNode(LuaScript _LS, CancellationToken _CT)
         => Task.Run(() => {
 
+                        Challenge = G_ChallengeID is null ? null : DB.ChallengeColl()
+                                                                        .FindById(G_ChallengeID);
+
+                        LC.Challenge = Challenge;
+                        
                         //LC.LoadDebugServer();
                         
                         LC.LoadScript(_LS, this.Name);
@@ -187,7 +193,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     public void MessageReceived(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.RECEIVED));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.RECEIVED, Challenge));
         
         if (_Msg.DestinationAddress == this.Name)
         {
@@ -215,10 +221,10 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
     private void ConsumeDeadEndMessage(Message _Msg) {
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED, Challenge));
 
         DB.FinalMsgColl()
-          .Insert(new FinalMessageRecord(_Msg, this.Name, true));
+          .Insert(new FinalMessageRecord(_Msg, this.Name, true, Challenge));
         
         Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
         
@@ -228,10 +234,10 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private void ConsumeMessage(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.CONSUMED, Challenge));
 
         DB.FinalMsgColl()
-          .Insert(new FinalMessageRecord(_Msg, this.Name, true));
+          .Insert(new FinalMessageRecord(_Msg, this.Name, true, Challenge));
 
         Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
         
@@ -241,10 +247,10 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     private void DropMessage(Message _Msg) {
 
         DB.JourneyColl()
-          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.DROPPED));
+          .Insert(new MessageJourneyRecord(_Msg, this.Name, RecordAction.DROPPED, Challenge));
 
         DB.FinalMsgColl()
-          .Insert(new FinalMessageRecord(_Msg, this.Name, false));
+          .Insert(new FinalMessageRecord(_Msg, this.Name, false, Challenge));
         
         Interlocked.Decrement(ref G_TotalMessagesInPlay_Ref);
         

@@ -1,9 +1,13 @@
 using System;
 
+using LiteDB;
+
 namespace LleuadNetworkSim.Models.Repo.Entities;
 
 public record ChallengeRecord : BaseRecord 
 {
+    [BsonId]
+    public ObjectId? ID { get; init; }
     public int TotalNodesInvolved { get; set; }
     public int TotalMessagesInvolved { get; set; }
     public string ChallengeName { get; set; }

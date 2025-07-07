@@ -59,7 +59,8 @@ public class LuaController
     public int AutoYieldCounter { get; set; } = 60_000;
 
     public IDBWrapper DB = null!;
-    
+    public ChallengeRecord? Challenge;
+
     public void LoadScript(LuaScript _LS, string _NodeID) {
 
         NodeID = _NodeID;
@@ -304,7 +305,7 @@ public class LuaController
         try
         {
             DB.LPRColl()
-              .Insert(new LuaProcessRecord { NodeID = NodeID, Action = _Type, Information = _Message });
+              .Insert(new LuaProcessRecord { NodeID = NodeID, Action = _Type, Information = _Message, Challenge = Challenge});
         }
         catch (Exception e)
         {

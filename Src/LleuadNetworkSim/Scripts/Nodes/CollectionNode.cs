@@ -12,11 +12,16 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 
 using Godot;
+using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
+
+using LiteDB;
 
 using LleuadNetworkSim.Models;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
+using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -47,6 +52,10 @@ public partial class CollectionNode : Node, IPersistable
         UserData.RegisterType<Message>();
         UserData.RegisterType<ReadonlyMessage>();
         UserData.DefaultAccessMode = InteropAccessMode.Preoptimized;
+
+#if DEBUG
+        G_ChallengeID = new ObjectId(1751909515, 16211519, 1177, 8867193);
+#endif
         
         base._Ready();
     }
@@ -475,6 +484,21 @@ public partial class CollectionNode : Node, IPersistable
 
     static private bool IsFile(string _Path)
         => File.Exists(_Path);
+    #endregion
 
+    #region Tidy up
+    [Inject]
+    private IDBWrapper DB = null!;
+    
+    public override void _Notification(int _Notif)
+    {
+        if (_Notif == NotificationWMCloseRequest)
+        {
+            GodotLogger.LogDebug("Checkpointing DB");
+            DB.Checkpoint(); 
+        }
+        
+        base._Notification(_Notif);
+    }
     #endregion
 }

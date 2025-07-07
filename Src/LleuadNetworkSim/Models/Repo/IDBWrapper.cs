@@ -14,4 +14,5 @@ public interface IDBWrapper : IDisposable
     public ILiteCollection<MessageJourneyRecord> JourneyColl();
     public ILiteCollection<FinalMessageRecord> FinalMsgColl();
     public ILiteCollection<ChallengeRecord> ChallengeColl();
+    void Checkpoint();
 }

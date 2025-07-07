@@ -17,21 +17,21 @@ public sealed class Repo : IDBWrapper
 
 #if DEBUG
         Console.WriteLine($"Opening DB at {_Location}");
-#endif
-        
+#endif 
 
         DB = new LiteDatabase(_Location);
 
         if (DB.UserVersion != DBConf.RecordVersion)
         {
+            //TODO add actual record versioning pls
             DB.Rebuild();
             DB.UserVersion = DBConf.RecordVersion;
         }
         
-        _LPRColl = DB.GetCollection<LuaProcessRecord>(DBConf.LPRCollName);
-        _JourneyColl = DB.GetCollection<MessageJourneyRecord>(DBConf.JourneyCollName);
-        _FinalMsgColl = DB.GetCollection<FinalMessageRecord>(DBConf.FinalMessageCollName);
-        _ChallengeColl = DB.GetCollection<ChallengeRecord>(DBConf.ChallengeCollName);
+        _LPRColl = DB.GetCollection<LuaProcessRecord>(DBConf.LPR_COLL_NAME);
+        _JourneyColl = DB.GetCollection<MessageJourneyRecord>(DBConf.JOURNEY_COLL_NAME);
+        _FinalMsgColl = DB.GetCollection<FinalMessageRecord>(DBConf.FINAL_MESSAGE_COLL_NAME);
+        _ChallengeColl = DB.GetCollection<ChallengeRecord>(DBConf.CHALLENGE_COLL_NAME);
         
         SetupColls();
     }
@@ -39,16 +39,17 @@ public sealed class Repo : IDBWrapper
     private void SetupColls() {
         _LPRColl.EnsureIndex(X => X.NodeID);
         _LPRColl.EnsureIndex(X => X.Action);
+        _LPRColl.Include(X => X.Challenge);
         
         _JourneyColl.EnsureIndex(X => X.MessageID);
         _JourneyColl.EnsureIndex(X => X.Sender);
         _JourneyColl.EnsureIndex(X => X.Destination);
-        _JourneyColl.EnsureIndex(X => X.ChallengeID);
+        _JourneyColl.Include(X => X.Challenge);
         
         _FinalMsgColl.EnsureIndex(X => X.MessageID);
         _FinalMsgColl.EnsureIndex(X => X.Sender);
         _FinalMsgColl.EnsureIndex(X => X.Destination);
-        _FinalMsgColl.EnsureIndex(X => X.ChallengeID);
+        _FinalMsgColl.Include(X => X.Challenge);
         
         _ChallengeColl.EnsureIndex(X => X.ChallengeName);
     }
@@ -88,4 +89,9 @@ public sealed class Repo : IDBWrapper
     private ILiteCollection<ChallengeRecord> _ChallengeColl { get; init; }
     public ILiteCollection<ChallengeRecord> ChallengeColl() => _ChallengeColl;
     #endregion
+
+    public void Checkpoint() {
+        DB.Rebuild();
+        DB.Checkpoint();
+    }
 }

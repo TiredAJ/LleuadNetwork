@@ -7,32 +7,28 @@ static public class DBConf
     static public string ConnectionString 
         => ProjectSettings.GlobalizePath("user://Data.db");
 
-    static public string LPRCollName
-        => "LPRCollection";
+    public const string LPR_COLL_NAME = "LPRCollection";
 
-    static public string ChallengeCollName
-        => "ChallengeCollection";
+    public const string CHALLENGE_COLL_NAME = "ChallengeCollection";
     
-    static public string JourneyCollName 
-        => "MessageJourneyCollection";
+    public const string JOURNEY_COLL_NAME = "MessageJourneyCollection";
     
-    static public string FinalMessageCollName 
-        => "FinalMessageCollection";
+    public const string FINAL_MESSAGE_COLL_NAME = "FinalMessageCollection";
 
     static public int MaxPageSize
         => 200;
 
     static public int LPRecordVersion
-        => 2;
+        => 3;
 
     static public int ChallengeRecordVersion
-        => 2;
+        => 3;
     
     static public int JourneyRecordVersion 
-        => 2;
+        => 3;
     
     static public int FinalMessageRecordVersion 
-        => 2;
+        => 3;
 
     static public int RecordVersion
         => LPRecordVersion | ChallengeRecordVersion | JourneyRecordVersion | FinalMessageRecordVersion;

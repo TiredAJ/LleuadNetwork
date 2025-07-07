@@ -2,6 +2,7 @@ using System;
 
 using LiteDB;
 
+using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Models.Repo.Entities;
@@ -11,7 +12,9 @@ namespace LleuadNetworkSim.Models.Repo.Entities;
 /// </summary>
 public record FinalMessageRecord : BaseRecord {
     [BsonId]
-    public ObjectId? ChallengeID { get; set; }
+    public ObjectId ID { get; init; }
+    [BsonRef(DBConf.CHALLENGE_COLL_NAME)]
+    public ChallengeRecord? Challenge { get; set; }
     public string MessageID { get; set; }
     public string Sender { get; set; }
     public string Destination { get; set; }
@@ -27,8 +30,8 @@ public record FinalMessageRecord : BaseRecord {
 
     public FinalMessageRecord(){}
     
-    public FinalMessageRecord(Messaging.Message _Msg, string _CurLoc, bool _Consumed) : base() {
-        ChallengeID = G_ChallengeID;
+    public FinalMessageRecord(Messaging.Message _Msg, string _CurLoc, bool _Consumed, ChallengeRecord? _Challenge) : base() {
+        Challenge = _Challenge;
         MessageID = _Msg.ID;
         Sender = _Msg.SenderAddress;
         Destination = _Msg.DestinationAddress;
