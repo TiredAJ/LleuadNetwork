@@ -9,6 +9,7 @@ using Godot;
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Scripts.Nodes;
+// ReSharper disable InvalidXmlDocComment
 
 namespace LleuadNetworkSim.Utils;
 

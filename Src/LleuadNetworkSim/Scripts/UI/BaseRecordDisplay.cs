@@ -6,6 +6,5 @@ namespace LleuadNetworkSim.Scripts.UI;
 
 public abstract partial class BaseRecordDisplay : HFlowContainer
 {
-    public void SetData<T>(T _BaseRecord) where T : BaseRecord
-    {}
+    public abstract void SetData(IBaseRecord? _BaseRecord);
 }

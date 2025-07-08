@@ -298,9 +298,9 @@ NodeList = NodePath("VBoxContainer/VBoxContainer/OptionButton")
 DetailsList = NodePath("VBoxContainer/ItemList")
 dbg_btn_Clear = NodePath("VBoxContainer/VBoxContainer/HFlowContainer/HFlowContainer2/Button2")
 RecordDisplayParent = NodePath("VBoxContainer/RecordDisplayNode")
-FMRDisplay = ExtResource("23_c3pre")
-LPRDisplay = ExtResource("24_s1acj")
-MJRDisplay = ExtResource("25_t8ijv")
+FMRDisplayScene = ExtResource("23_c3pre")
+LPRDisplayScene = ExtResource("24_s1acj")
+MJRDisplayScene = ExtResource("25_t8ijv")
 
 [node name="TextureRect" type="TextureRect" parent="DetailView"]
 z_index = -2

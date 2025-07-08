@@ -50,14 +50,18 @@ public partial class win_DetailView : Window
     private Control RecordDisplayParent = null!;
 
     [Export]
+    private PackedScene FMRDisplayScene = null!;
+    [Export]
+    private PackedScene LPRDisplayScene = null!;
+    [Export]
+    private PackedScene MJRDisplayScene = null!;
+
     private PackedSceneCache<FinalMessageDisplay> FMRDisplay = null!;
-    [Export]
     private PackedSceneCache<LPRDisplay> LPRDisplay = null!;
-    [Export]
-    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!;
+    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!; 
     
     [Inject]
-    public IDBWrapper DB = null!;
+    private IDBWrapper DB = null!;
     
     public override void _Ready() {
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
@@ -68,6 +72,10 @@ public partial class win_DetailView : Window
         dbg_btn_Clear.Visible = true;
 #endif
 
+        FMRDisplay = new PackedSceneCache<FinalMessageDisplay> {Scene = FMRDisplayScene};
+        LPRDisplay = new PackedSceneCache<LPRDisplay> { Scene = LPRDisplayScene };
+        MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> { Scene = MJRDisplayScene };
+        
         ChosenDisplay = LPRDisplay.GetInstance();
 
         SetRecordDisplay();
@@ -117,6 +125,7 @@ public partial class win_DetailView : Window
         }
         
         SetRecordDisplay();
+        _Refresh();
     }
 
     public void ChangeSelectedNode(string? _Selection) {
@@ -219,7 +228,7 @@ public partial class win_DetailView : Window
         JourneyData = _SelectedNodeID == Maybe<string>.None
           ? DB.JourneyColl().FindAll().ToList()
           : DB.JourneyColl()
-              .Find(X => X.Sender == _SelectedNodeID.Value || X.Destination == _SelectedNodeID.Value).ToList();
+              .Find(X => (X.Sender == _SelectedNodeID.Value) || (X.Destination == _SelectedNodeID.Value)).ToList();
 
         return JourneyData.Select(X => X.ToString()).ToList();
     }
@@ -242,25 +251,14 @@ public partial class win_DetailView : Window
     #endregion
     
     public void Clear() {
+        int TotalDeletedRecords = Selectedview switch {
+            Views.LUA_PROCESS => DB.LPRColl().DeleteAll(),
+            Views.MSG_JOURNEY => DB.JourneyColl().DeleteAll(),
+            Views.FINAL_MESSAGE => DB.FinalMsgColl().DeleteAll(),
+            Views.CHALLENGE_RECORD => DB.ChallengeColl().DeleteAll(),
+            _ => 0
+        };
 
-        int TotalDeletedRecords = 0;
-        
-        switch (Selectedview)
-        {
-            case Views.LUA_PROCESS:
-                TotalDeletedRecords = DB.LPRColl().DeleteAll();
-                break;
-            case Views.MSG_JOURNEY:
-                TotalDeletedRecords = DB.JourneyColl().DeleteAll();
-                break;
-            case Views.FINAL_MESSAGE:
-                TotalDeletedRecords = DB.FinalMsgColl().DeleteAll();
-                break;
-            case Views.CHALLENGE_RECORD:
-                TotalDeletedRecords = DB.ChallengeColl().DeleteAll();
-                break;
-        }
-        
         GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
         
         DetailsList.Clear();
@@ -279,6 +277,7 @@ public partial class win_DetailView : Window
                 break;
             case Views.FINAL_MESSAGE:
                 ChosenDisplay?.SetData(FinalMessageData[_Index]);
+                SelectedRecord = FinalMessageData[_Index];
                 break;
             case Views.CHALLENGE_RECORD:
                 SelectedRecord = ChallengeData[_Index];

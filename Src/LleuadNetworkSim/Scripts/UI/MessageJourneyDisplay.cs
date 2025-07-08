@@ -1,5 +1,6 @@
 
 using Godot;
+using Godot.Logging;
 
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Utils;
@@ -25,13 +26,20 @@ public partial class MessageJourneyDisplay : BaseRecordDisplay
     [Export]
     private LineEdit Hops = null!;
 
-    public new void SetData(MessageJourneyRecord _MJR) {
-        ChallengeName.Text = _MJR.Challenge?.ChallengeName.Or("Not in challenge");
-        MessageID.Text = _MJR.MessageID;
-        Sender.Text = _MJR.Sender.Or("No sender");
-        Destination.Text = _MJR.Destination.Or("No destination");
-        MessageType.Text = _MJR.Type.Or("Unknown type");
-        CurrentLocation.Text = _MJR.CurrentLocation.Or("Unknown location");
-        Action.Text = _MJR.Action.ToStr();
+    public override void SetData(IBaseRecord? _BaseRecord) {
+        
+        if (_BaseRecord is not MessageJourneyRecord MJR)
+        {
+            GodotLogger.LogWarning("Couldn't cast baserecord to MJR");
+            return;
+        }
+        
+        ChallengeName.Text = MJR.Challenge?.ChallengeName.Or("Not in challenge");
+        MessageID.Text = MJR.MessageID;
+        Sender.Text = MJR.Sender.Or("No sender");
+        Destination.Text = MJR.Destination.Or("No destination");
+        MessageType.Text = MJR.Type.Or("Unknown type");
+        CurrentLocation.Text = MJR.CurrentLocation.Or("Unknown location");
+        Action.Text = MJR.Action.ToStr();
     }
 }

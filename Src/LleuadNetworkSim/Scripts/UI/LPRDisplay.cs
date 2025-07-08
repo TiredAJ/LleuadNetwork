@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Logging;
 
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Utils;
@@ -16,10 +17,17 @@ public partial class LPRDisplay : BaseRecordDisplay
     [Export]
     private RichTextLabel Information = null!;
 
-    public new void SetData(LuaProcessRecord _LPR) {
-        RecordID.Text = _LPR.ID?.ToString().Or("");
-        NodeID.Text = _LPR.NodeID.Or("Not given");
-        Action.Text = _LPR.Action!.Or("");
-        Information.Text = _LPR.Information!.Or("");
+    public override void SetData(IBaseRecord? _BaseRecord) {
+        
+        if (_BaseRecord is not LuaProcessRecord LPR)
+        {
+            GodotLogger.LogWarning("Couldn't cast baserecord to LPR");
+            return;
+        }
+        
+        RecordID.Text = LPR.ID?.ToString().Or("");
+        NodeID.Text = LPR.NodeID.Or("Not given");
+        Action.Text = LPR.Action!.Or("");
+        Information.Text = LPR.Information!.Or("");
     }
 }

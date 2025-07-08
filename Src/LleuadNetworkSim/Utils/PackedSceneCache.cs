@@ -1,5 +1,3 @@
-using System;
-
 using CSharpFunctionalExtensions;
 
 using Godot;
@@ -19,8 +17,4 @@ public partial class PackedSceneCache<T> : Resource where T : Node
 
         return Instance.Value;
     }
-
-    //public new Node Instantiate(GenEditState _) {
-    //    throw new NotImplementedException("Please use GetInstance() instead");
-    //}
 }

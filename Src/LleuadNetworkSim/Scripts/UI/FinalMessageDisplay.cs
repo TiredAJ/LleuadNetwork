@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Logging;
 
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Utils;
@@ -32,18 +33,25 @@ public partial class FinalMessageDisplay : BaseRecordDisplay
     [Export]
     private LineEdit Consumed = null!;
 
-    public new void SetData(FinalMessageRecord _FMR) {
-        MessageID.Text = _FMR.MessageID;
-        Sender.Text = _FMR.Sender.Or("Missing Sender.");
-        Destination.Text = _FMR.Destination.Or("Missing Destination.");
-        FinalDestination.Text = _FMR.FinalDestination.Or("Disappeared.");
-        Type.Text = _FMR.Type.Or("Missing.");
-        Index.Text = _FMR.Index.ToString();
-        CreationTime.Text = _FMR.CreationTime.ToString("G");
-        LifeSpan.Text = _FMR.LifeSpan.ToString("g");
-        ActiveTime.Text = _FMR.ActiveTime.ToString("g");
-        EndTime.Text = _FMR.EndTime.ToString("G");
-        Hops.Text = _FMR.Hops.ToString();
-        Consumed.Text = _FMR.Consumed ? "true" : "false";
+    public override void SetData(IBaseRecord? _BaseRecord) {
+        
+        if (_BaseRecord is not FinalMessageRecord FMR)
+        {
+            GodotLogger.LogWarning("Couldn't cast baserecord to MJR");
+            return;
+        }
+        
+        MessageID.Text = FMR.MessageID;
+        Sender.Text = FMR.Sender.Or("Missing Sender.");
+        Destination.Text = FMR.Destination.Or("Missing Destination.");
+        FinalDestination.Text = FMR.FinalDestination.Or("Disappeared.");
+        Type.Text = FMR.Type.Or("Missing.");
+        Index.Text = FMR.Index.ToString();
+        CreationTime.Text = FMR.CreationTime.ToString("G");
+        LifeSpan.Text = FMR.LifeSpan.ToString("g");
+        ActiveTime.Text = FMR.ActiveTime.ToString("g");
+        EndTime.Text = FMR.EndTime.ToString("G");
+        Hops.Text = FMR.Hops.ToString();
+        Consumed.Text = FMR.Consumed ? "true" : "false";
     }
 }

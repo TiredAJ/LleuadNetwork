@@ -2,7 +2,7 @@ using System;
 
 namespace LleuadNetworkSim.Models.Repo.Entities;
 
-public record BaseRecord
+public record BaseRecord : IBaseRecord
 {
     public DateTime RecordCreationTime { get; init; }
 
