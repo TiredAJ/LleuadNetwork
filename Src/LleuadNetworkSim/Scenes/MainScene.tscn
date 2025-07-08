@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=40 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -27,6 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://dog7v7afs11qw" path="res://Scenes/UI/final_message_display.tscn" id="23_c3pre"]
 [ext_resource type="PackedScene" uid="uid://dkupr6ewuc0b1" path="res://Scenes/UI/lpr_display.tscn" id="24_s1acj"]
 [ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
+[ext_resource type="PackedScene" uid="uid://dla0ibs0nvuf2" path="res://Scenes/UI/message_journey_display.tscn" id="25_t8ijv"]
 [ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
 [ext_resource type="Script" uid="uid://beary1w3x86qc" path="res://Scripts/DependencyRegistrationNode.cs" id="27_4sso6"]
 [ext_resource type="Script" uid="uid://bdr11g2sgmcab" path="res://Scripts/Buttons/btn_Filter.cs" id="28_r0vnq"]
@@ -299,6 +300,7 @@ dbg_btn_Clear = NodePath("VBoxContainer/VBoxContainer/HFlowContainer/HFlowContai
 RecordDisplayParent = NodePath("VBoxContainer/RecordDisplayNode")
 FMRDisplay = ExtResource("23_c3pre")
 LPRDisplay = ExtResource("24_s1acj")
+MJRDisplay = ExtResource("25_t8ijv")
 
 [node name="TextureRect" type="TextureRect" parent="DetailView"]
 z_index = -2

@@ -1,9 +1,167 @@
-[gd_scene format=3 uid="uid://dla0ibs0nvuf2"]
+[gd_scene load_steps=3 format=3 uid="uid://dla0ibs0nvuf2"]
 
-[node name="MessageJourneyDisplay" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+[ext_resource type="Script" uid="uid://uht05c74l8bc" path="res://Scripts/UI/MessageJourneyDisplay.cs" id="1_jbjs1"]
+[ext_resource type="StyleBox" uid="uid://bio2foaka3dsa" path="res://Styles/Text/TextBackground.tres" id="1_oc3or"]
+
+[node name="MessageJourneyDisplay" type="HFlowContainer" node_paths=PackedStringArray("ChallengeName", "MessageID", "Sender", "Destination", "MessageType", "CurrentLocation", "Action", "Hops")]
+custom_minimum_size = Vector2(600, 244)
+anchors_preset = -1
+anchor_right = 0.6
+anchor_bottom = 0.305
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
+script = ExtResource("1_jbjs1")
+ChallengeName = NodePath("cntr_ChallengeName/txt_ChallengeName")
+MessageID = NodePath("cntr_MessageID/txt_MessageID")
+Sender = NodePath("cntr_Sender/txt_Sender")
+Destination = NodePath("cntr_Destination/txt_Destination")
+MessageType = NodePath("cntr_Type/txt_Type")
+CurrentLocation = NodePath("cntr_CurrentLoc/txt_CurrentLoc")
+Action = NodePath("cntr_Action/txt_Action")
+Hops = NodePath("cntr_Hops/txt_Hops")
+
+[node name="cntr_ChallengeName" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_ChallengeName"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Challenge Name"
+
+[node name="txt_ChallengeName" type="LineEdit" parent="cntr_ChallengeName"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The location this message ended up at."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_MessageID" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_MessageID"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Message ID"
+
+[node name="txt_MessageID" type="LineEdit" parent="cntr_MessageID"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The ID of the currently selected Message."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Sender" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Sender"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Sender"
+
+[node name="txt_Sender" type="LineEdit" parent="cntr_Sender"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The ID of the node that spaned and originally sent this message."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Destination" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Destination"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Destination"
+
+[node name="txt_Destination" type="LineEdit" parent="cntr_Destination"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The intended destination of this message."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Type" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Type"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Message Type"
+
+[node name="txt_Type" type="LineEdit" parent="cntr_Type"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The type of the message."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_CurrentLoc" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_CurrentLoc"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Current Location"
+
+[node name="txt_CurrentLoc" type="LineEdit" parent="cntr_CurrentLoc"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The Index of the message (if it's part of a data blob)."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Action" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Action"]
+layout_mode = 2
+text = "Action"
+
+[node name="txt_Action" type="LineEdit" parent="cntr_Action"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The time/date this record was created."
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_Hops" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="cntr_Hops"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Hops"
+
+[node name="txt_Hops" type="LineEdit" parent="cntr_Hops"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "How many hops this message took to get to \"Final Destination\""
+theme_override_styles/normal = ExtResource("1_oc3or")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false

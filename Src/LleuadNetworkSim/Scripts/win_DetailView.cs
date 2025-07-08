@@ -14,6 +14,7 @@ using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Scripts.Buttons;
 using LleuadNetworkSim.Scripts.UI;
+using LleuadNetworkSim.Utils;
 
 using Timer = System.Threading.Timer;
 
@@ -49,10 +50,11 @@ public partial class win_DetailView : Window
     private Control RecordDisplayParent = null!;
 
     [Export]
-    private PackedScene FMRDisplay = null!;
-
+    private PackedSceneCache<FinalMessageDisplay> FMRDisplay = null!;
     [Export]
-    private PackedScene LPRDisplay = null!;
+    private PackedSceneCache<LPRDisplay> LPRDisplay = null!;
+    [Export]
+    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!;
     
     [Inject]
     public IDBWrapper DB = null!;
@@ -66,7 +68,7 @@ public partial class win_DetailView : Window
         dbg_btn_Clear.Visible = true;
 #endif
 
-        ChosenDisplay = LPRDisplay.Instantiate() as LPRDisplay;
+        ChosenDisplay = LPRDisplay.GetInstance();
 
         SetRecordDisplay();
         
@@ -93,24 +95,23 @@ public partial class win_DetailView : Window
     }
 
     public void ChangeView(string _SelectedView) {
-
-        //ChosenDisplay = (FMRDisplay.Instantiate() as BaseRecordDisplay<BaseRecord>)!;
         
         switch (_SelectedView)
         {
             case "Script_Output":
             default:
-                ChosenDisplay = LPRDisplay.Instantiate() as BaseRecordDisplay;
+                ChosenDisplay = LPRDisplay.GetInstance();
                 Selectedview = Views.LUA_PROCESS;
                 break;
             case "Challenge_Output":
                 Selectedview = Views.CHALLENGE_RECORD;
                 break;
             case "Message_Journey":
+                ChosenDisplay = MJRDisplay.GetInstance();
                 Selectedview = Views.MSG_JOURNEY;
                 break;
             case "Final_Message":
-                ChosenDisplay = FMRDisplay.Instantiate() as BaseRecordDisplay;
+                ChosenDisplay = FMRDisplay.GetInstance();
                 Selectedview = Views.FINAL_MESSAGE;
                 break;
         }
@@ -269,14 +270,15 @@ public partial class win_DetailView : Window
         switch (Selectedview)
         {
             case Views.LUA_PROCESS:
-                (ChosenDisplay as LPRDisplay)?.SetData(LPRData[_Index]);
+                ChosenDisplay?.SetData(LPRData[_Index]);
                 SelectedRecord = LPRData[_Index];
                 break;
             case Views.MSG_JOURNEY:
+                ChosenDisplay?.SetData(JourneyData[_Index]);
                 SelectedRecord = JourneyData[_Index];
                 break;
             case Views.FINAL_MESSAGE:
-                (ChosenDisplay as FinalMessageDisplay)?.SetData(FinalMessageData[_Index]);
+                ChosenDisplay?.SetData(FinalMessageData[_Index]);
                 break;
             case Views.CHALLENGE_RECORD:
                 SelectedRecord = ChallengeData[_Index];

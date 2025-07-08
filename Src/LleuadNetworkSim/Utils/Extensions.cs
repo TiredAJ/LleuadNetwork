@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 
 using Godot;
 
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Scripts.Nodes;
 
@@ -88,4 +89,14 @@ static public class Extensions
     /// <param name="_Alternate">Alternative to return if the provided int is &lt; 0.</param>
     static public int Or(this int _Val, int _LessThan, int _Alternate)
         => _Val < _LessThan ? _Alternate : _Val;
+
+    static public string ToStr(this RecordAction _RA) {
+        return _RA switch {
+            RecordAction.RECEIVED => "RECEIVED",
+            RecordAction.CONSUMED => "CONSUMED",
+            RecordAction.DROPPED => "DROPPED",
+            RecordAction.SENT => "SENT",
+            _ => "N/A"
+        };
+    }
 }
