@@ -46,9 +46,8 @@ public partial class Packet : PathFollow2D
 
         if (ProgressRatio >= 0.98f)
         {
-            (GetParent() as NodeConnection)?.PacketArrived();
-            
-            this.QueueFree();
+            (GetParent() as NodeConnection)?.PacketArrived(this.Name);
+            return;
         }
         
         base._Process(_Delta);
@@ -72,5 +71,19 @@ public partial class Packet : PathFollow2D
         { Sprite.Texture = PacketTextures[0]; }
         
         GodotLogger.LogInfo($"Set type to {_Type}");
+    }
+
+    public override void _Notification(int _Noti) {
+
+        if (_Noti == NotificationPredelete)
+        { GodotLogger.LogInfo("Packet is about to be deleted!"); }
+        
+        base._Notification(_Noti);
+    }
+
+    public override void _ExitTree() {
+        GodotLogger.LogInfo("Packet has left tree");
+        
+        base._ExitTree();
     }
 }

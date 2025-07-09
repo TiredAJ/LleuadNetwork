@@ -30,8 +30,6 @@ namespace LleuadNetworkSim.Models.Lua;
 
 public class LuaController
 {
-    static private Maybe<MoonSharpVsCodeDebugServer> Server { get; set; } = new MoonSharpVsCodeDebugServer();
-
     readonly private Script Scrpt = new(/*CoreModules.Preset_SoftSandbox*/) {
         Options = {
             ScriptLoader = new FileSystemScriptLoader() {
@@ -110,9 +108,6 @@ public class LuaController
     }
 
     public async Task Start(CancellationToken _CT) {
-
-        if (Server.HasValue)
-        { Server.Value.AttachToScript(Scrpt, NodeID); }
 
         Coroutine Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine;
         

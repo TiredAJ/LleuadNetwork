@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cur26gw63h6j" path="res://Scripts/Nodes/NetworkNode.cs" id="1_ob1qj"]
 [ext_resource type="Texture2D" uid="uid://dihr6vx3kjyco" path="res://Assets/Sprites/SelectedRing.png" id="2_2thui"]
-[ext_resource type="PackedScene" uid="uid://dv7ve2sluedit" path="res://packet.tscn" id="2_3i4p6"]
+[ext_resource type="PackedScene" uid="uid://dv7ve2sluedit" path="res://Scenes/packet.tscn" id="2_3i4p6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2thui"]
 radius = 54.037

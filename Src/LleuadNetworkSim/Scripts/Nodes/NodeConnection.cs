@@ -107,13 +107,22 @@ public partial class NodeConnection : Path2D
                 });
     }
     
-    public void PacketArrived() {
+    public void PacketArrived(string _ChildName) {
         FollowerCount--;
 
+        Packet? ArrivedChild = GetChildren<Packet>()
+            .FirstOrDefault(X => X.Name == _ChildName);
+        
         Task.Run(async () => { 
                     Message Msg = await CommsInput.ReadAsync();
                     NodeB.MessageReceived(Msg); 
                 });
+
+        if (ArrivedChild is null)
+        { return; }
+
+        RemoveChild(ArrivedChild);
+        ArrivedChild.Free();
     }
 
     public void ClearMessages() {

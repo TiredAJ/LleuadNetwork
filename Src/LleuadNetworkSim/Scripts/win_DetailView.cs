@@ -8,6 +8,7 @@ using CSharpFunctionalExtensions;
 using Godot;
 using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
+using Godot.NativeInterop;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
@@ -50,15 +51,24 @@ public partial class win_DetailView : Window
     private Control RecordDisplayParent = null!;
 
     [Export]
-    private PackedScene FMRDisplayScene = null!;
+    private PackedScene FMRDisplayScene {
+        get => throw new NotImplementedException("Please use the cached version instead."); 
+        set => FMRDisplay = new PackedSceneCache<FinalMessageDisplay>{Scene = value};
+    }
     [Export]
-    private PackedScene LPRDisplayScene = null!;
+    private PackedScene LPRDisplayScene {
+        get => throw new NotImplementedException("Please use the cached version instead."); 
+        set => LPRDisplay = new PackedSceneCache<LPRDisplay> {Scene = value};
+    }
     [Export]
-    private PackedScene MJRDisplayScene = null!;
-
+    private PackedScene MJRDisplayScene {
+        get => throw new NotImplementedException("Please use the cached version instead."); 
+        set => MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> {Scene = value};
+    }
+    
     private PackedSceneCache<FinalMessageDisplay> FMRDisplay = null!;
     private PackedSceneCache<LPRDisplay> LPRDisplay = null!;
-    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!; 
+    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!;
     
     [Inject]
     private IDBWrapper DB = null!;
@@ -72,16 +82,27 @@ public partial class win_DetailView : Window
         dbg_btn_Clear.Visible = true;
 #endif
 
-        FMRDisplay = new PackedSceneCache<FinalMessageDisplay> {Scene = FMRDisplayScene};
-        LPRDisplay = new PackedSceneCache<LPRDisplay> { Scene = LPRDisplayScene };
-        MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> { Scene = MJRDisplayScene };
+        //FMRDisplay = new PackedSceneCache<FinalMessageDisplay> {Scene = FMRDisplayScene};
+        //LPRDisplay = new PackedSceneCache<LPRDisplay> { Scene = LPRDisplayScene };
+        //MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> { Scene = MJRDisplayScene };
         
         ChosenDisplay = LPRDisplay.GetInstance();
 
+        //FMRDisplay = FMRDisplayScene;
+        
         SetRecordDisplay();
         
         base._Ready();
     }
+
+    //public override bool _Set(StringName _Property, Variant _Value) {
+    //    if (_Property != "FMRDisplay")
+    //    { return base._Set(_Property, _Value); }
+    //
+    //    FMRDisplay = new PackedSceneCache<FinalMessageDisplay>() { Scene = (PackedScene)_Value };
+    //    return true;
+    //
+    //}
 
     public void UpdateNodes(List<string> _NodeIDs) {
         NodeIDs = _NodeIDs;
