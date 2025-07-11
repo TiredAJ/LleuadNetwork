@@ -1,0 +1,103 @@
+[gd_scene load_steps=3 format=3 uid="uid://bok2v7iofg02c"]
+
+[ext_resource type="Script" uid="uid://cgik7o7gukbj5" path="res://Scripts/UI/ChallengeDisplay.cs" id="1_cbjx2"]
+[ext_resource type="StyleBox" uid="uid://bio2foaka3dsa" path="res://Styles/Text/TextBackground.tres" id="1_ml0fw"]
+
+[node name="ChallengeDisplay" type="HFlowContainer"]
+anchors_preset = -1
+anchor_right = 0.656
+anchor_bottom = 0.17
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+script = ExtResource("1_cbjx2")
+
+[node name="cntr_Name" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_Name"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Challenge Name"
+
+[node name="txt_Name" type="LineEdit" parent="cntr_Name"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The intended destination of this message."
+theme_override_styles/normal = ExtResource("1_ml0fw")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_NodeCount" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_NodeCount"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Total Nodes involved"
+
+[node name="txt_NodeCount" type="LineEdit" parent="cntr_NodeCount"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The ID of the currently selected Message."
+theme_override_styles/normal = ExtResource("1_ml0fw")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_MessageCount" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_MessageCount"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Total Messages Involved"
+
+[node name="txt_MessageCount" type="LineEdit" parent="cntr_MessageCount"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The ID of the node that spaned and originally sent this message."
+theme_override_styles/normal = ExtResource("1_ml0fw")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_StartTime" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_StartTime"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Start Time"
+
+[node name="txt_StartTime" type="LineEdit" parent="cntr_StartTime"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The location this message ended up at."
+theme_override_styles/normal = ExtResource("1_ml0fw")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="cntr_TunTime" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="cntr_TunTime"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Run Time"
+
+[node name="txt_RunTime" type="LineEdit" parent="cntr_TunTime"]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+tooltip_text = "The type of the message."
+theme_override_styles/normal = ExtResource("1_ml0fw")
+editable = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+middle_mouse_paste_enabled = false

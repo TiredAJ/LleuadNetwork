@@ -47,14 +47,13 @@ public class LuaController
     readonly private Dictionary<string, string> ScriptFiles = [];
     readonly private Dictionary<string, Message> MessagesInProcess = [];
     
-    private DynValue ProcessCoroutine = DynValue.Nil;
+    private DynValue ProcessFunc = DynValue.Nil;
     
-    //the number of available ports this node has 
+    //the number of available ports the parent network node has 
     public int PortCount { get; set; }
     public List<Message> Backlog = [];
     public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
     public Action PullBacklog { get; set; } = () => { };
-    public int AutoYieldCounter { get; set; } = 60_000;
 
     public IDBWrapper DB = null!;
     public ChallengeRecord? Challenge;
@@ -75,7 +74,7 @@ public class LuaController
         if (TempProcess is not { Type: DataType.Function })
         { throw new ScriptMissingRequiredFuncException(Path.GetFileName(_LS.FileLoc), "ProcessMessage"); }
         
-        this.ProcessCoroutine = TempProcess;
+        this.ProcessFunc = TempProcess;
     }
 
     private void LoadGlobals() {
@@ -98,7 +97,7 @@ public class LuaController
         {
             Message TestMessage = MessageGenerator.DebugMessage;
             
-            DynValue Res = ProcessCoroutine.Function.Call(TestMessage);
+            DynValue Res = ProcessFunc.Function.Call(TestMessage);
 
             if (Res.Type != DataType.Number || Res.CastToNumber().ToInt() == -1)
             { throw new InvalidScriptFuncResultException(Res.Type, Res); }
@@ -109,34 +108,33 @@ public class LuaController
 
     public async Task Start(CancellationToken _CT) {
 
-        Coroutine Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine;
+        Closure Func = ProcessFunc.Function;
+
+        Challenge = DB.ChallengeColl()
+                      .FindById(G_ChallengeID);
         
         await Task.Run(() => {
                            Stopwatch SW = new();
-                           Crtn.AutoYieldCounter = AutoYieldCounter;
 
                            bool FirstLoad = true;
                            
                            while (!_CT.IsCancellationRequested)
                            {
-                               if (Crtn.State == CoroutineState.Dead)
-                               { Crtn = Scrpt.CreateCoroutine(ProcessCoroutine).Coroutine; }
-                               
                                SW.Restart();
 
                                try
                                {
-                                   _ = Crtn.Resume(DynValue.Nil, FirstLoad);
+                                   Func.Call(DynValue.Nil, FirstLoad);
                                }
-                               catch (ScriptRuntimeException e)
+                               catch (ScriptRuntimeException EXC)
                                {
-                                   GodotLogger.LogError($"{e.Message} - {e.DecoratedMessage} - {e.Data}");
+                                   GodotLogger.LogError($"{EXC.Message} - {EXC.DecoratedMessage} - {EXC.Data}");
                                    break;
                                }
 
                                FirstLoad = false;
-                               
-                               Thread.Sleep(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500));
+
+                               Task.Delay(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500), _CT);
 
                                if (Backlog.Count == 0)
                                { PullBacklog(); }
@@ -147,16 +145,16 @@ public class LuaController
                        _CT);
     }
 
-    public void LoadDebugServer() {
-        try
-        { Server.Value.Start(); }
-        catch (InvalidOperationException)
-        { }
-        catch (Exception Exc)
-        {
-            Debug.WriteLine($"Couldn't load debug server due to {Exc.Message}");
-        }
-    }
+    //public void LoadDebugServer() {
+    //    try
+    //    { Server.Value.Start(); }
+    //    catch (InvalidOperationException)
+    //    { }
+    //    catch (Exception Exc)
+    //    {
+    //        Debug.WriteLine($"Couldn't load debug server due to {Exc.Message}");
+    //    }
+    //}
 
     #region Passthrough
     /// <summary>

@@ -53,22 +53,28 @@ public partial class win_DetailView : Window
     [Export]
     private PackedScene FMRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead."); 
-        set => FMRDisplay = new PackedSceneCache<FinalMessageDisplay>{Scene = value};
+        set => FMRDisp = new PackedSceneCache<FinalMessageDisplay>{Scene = value};
     }
     [Export]
     private PackedScene LPRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead."); 
-        set => LPRDisplay = new PackedSceneCache<LPRDisplay> {Scene = value};
+        set => LPRDisp = new PackedSceneCache<LPRDisplay> {Scene = value};
     }
     [Export]
     private PackedScene MJRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead."); 
-        set => MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> {Scene = value};
+        set => MJRDisp = new PackedSceneCache<MessageJourneyDisplay> {Scene = value};
+    }
+    [Export]
+    private PackedScene ChallengeDisplayScene {
+        get => throw new NotImplementedException("Please use the cached version instead."); 
+        set => ChallengeDisp = new PackedSceneCache<ChallengeDisplay> {Scene = value};
     }
     
-    private PackedSceneCache<FinalMessageDisplay> FMRDisplay = null!;
-    private PackedSceneCache<LPRDisplay> LPRDisplay = null!;
-    private PackedSceneCache<MessageJourneyDisplay> MJRDisplay = null!;
+    private PackedSceneCache<FinalMessageDisplay> FMRDisp = null!;
+    private PackedSceneCache<LPRDisplay> LPRDisp = null!;
+    private PackedSceneCache<MessageJourneyDisplay> MJRDisp = null!;
+    private PackedSceneCache<ChallengeDisplay> ChallengeDisp = null!; 
     
     [Inject]
     private IDBWrapper DB = null!;
@@ -81,14 +87,8 @@ public partial class win_DetailView : Window
 #if DEBUG
         dbg_btn_Clear.Visible = true;
 #endif
-
-        //FMRDisplay = new PackedSceneCache<FinalMessageDisplay> {Scene = FMRDisplayScene};
-        //LPRDisplay = new PackedSceneCache<LPRDisplay> { Scene = LPRDisplayScene };
-        //MJRDisplay = new PackedSceneCache<MessageJourneyDisplay> { Scene = MJRDisplayScene };
         
-        ChosenDisplay = LPRDisplay.GetInstance();
-
-        //FMRDisplay = FMRDisplayScene;
+        ChosenDisplay = LPRDisp.GetInstance();
         
         SetRecordDisplay();
         
@@ -96,10 +96,10 @@ public partial class win_DetailView : Window
     }
 
     //public override bool _Set(StringName _Property, Variant _Value) {
-    //    if (_Property != "FMRDisplay")
+    //    if (_Property != "FMRDisp")
     //    { return base._Set(_Property, _Value); }
     //
-    //    FMRDisplay = new PackedSceneCache<FinalMessageDisplay>() { Scene = (PackedScene)_Value };
+    //    FMRDisp = new PackedSceneCache<FinalMessageDisplay>() { Scene = (PackedScene)_Value };
     //    return true;
     //
     //}
@@ -129,18 +129,19 @@ public partial class win_DetailView : Window
         {
             case "Script_Output":
             default:
-                ChosenDisplay = LPRDisplay.GetInstance();
+                ChosenDisplay = LPRDisp.GetInstance();
                 Selectedview = Views.LUA_PROCESS;
                 break;
             case "Challenge_Output":
+                ChosenDisplay = ChallengeDisp.GetInstance();
                 Selectedview = Views.CHALLENGE_RECORD;
                 break;
             case "Message_Journey":
-                ChosenDisplay = MJRDisplay.GetInstance();
+                ChosenDisplay = MJRDisp.GetInstance();
                 Selectedview = Views.MSG_JOURNEY;
                 break;
             case "Final_Message":
-                ChosenDisplay = FMRDisplay.GetInstance();
+                ChosenDisplay = FMRDisp.GetInstance();
                 Selectedview = Views.FINAL_MESSAGE;
                 break;
         }
@@ -288,25 +289,24 @@ public partial class win_DetailView : Window
     public void SelectRecord(int _Index) {
         switch (Selectedview)
         {
-            case Views.LUA_PROCESS:
-                ChosenDisplay?.SetData(LPRData[_Index]);
+            case Views.LUA_PROCESS:                
                 SelectedRecord = LPRData[_Index];
                 break;
-            case Views.MSG_JOURNEY:
-                ChosenDisplay?.SetData(JourneyData[_Index]);
+            case Views.MSG_JOURNEY:                
                 SelectedRecord = JourneyData[_Index];
                 break;
-            case Views.FINAL_MESSAGE:
-                ChosenDisplay?.SetData(FinalMessageData[_Index]);
+            case Views.FINAL_MESSAGE:                
                 SelectedRecord = FinalMessageData[_Index];
                 break;
-            case Views.CHALLENGE_RECORD:
+            case Views.CHALLENGE_RECORD:                
                 SelectedRecord = ChallengeData[_Index];
                 break;
             default:
                 GodotLogger.LogWarning("Unspecified view seleeted.");
-                break;
+                return;
         }
+        
+        ChosenDisplay?.SetData(SelectedRecord);
     }
 
     private void SetRecordDisplay() {
