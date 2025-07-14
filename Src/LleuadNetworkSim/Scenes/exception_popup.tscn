@@ -13,16 +13,16 @@ size = Vector2i(350, 350)
 visible = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_shvc0")
 script = ExtResource("1_shvc0")
-ExceptionName = NodePath("HFlowContainer/ExcName")
-ExceptionDetails = NodePath("HFlowContainer/ExcDetails")
+ExceptionName = NodePath("hfc_Main/lbl_ExcName")
+ExceptionDetails = NodePath("hfc_Main/txte_ExcDetails")
 
-[node name="HFlowContainer" type="FlowContainer" parent="."]
+[node name="hfc_Main" type="FlowContainer" parent="."]
 anchors_preset = 13
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_right = 350.0
-offset_bottom = 350.0
+offset_left = -175.0
+offset_right = 175.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -30,7 +30,7 @@ size_flags_vertical = 3
 alignment = 1
 last_wrap_alignment = 2
 
-[node name="ExcName" type="Label" parent="HFlowContainer"]
+[node name="lbl_ExcName" type="Label" parent="hfc_Main"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -38,7 +38,7 @@ size_flags_vertical = 6
 text = "Exception name"
 horizontal_alignment = 1
 
-[node name="ExcDetails" type="TextEdit" parent="HFlowContainer"]
+[node name="txte_ExcDetails" type="TextEdit" parent="hfc_Main"]
 custom_minimum_size = Vector2(300, 250)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -54,7 +54,7 @@ virtual_keyboard_enabled = false
 wrap_mode = 1
 indent_wrapped_lines = true
 
-[node name="btn_Ok" type="Button" parent="HFlowContainer" node_paths=PackedStringArray("ParentPopup")]
+[node name="btn_Ok" type="Button" parent="hfc_Main" node_paths=PackedStringArray("ParentPopup")]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
 size_flags_horizontal = 3

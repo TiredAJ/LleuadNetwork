@@ -128,7 +128,6 @@ public partial class win_DetailView : Window
         switch (_SelectedView)
         {
             case "Script_Output":
-            default:
                 ChosenDisplay = LPRDisp.GetInstance();
                 Selectedview = Views.LUA_PROCESS;
                 break;
@@ -144,6 +143,11 @@ public partial class win_DetailView : Window
                 ChosenDisplay = FMRDisp.GetInstance();
                 Selectedview = Views.FINAL_MESSAGE;
                 break;
+            default:
+                ChosenDisplay = null;
+                Selectedview = Views.NONE;
+                break;
+            
         }
         
         SetRecordDisplay();
@@ -163,21 +167,22 @@ public partial class win_DetailView : Window
         LUA_PROCESS,
         MSG_JOURNEY,
         FINAL_MESSAGE,
-        CHALLENGE_RECORD
+        CHALLENGE_RECORD,
+        NONE
     }
 
     public void Refresh() {
 
         if (IsAutoRefreshing)
         { IsAutoRefreshing = false; }
-        
+
         _Refresh();
     }
 
     public void SetAutoRefresh(DetailViewRefreshMode _Mode) {
 
         Console.WriteLine($"Autorefresh set to {_Mode}");
-        
+
         if (_Mode == DetailViewRefreshMode.MANUAL)
         {
             RefreshTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -204,14 +209,13 @@ public partial class win_DetailView : Window
             Console.WriteLine("no records to load");
             return;
         }
-        
+
         DetailsList.Clear();
 
         List<string> RecordData;
 
         switch (Selectedview)
         {
-            default:
             case Views.LUA_PROCESS:
                 RecordData = GetLPRData();
                 break;
@@ -224,10 +228,13 @@ public partial class win_DetailView : Window
             case Views.CHALLENGE_RECORD:
                 RecordData = GetChallengeData();
                 break;
+            case Views.NONE:
+            default:
+                return;
         }
-        
+
         RecordData.ForEach(X => DetailsList.AddItem(X));
-        
+
         Console.WriteLine($"Loaded {DetailsList.ItemCount} messages.");
     }
 
@@ -271,7 +278,7 @@ public partial class win_DetailView : Window
         return ChallengeData.Select(X => X.ToString()).ToList();
     }
     #endregion
-    
+
     public void Clear() {
         int TotalDeletedRecords = Selectedview switch {
             Views.LUA_PROCESS => DB.LPRColl().DeleteAll(),
@@ -295,30 +302,33 @@ public partial class win_DetailView : Window
             case Views.MSG_JOURNEY:                
                 SelectedRecord = JourneyData[_Index];
                 break;
-            case Views.FINAL_MESSAGE:                
+            case Views.FINAL_MESSAGE:
                 SelectedRecord = FinalMessageData[_Index];
                 break;
-            case Views.CHALLENGE_RECORD:                
+            case Views.CHALLENGE_RECORD:
                 SelectedRecord = ChallengeData[_Index];
                 break;
+            case Views.NONE:
             default:
-                GodotLogger.LogWarning("Unspecified view seleeted.");
+                GodotLogger.LogInfo("No view selected.");
                 return;
         }
-        
+
         ChosenDisplay?.SetData(SelectedRecord);
     }
 
     private void SetRecordDisplay() {
+
+        if (RecordDisplayParent.GetChildCount() > 0 || Selectedview == Views.NONE)
+        { RecordDisplayParent.RemoveChild(RecordDisplayParent.GetChild(0)); }
+
         if (ChosenDisplay is null)
         { return; }
-        
+
         if (SelectedRecord is not null)
         { ChosenDisplay.SetData(SelectedRecord); }
 
-        if (RecordDisplayParent.GetChildCount() > 0)
-        { RecordDisplayParent.RemoveChild(RecordDisplayParent.GetChild(0)); }
-        
+
         RecordDisplayParent.AddChild(ChosenDisplay!);
     }
 }

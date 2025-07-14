@@ -47,7 +47,7 @@ public partial class CollectionNode : Node, IPersistable
     private win_DetailView DetailView = null!;
 
     public override void _Ready() {
-        
+
         //register Lua UserData types
         UserData.RegisterType<Message>();
         UserData.RegisterType<ReadonlyMessage>();
@@ -56,6 +56,34 @@ public partial class CollectionNode : Node, IPersistable
 #if DEBUG
         G_ChallengeID = new ObjectId(1751909515, 16211519, 1177, 8867193);
 #endif
+
+        bool HasLoadedMap = false;
+        bool HasLoadedScript = false;
+        bool HasLoadedChallenge = false;
+
+        foreach (string? Arg in OS.GetCmdlineUserArgs())
+        {
+            if (HasLoadedMap && HasLoadedChallenge && HasLoadedScript)
+            { break; }
+
+            if (!HasLoadedMap && Arg.Contains("--map="))
+            {
+                LoadMap(Arg[6..]);
+                HasLoadedMap = true; continue;
+            }
+
+            if (!HasLoadedScript && Arg.Contains("--scripts="))
+            {
+                LoadScript(Arg[10..].Split(';'));
+                HasLoadedScript = true; continue;
+            }
+
+            if (!HasLoadedChallenge && Arg.Contains("--challenge="))
+            {
+                TryLoadChallenge(Arg[12..]);
+                HasLoadedChallenge = true; continue;
+            }
+        }
         
         base._Ready();
     }

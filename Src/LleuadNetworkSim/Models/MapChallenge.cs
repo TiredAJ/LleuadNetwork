@@ -12,17 +12,17 @@ namespace LleuadNetworkSim.Models;
 
 public class MapChallenge
 {
-    readonly private Dictionary<string, List<Msg>> Challenge = []; 
+    readonly private Dictionary<string, List<Msg>> Challenge = [];
     private Dictionary<Msg, int> Distribution = [];
     private List<string> NodeAddresses = [];
-    
+
     public string Name { get; set; }
 
     public MapChallenge(string _FilePath) {
         Name = Path.GetFileName(_FilePath);
         LoadFile(_FilePath);
     }
-    
+
     public MapChallenge(List<string> _NodeAddresses, Dictionary<Msg, int> _Distribution) {
         Name = "N/A";
         NodeAddresses = _NodeAddresses;

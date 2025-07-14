@@ -4,10 +4,11 @@
 [ext_resource type="StyleBox" uid="uid://bio2foaka3dsa" path="res://Styles/Text/TextBackground.tres" id="1_oc3or"]
 
 [node name="MessageJourneyDisplay" type="HFlowContainer" node_paths=PackedStringArray("ChallengeName", "MessageID", "Sender", "Destination", "MessageType", "CurrentLocation", "Action", "Hops")]
-custom_minimum_size = Vector2(600, 244)
+custom_minimum_size = Vector2(600, 0)
 anchors_preset = -1
 anchor_right = 0.6
 anchor_bottom = 0.305
+offset_bottom = -52.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
