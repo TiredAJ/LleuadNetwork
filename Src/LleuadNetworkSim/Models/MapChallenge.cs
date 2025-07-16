@@ -45,7 +45,7 @@ public class MapChallenge
         for(int i = 0; i < NodeAddresses.Count; i++)
         {
             string Sender = NodeAddresses[i];
-            
+
             List<string> AvailableAddr = NodeAddresses.Where(X => X != Sender).ToList();
 
             Msg[] Messages = AllMessages[i];
@@ -55,7 +55,7 @@ public class MapChallenge
                 Msg.SenderAddress = Sender;
                 Msg.DestinationAddress = AvailableAddr.RandomSubset(1).First();
             }
-            
+
             Challenge.Add(Sender, Messages.ToList());
         }
 
@@ -75,7 +75,7 @@ public class MapChallenge
     }
 
     private void LoadFile(string _Path) {
-        
+
         using Stream Reader = new FileStream(_Path, FileMode.Open);
 
         Dictionary<Msg, int>? Data = JsonSerializer.Deserialize<Dictionary<Msg, int>>(Reader);

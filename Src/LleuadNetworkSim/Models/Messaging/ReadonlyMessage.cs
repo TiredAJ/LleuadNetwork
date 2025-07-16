@@ -23,7 +23,7 @@ public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, 
         get => IntHeaders.GetHeader(Header.ID);
         init => IntHeaders.SetHeaderValue(Header.ID, value);
     }
-    
+
     /// <summary>
     /// Address of the sender node.
     /// </summary>
@@ -123,7 +123,7 @@ public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, 
 
     /// <summary>
     /// If this message is a chunk, what the total size is (in bytes)
-    ///  of it's blob (all chunks together). 
+    ///  of it's blob (all chunks together).
     /// </summary>
     public new long TotalSize {
         get => Convert.ToInt64(IntHeaders.GetHeader(Header.TOTAL_SIZE));
@@ -137,8 +137,8 @@ public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, 
     #endregion
 
     #endregion
-    
-    public ReadonlyMessage(Message _Msg) 
+
+    public ReadonlyMessage(Message _Msg)
         : this(_Msg.SenderAddress, _Msg.SenderAddress, _Msg.Payload.GetValueOrDefault(), _Msg.MaxHops) {
 
         IntHeaders = _Msg.CloneHeaders();

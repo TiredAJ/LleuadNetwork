@@ -34,13 +34,13 @@ public partial class FinalMessageDisplay : BaseRecordDisplay
     private LineEdit Consumed = null!;
 
     public override void SetData(IBaseRecord? _BaseRecord) {
-        
+
         if (_BaseRecord is not FinalMessageRecord FMR)
         {
             GodotLogger.LogWarning("Couldn't cast baserecord to MJR");
             return;
         }
-        
+
         MessageID.Text = FMR.MessageID;
         Sender.Text = FMR.Sender.Or("Missing Sender.");
         Destination.Text = FMR.Destination.Or("Missing Destination.");

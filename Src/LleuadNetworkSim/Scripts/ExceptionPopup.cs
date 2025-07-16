@@ -18,7 +18,7 @@ public partial class ExceptionPopup : PopupPanel
 
         ExceptionName.Text = Exc.GetType().Name;
         ExceptionDetails.Text = Exc.Message;
-        
+
         base._EnterTree();
     }
 }

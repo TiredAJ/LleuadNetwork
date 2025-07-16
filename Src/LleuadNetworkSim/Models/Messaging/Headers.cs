@@ -34,11 +34,11 @@ public struct Headers
     public Headers() {
         IntHeaders = DEFAULT_HEADERS.ToDictionary();
     }
-    
+
     public Headers(Dictionary<string, string> Metadata) {
-        
+
         IntHeaders = DEFAULT_HEADERS.ToDictionary();
-        
+
         foreach (KeyValuePair<string, string> KVP in Metadata)
         { IntHeaders.TryAdd(KVP.Key, KVP.Value); }
     }

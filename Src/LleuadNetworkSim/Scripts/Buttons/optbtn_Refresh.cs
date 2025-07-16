@@ -6,11 +6,11 @@ public partial class optbtn_Refresh : OptionButton
 {
     [Export]
     private win_DetailView DetailView = null!;
-    
+
     public override void _Ready() {
 
         ItemSelected += _Index => DetailView.SetAutoRefresh((DetailViewRefreshMode)_Index);
-        
+
         base._Ready();
     }
 }

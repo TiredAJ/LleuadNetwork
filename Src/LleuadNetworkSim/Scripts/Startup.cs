@@ -7,7 +7,7 @@ namespace LleuadNetworkSim.Scripts;
 public partial class Startup : Node2D
 {
     public override void _Ready() {
-        
+
         LogConfiguration Conf = new();
         Conf.RegisterTarget(new GDPrintTarget("GodotConsole"));
 
@@ -16,12 +16,12 @@ public partial class Startup : Node2D
             FormatText = "[${level}][${classname}.${methodname}] ${message}",
             FormatLogLevel = LogLevel.Info
         };
-        
-        Conf.ApplyFormattingRule(Formatting);        
-        
+
+        Conf.ApplyFormattingRule(Formatting);
+
         // Set the configuration
         GodotLogger.SetConfiguration(Conf);
-        
+
         base._Ready();
     }
 }

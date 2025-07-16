@@ -1,5 +1,3 @@
-using System;
-
 namespace LleuadNetworkSim.Models.Lua;
 
 public struct LuaScript

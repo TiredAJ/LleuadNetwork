@@ -29,7 +29,7 @@ public record FinalMessageRecord : BaseRecord {
     public bool Consumed { get; set; }
 
     public FinalMessageRecord(){}
-    
+
     public FinalMessageRecord(Messaging.Message _Msg, string _CurLoc, bool _Consumed, ChallengeRecord? _Challenge) : base() {
         Challenge = _Challenge;
         MessageID = _Msg.ID;

@@ -56,16 +56,16 @@ static public class Extensions
 
     static public Vector2 ToVec2(this PositionVectorVO _PVO)
         => new(_PVO.X, _PVO.Y);
-    
+
     static public bool HasFlagFast(this UIMode _Value, UIMode _Flag)
         => (_Value & _Flag) != 0;
 
     static public int ToInt32(this JsonNode _JNode)
         => Convert.ToInt32(_JNode);
-    
+
     static public int ToInt(this double _D)
         => Convert.ToInt32(_D);
-    
+
     static public int ToInt(this double? _D)
         => Convert.ToInt32(_D);
 

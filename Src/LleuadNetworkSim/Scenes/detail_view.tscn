@@ -1,0 +1,187 @@
+[gd_scene load_steps=15 format=3 uid="uid://c3825ytt2j4mf"]
+
+[ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="1_ng7ga"]
+[ext_resource type="PackedScene" uid="uid://dog7v7afs11qw" path="res://Scenes/UI/final_message_display.tscn" id="2_hyri3"]
+[ext_resource type="PackedScene" uid="uid://dkupr6ewuc0b1" path="res://Scenes/UI/lpr_display.tscn" id="3_rphvh"]
+[ext_resource type="PackedScene" uid="uid://dla0ibs0nvuf2" path="res://Scenes/UI/message_journey_display.tscn" id="4_2k2ae"]
+[ext_resource type="PackedScene" uid="uid://bok2v7iofg02c" path="res://Scenes/UI/challenge_display.tscn" id="5_rckiw"]
+[ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="6_mj20n"]
+[ext_resource type="Script" uid="uid://dbi4ymdmfrac3" path="res://Scripts/Buttons/optbtn_NodeSelection.cs" id="7_sjh0l"]
+[ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="8_8fhc6"]
+[ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="9_f6jy2"]
+[ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="10_fvc8k"]
+[ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="11_3v8go"]
+[ext_resource type="Script" uid="uid://bdr11g2sgmcab" path="res://Scripts/Buttons/btn_Filter.cs" id="12_p4yd1"]
+[ext_resource type="Script" uid="uid://c75imyeip7yvp" path="res://Scripts/UI/WinDetailsList.cs" id="13_njo7k"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_gyaec"]
+
+[node name="DetailView" type="Window" node_paths=PackedStringArray("NodeList", "DetailsList", "dbg_btn_Clear", "RecordDisplayParent")]
+auto_translate_mode = 1
+title = "Details"
+initial_position = 2
+size = Vector2i(600, 790)
+wrap_controls = true
+transient = true
+script = ExtResource("1_ng7ga")
+NodeList = NodePath("VBoxContainer/VBoxContainer/optbtn_NodeSelection")
+DetailsList = NodePath("VBoxContainer/itmlst_Records")
+dbg_btn_Clear = NodePath("VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh/dbg_btn_Clear")
+RecordDisplayParent = NodePath("VBoxContainer/vbxc_RecordDisplayPane")
+FMRDisplayScene = ExtResource("2_hyri3")
+LPRDisplayScene = ExtResource("3_rphvh")
+MJRDisplayScene = ExtResource("4_2k2ae")
+ChallengeDisplayScene = ExtResource("5_rckiw")
+
+[node name="txtr_Background" type="TextureRect" parent="."]
+z_index = -2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+texture = ExtResource("6_mj20n")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 60)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="optbtn_NodeSelection" type="OptionButton" parent="VBoxContainer/VBoxContainer" node_paths=PackedStringArray("DetailView")]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+fit_to_longest_item = false
+allow_reselect = true
+script = ExtResource("7_sjh0l")
+DetailView = NodePath("../../..")
+
+[node name="hfc_MainControls" type="HFlowContainer" parent="VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="hfc_DisplayOptions" type="HFlowContainer" parent="VBoxContainer/VBoxContainer/hfc_MainControls"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="chkbx_NoDisplay" type="CheckBox" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "No Display"
+script = ExtResource("8_8fhc6")
+DetailView = NodePath("../../../../..")
+metadata/View = "None"
+
+[node name="chkbx_ScriptOutput" type="CheckBox" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_pressed = true
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Script Output"
+script = ExtResource("8_8fhc6")
+DetailView = NodePath("../../../../..")
+metadata/View = "Script_Output"
+
+[node name="chkbx_MsgJourney" type="CheckBox" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Message Journey"
+script = ExtResource("8_8fhc6")
+DetailView = NodePath("../../../../..")
+metadata/View = "Message_Journey"
+
+[node name="chkbx_ChallengeOutput" type="CheckBox" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Challenge Output"
+script = ExtResource("8_8fhc6")
+DetailView = NodePath("../../../../..")
+metadata/View = "Challenge_Output"
+
+[node name="chkbx_FinalMessage" type="CheckBox" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_gyaec")
+text = "Final Message"
+script = ExtResource("8_8fhc6")
+DetailView = NodePath("../../../../..")
+metadata/View = "Final_Message"
+
+[node name="Spacer" type="Container" parent="VBoxContainer/VBoxContainer/hfc_MainControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="hfc_Refresh" type="HFlowContainer" parent="VBoxContainer/VBoxContainer/hfc_MainControls"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+alignment = 2
+
+[node name="btn_ManualRefresh" type="Button" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Refresh
+"
+script = ExtResource("9_f6jy2")
+DetailView = NodePath("../../../../..")
+
+[node name="optbtn_RefreshTimer" type="OptionButton" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+selected = 0
+item_count = 4
+popup/item_0/text = "Manual"
+popup/item_0/id = 0
+popup/item_1/text = "1 Second"
+popup/item_1/id = 1
+popup/item_2/text = "5 Second"
+popup/item_2/id = 2
+popup/item_3/text = "10 Second"
+popup/item_3/id = 3
+script = ExtResource("10_fvc8k")
+DetailView = NodePath("../../../../..")
+
+[node name="dbg_btn_Clear" type="Button" parent="VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DEBUG - Clear"
+script = ExtResource("11_3v8go")
+DetailView = NodePath("../../../../..")
+
+[node name="hbxc_Search" type="HBoxContainer" parent="VBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="txt_SearchBar" type="LineEdit" parent="VBoxContainer/VBoxContainer/hbxc_Search"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search"
+editable = false
+select_all_on_focus = true
+
+[node name="btn_Search" type="Button" parent="VBoxContainer/VBoxContainer/hbxc_Search" node_paths=PackedStringArray("DetailView")]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+disabled = true
+text = "Search"
+script = ExtResource("12_p4yd1")
+DetailView = NodePath("../../../..")
+
+[node name="vbxc_RecordDisplayPane" type="VBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+
+[node name="itmlst_Records" type="ItemList" parent="VBoxContainer" node_paths=PackedStringArray("ParentDetailView")]
+layout_mode = 2
+size_flags_vertical = 3
+allow_search = false
+script = ExtResource("13_njo7k")
+ParentDetailView = NodePath("../..")

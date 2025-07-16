@@ -32,28 +32,28 @@ public partial class NodeConnection : Path2D
 
         CommsOutput = _Output;
         CommsInput = _Input;
-        
+
         if (!IsNodeReady())
         { return; }
 
         Debug.WriteLine("resetting curve!");
-            
+
         ResetCurve();
-            
+
         Length = ToLocal(NodeA.GlobalPosition).DistanceTo(ToLocal(NodeB.GlobalPosition));
     }
-    
+
     public override void _Ready() {
 
-        this.Curve = new Curve2D();        
-        
+        this.Curve = new Curve2D();
+
         base._Ready();
     }
 
     public override void _Process(double _Delta) {
-    
+
         ResetCurve();
-        
+
         base._Process(_Delta);
     }
 
@@ -64,14 +64,14 @@ public partial class NodeConnection : Path2D
 
         NodeA.RemoveConnection(NodeB.Name);
         NodeB.RemoveConnection(NodeA.Name);
-        
+
         base._ExitTree();
     }
 
-    private void ResetCurve() {        
+    private void ResetCurve() {
         Curve.ClearPoints();
 
-        Vector2 PointA = ToLocal(NodeA.GlobalPosition); 
+        Vector2 PointA = ToLocal(NodeA.GlobalPosition);
         Vector2 PointB = ToLocal(NodeB.GlobalPosition);
 
         if (PointA != PointAPrev || PointB != PointBPrev)
@@ -79,10 +79,10 @@ public partial class NodeConnection : Path2D
             Length = PointA.DistanceTo(PointB);
             UpdateFollowers();
         }
-        
+
         Curve.AddPoint(PointA);
         Curve.AddPoint(PointB);
-        
+
         Liner.UpdatePoints(PointA, PointB);
 
         PointAPrev = PointA;
@@ -106,16 +106,16 @@ public partial class NodeConnection : Path2D
                     await CommsOutput.WriteAsync(_Msg);
                 });
     }
-    
+
     public void PacketArrived(string _ChildName) {
         FollowerCount--;
 
         Packet? ArrivedChild = GetChildren<Packet>()
             .FirstOrDefault(X => X.Name == _ChildName);
-        
-        Task.Run(async () => { 
+
+        Task.Run(async () => {
                     Message Msg = await CommsInput.ReadAsync();
-                    NodeB.MessageReceived(Msg); 
+                    NodeB.MessageReceived(Msg);
                 });
 
         if (ArrivedChild is null)
@@ -128,11 +128,11 @@ public partial class NodeConnection : Path2D
     public void ClearMessages() {
         if (CommsInput.Count != 0)
         { _ = CommsInput.ReadAllAsync(); }
-        
+
         foreach (Packet Child in GetChildren<Packet>())
         { Child?.QueueFree(); }
     }
-    
+
     private IEnumerable<T> GetChildren<T>() where T : Node
         => GetChildren()
             .Where(X => !X.IsQueuedForDeletion())

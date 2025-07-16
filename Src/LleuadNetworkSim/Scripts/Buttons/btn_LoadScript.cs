@@ -14,8 +14,8 @@ public partial class btn_LoadScript : FileButton
         FD.FilesSelected += CollNode.LoadScript;
         FD.FileSelected += _Path => CollNode.LoadScript(_Path);
         FD.DirSelected += _Path => CollNode.LoadScript(_Path);
-        
+
         base._Ready();
     }
-    
+
 }

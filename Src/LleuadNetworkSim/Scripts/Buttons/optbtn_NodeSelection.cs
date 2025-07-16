@@ -19,7 +19,7 @@ public partial class optbtn_NodeSelection : OptionButton
 
                             DetailView.ChangeSelectedNode(_Index < 0 ? null : GetItemText((int)_Index));
                         };
-        
+
         base._Ready();
     }
 }

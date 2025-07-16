@@ -8,7 +8,7 @@ namespace LleuadNetworkSim.Models.Repo.Entities;
 /// A point in the journey of a message. Should be generated on message reception.
 /// </summary>
 public record MessageJourneyRecord : BaseRecord {
-    
+
     public ObjectId? ID { get; init; }
     [BsonRef(DBConf.CHALLENGE_COLL_NAME)]
     public ChallengeRecord? Challenge { get; set; }
@@ -21,7 +21,7 @@ public record MessageJourneyRecord : BaseRecord {
     public RecordAction Action { get; set; }
 
     public MessageJourneyRecord(){}
-    
+
     public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action, ChallengeRecord? _Challenge) : base() {
         Challenge = _Challenge;
         MessageID = _Msg.ID;

@@ -12,7 +12,7 @@ public partial class chkbx_DetailView : CheckBox
         Variant Type = GetMeta("View", "Script_Output");
 
         DetailView.ChangeView(Type.AsString());
-        
+
         base._Pressed();
     }
 }

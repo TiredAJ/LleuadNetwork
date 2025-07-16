@@ -6,7 +6,7 @@ public partial class WinDetailsList : ItemList
 {
     [Export]
     private win_DetailView ParentDetailView = null!;
-    
+
     public WinDetailsList() {
         this.ItemSelected += RecordSelected;
     }

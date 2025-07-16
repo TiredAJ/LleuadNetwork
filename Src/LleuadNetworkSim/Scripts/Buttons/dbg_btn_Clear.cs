@@ -10,7 +10,7 @@ public partial class dbg_btn_Clear : Button
     public override void _Pressed() {
 
         DetailView.Clear();
-        
+
         base._Pressed();
     }
 }

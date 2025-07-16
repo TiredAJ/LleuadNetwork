@@ -11,7 +11,7 @@ public class ExceptionPopupWrapper
                                                         .Instantiate<Scripts.ExceptionPopup>();
 
         ExcPopup.Exc = _Exc;
-        
+
         _Parent.AddChild(ExcPopup);
 
         throw _Exc;

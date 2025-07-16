@@ -15,9 +15,9 @@ public partial class btn_StopChallenge : Button
     public override void _Pressed() {
 
         CollNode.StopChallenge();
-        
+
         ButtonParent.ClearMode();
-        
+
         base._Pressed();
     }
 }

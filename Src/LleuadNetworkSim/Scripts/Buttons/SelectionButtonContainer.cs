@@ -11,7 +11,7 @@ public partial class SelectionButtonContainer : FlowContainer
         foreach (Button Children in GetChildren<Button>())
         { Children.Disabled = !_Toggled; }
     }
-    
+
     private IEnumerable<T> GetChildren<T>() where T : Node
         => GetChildren()
            .Where(X => !X.IsQueuedForDeletion())

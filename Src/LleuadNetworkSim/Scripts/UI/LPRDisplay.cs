@@ -18,13 +18,13 @@ public partial class LPRDisplay : BaseRecordDisplay
     private RichTextLabel Information = null!;
 
     public override void SetData(IBaseRecord? _BaseRecord) {
-        
+
         if (_BaseRecord is not LuaProcessRecord LPR)
         {
             GodotLogger.LogWarning("Couldn't cast baserecord to LPR");
             return;
         }
-        
+
         RecordID.Text = LPR.ID?.ToString().Or("");
         NodeID.Text = LPR.NodeID.Or("Not given");
         Action.Text = LPR.Action!.Or("");

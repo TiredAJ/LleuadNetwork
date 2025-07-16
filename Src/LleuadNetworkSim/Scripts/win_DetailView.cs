@@ -52,33 +52,33 @@ public partial class win_DetailView : Window
 
     [Export]
     private PackedScene FMRDisplayScene {
-        get => throw new NotImplementedException("Please use the cached version instead."); 
+        get => throw new NotImplementedException("Please use the cached version instead.");
         set => FMRDisp = new PackedSceneCache<FinalMessageDisplay>{Scene = value};
     }
     [Export]
     private PackedScene LPRDisplayScene {
-        get => throw new NotImplementedException("Please use the cached version instead."); 
+        get => throw new NotImplementedException("Please use the cached version instead.");
         set => LPRDisp = new PackedSceneCache<LPRDisplay> {Scene = value};
     }
     [Export]
     private PackedScene MJRDisplayScene {
-        get => throw new NotImplementedException("Please use the cached version instead."); 
+        get => throw new NotImplementedException("Please use the cached version instead.");
         set => MJRDisp = new PackedSceneCache<MessageJourneyDisplay> {Scene = value};
     }
     [Export]
     private PackedScene ChallengeDisplayScene {
-        get => throw new NotImplementedException("Please use the cached version instead."); 
+        get => throw new NotImplementedException("Please use the cached version instead.");
         set => ChallengeDisp = new PackedSceneCache<ChallengeDisplay> {Scene = value};
     }
-    
+
     private PackedSceneCache<FinalMessageDisplay> FMRDisp = null!;
     private PackedSceneCache<LPRDisplay> LPRDisp = null!;
     private PackedSceneCache<MessageJourneyDisplay> MJRDisp = null!;
-    private PackedSceneCache<ChallengeDisplay> ChallengeDisp = null!; 
-    
+    private PackedSceneCache<ChallengeDisplay> ChallengeDisp = null!;
+
     [Inject]
     private IDBWrapper DB = null!;
-    
+
     public override void _Ready() {
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
 
@@ -87,11 +87,11 @@ public partial class win_DetailView : Window
 #if DEBUG
         dbg_btn_Clear.Visible = true;
 #endif
-        
+
         ChosenDisplay = LPRDisp.GetInstance();
-        
+
         SetRecordDisplay();
-        
+
         base._Ready();
     }
 
@@ -119,12 +119,12 @@ public partial class win_DetailView : Window
         { NodeList.AddItem(NodeID); }
 
         NodeList.Selected = -1;
-        
+
         Console.WriteLine("Populated NodeIDs");
     }
 
     public void ChangeView(string _SelectedView) {
-        
+
         switch (_SelectedView)
         {
             case "Script_Output":
@@ -147,9 +147,9 @@ public partial class win_DetailView : Window
                 ChosenDisplay = null;
                 Selectedview = Views.NONE;
                 break;
-            
+
         }
-        
+
         SetRecordDisplay();
         _Refresh();
     }
@@ -161,7 +161,7 @@ public partial class win_DetailView : Window
     public void ChangeFilterCriteria(string? _FilterQ) {
         _FilterCriteria = _FilterQ;
     }
-    
+
     private enum Views
     {
         LUA_PROCESS,
@@ -241,10 +241,10 @@ public partial class win_DetailView : Window
     #region DataSources
 
     private List<string> GetLPRData() {
-        LPRData = _SelectedNodeID == Maybe<string>.None 
+        LPRData = _SelectedNodeID == Maybe<string>.None
            ? DB.LPRColl().FindAll().ToList()
            : DB.LPRColl().Find(X => X.NodeID == _SelectedNodeID.Value).ToList();
-        
+
         return _FilterCriteria.HasValue
             ? LPRData.Where(X => X.Action == _FilterCriteria.Value)
                        .Select(X => X.ToString())
@@ -266,7 +266,7 @@ public partial class win_DetailView : Window
         FinalMessageData = DB.FinalMsgColl()
                              .FindAll()
                              .ToList();
-        
+
         return FinalMessageData.Select(X => X.ToString()).ToList();
     }
 
@@ -274,7 +274,7 @@ public partial class win_DetailView : Window
         ChallengeData = DB.ChallengeColl()
                           .FindAll()
                           .ToList();
-        
+
         return ChallengeData.Select(X => X.ToString()).ToList();
     }
     #endregion
@@ -289,17 +289,17 @@ public partial class win_DetailView : Window
         };
 
         GodotLogger.LogInfo($"Purged {TotalDeletedRecords} record(s)...");
-        
+
         DetailsList.Clear();
     }
 
     public void SelectRecord(int _Index) {
         switch (Selectedview)
         {
-            case Views.LUA_PROCESS:                
+            case Views.LUA_PROCESS:
                 SelectedRecord = LPRData[_Index];
                 break;
-            case Views.MSG_JOURNEY:                
+            case Views.MSG_JOURNEY:
                 SelectedRecord = JourneyData[_Index];
                 break;
             case Views.FINAL_MESSAGE:

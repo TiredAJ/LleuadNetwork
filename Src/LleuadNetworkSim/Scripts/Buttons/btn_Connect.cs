@@ -8,9 +8,9 @@ public partial class btn_Connect : Button
     private Nodes.CollectionNode CollNode = null!;
 
     public override void _Pressed() {
-        
+
         CollNode.TryConnect();
-        
+
         base._Pressed();
     }
 }

@@ -15,9 +15,9 @@ public partial class btn_RunChallenge : Button
     public override void _Pressed() {
 
         _ = CollNode.RunChallenge();
-        
+
         ButtonParent.ClearMode();
-        
+
         base._Pressed();
     }
 }

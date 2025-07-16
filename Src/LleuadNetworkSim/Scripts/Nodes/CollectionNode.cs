@@ -21,7 +21,6 @@ using LleuadNetworkSim.Models;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
-using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -29,6 +28,7 @@ using LleuadNetworkSim.Utils;
 using MoonSharp.Interpreter;
 
 using MoreLinq;
+// ReSharper disable ArrangeMissingParentheses
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
@@ -36,7 +36,7 @@ public partial class CollectionNode : Node, IPersistable
 {
     [Export]
     private PackedScene ConnectionTemplate = null!;
-    
+
     [Export]
     private PackedScene NetworkNodeTemplate = null!;
 
@@ -84,7 +84,7 @@ public partial class CollectionNode : Node, IPersistable
                 HasLoadedChallenge = true; continue;
             }
         }
-        
+
         base._Ready();
     }
 
@@ -100,10 +100,10 @@ public partial class CollectionNode : Node, IPersistable
             foreach (NetworkNode NN in GetChildren<NetworkNode>())
             { NN.Selected = false; }
         }
-        
-        Mode = UIMode.NONE; 
+
+        Mode = UIMode.NONE;
     }
-    
+
     public bool RequestSelection(NetworkNode _Node) {
 
         if (SelectedNodes.Contains(_Node))
@@ -111,54 +111,55 @@ public partial class CollectionNode : Node, IPersistable
             SelectedNodes.Remove(_Node);
             return false;
         }
-        
+
         if (SelectedNodes.Count == 2)
         {
             SelectedNodes[0].Selected = false;
-            
+
             SelectedNodes.RemoveAt(0);
         }
-        
+
         SelectedNodes.Add(_Node);
 
         return true;
     }
-    
+
     /// <summary>
     /// Returns true if successfully selected
     /// </summary>
+    /// <param name="_Node">Node to be selected</param>
     public bool AddSelectedNode(NetworkNode _Node) {
 
         if (Mode != UIMode.NONE)
         { return false; }
-        
+
         if (SelectedNodes.Count == 2)
         { return false; }
-        
+
         SelectedNodes.Add(_Node);
 
-        Debug.WriteLine($"{_Node.Name} was added to selection");        
-        
+        Debug.WriteLine($"{_Node.Name} was added to selection");
+
         return true;
     }
 
     public bool DeselectNode(NetworkNode _Node) {
         _Node.Selected = false;
-        
+
         SelectedNodes.Remove(_Node);
-        
+
         return false;
     }
 
     public void DeselectAll() {
         foreach (NetworkNode Node in SelectedNodes)
         { Node.Selected = false; }
-        
+
         SelectedNodes.Clear();
     }
-    
+
     #endregion
-    
+
     #region Spawning
     public UIMode Mode { get; set; } = UIMode.NONE;
 
@@ -166,20 +167,20 @@ public partial class CollectionNode : Node, IPersistable
 
         if (Mode != UIMode.SPAWNING)
         { return; }
-        
+
         NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
 
         SceneInstance.Position = _Location;
         SceneInstance.Name = Guid.NewGuid().ToBase64Name();
-        
-        AddChild(SceneInstance);        
+
+        AddChild(SceneInstance);
     }
 
     public void HandleDelete() {
 
         if (SelectedNodes.Count == 0)
         { return; }
-        
+
         NetworkNode NodeA = SelectedNodes[0];
         DeleteNode(NodeA);
 
@@ -188,7 +189,7 @@ public partial class CollectionNode : Node, IPersistable
             NetworkNode NodeB = SelectedNodes[1];
             DeleteNode(NodeB);
         }
-        
+
         SelectedNodes.Clear();
     }
 
@@ -205,21 +206,21 @@ public partial class CollectionNode : Node, IPersistable
                      .Where(X => DeletableKeys.Contains(X.Key)))
         {
             (NodeConnection ConnAB, NodeConnection ConnBA) = KVP.Value;
-            
+
             ConnAB.QueueFree();
             ConnBA.QueueFree();
         }
 
         foreach (string Key in DeletableKeys)
         { Connections.Remove(Key); }
-        
+
         _Node.QueueFree();
     }
     #endregion
 
     #region Connections
-    private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
-    private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
+    readonly private Dictionary<string, (NetworkNode, NetworkNode)> ConnectedNodes = [];
+    readonly private Dictionary<string, (NodeConnection, NodeConnection)> Connections = [];
 
     readonly private BoundedChannelOptions BCODefault = new BoundedChannelOptions(100) {
         AllowSynchronousContinuations = false,
@@ -227,14 +228,14 @@ public partial class CollectionNode : Node, IPersistable
         SingleWriter = true,
         FullMode = BoundedChannelFullMode.Wait
     };
-    
+
     public void TryConnect() {
 
         if (SelectedNodes.Count != 2)
         { return; }
 
         Mode = UIMode.CONNECTING;
-        
+
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];
 
@@ -242,7 +243,7 @@ public partial class CollectionNode : Node, IPersistable
     }
 
     private void ConnectNodes(NetworkNode _NA, NetworkNode _NB) {
-        
+
         string ID = Convert.ToBase64String(_NA.Name.ToString().AddValue(_NB.Name));
 
         if (ConnectedNodes.ContainsKey(ID))
@@ -250,9 +251,9 @@ public partial class CollectionNode : Node, IPersistable
             GodotLogger.LogInfo($"Connection ID {ID} already exists, skipping...");
             return;
         }
-        
+
         ConnectedNodes.Add(ID, (_NA, _NB));
-        
+
         NodeConnection? ConnAB = ConnectionTemplate.Instantiate() as NodeConnection;
         NodeConnection? ConnBA = ConnectionTemplate.Instantiate() as NodeConnection;
 
@@ -261,21 +262,21 @@ public partial class CollectionNode : Node, IPersistable
             GodotLogger.LogWarning($"Null connections: ConnAB: [{ConnAB}], ConnBA: [{ConnBA}]");
             return;
         }
-        
+
         ConnAB.Name = Guid.NewGuid().ToBase64();
         ConnBA.Name = Guid.NewGuid().ToBase64();
-        
+
         Channel<Message> ChannelAB = Channel.CreateBounded<Message>(BCODefault);
         Channel<Message> ChannelBA = Channel.CreateBounded<Message>(BCODefault);
-        
+
         ConnAB.Init(_NA, _NB, ChannelBA.Writer, ChannelBA.Reader);
         ConnBA.Init(_NB, _NA, ChannelAB.Writer, ChannelAB.Reader);
-        
+
         Connections.Add(ID, (ConnAB, ConnBA));
-        
+
         _NA.AddConnection(_NB.Name, ConnAB);
         _NB.AddConnection(_NA.Name, ConnBA);
-        
+
         AddChild(ConnAB);
         AddChild(ConnBA);
     }
@@ -287,32 +288,32 @@ public partial class CollectionNode : Node, IPersistable
         { return; }
 
         Mode = UIMode.MESSAGING;
-        
+
         NetworkNode NodeA = SelectedNodes[0];
         NetworkNode NodeB = SelectedNodes[1];
 
         Interlocked.Increment(ref G_TotalMessagesInPlay_Ref);
-        
-        NodeA.DebugSendMessage(NodeB.Name);        
-    }    
+
+        NodeA.DebugSendMessage(NodeB.Name);
+    }
     #endregion
 
     #region Persist
-    
+
     public JsonObject Save() {
-        
+
         JsonObject JData = new JsonObject();
         JsonArray JArray = new JsonArray();
-        
+
         foreach (NetworkNode NN in GetChildren().OfType<NetworkNode>())
         { JArray.Add(NN.Save()); }
-        
+
         JData.Add("NetworkNodes", JArray);
 
         return JData;
     }
     public void Load(IBaseVO _VOData) {
-        
+
         if (_VOData is not CollectionNodeVO CollNodeVO)
         { throw new NotImplementedException(); }
 
@@ -332,24 +333,24 @@ public partial class CollectionNode : Node, IPersistable
             Debug.WriteLine("Map save has extension!");
             _Path = Path.ChangeExtension(_Path, "lnmap");
         }
-        
+
         JsonObject JData = Save();
-        
+
         using StreamWriter Writer = new (_Path);
-        
+
         JsonSerializerOptions JSO = new() {
             AllowTrailingCommas = false,
             DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
             AllowOutOfOrderMetadataProperties = false
-        }; 
+        };
 
         Writer.Write(JData.ToJsonString(JSO));
     }
     public void LoadMap(string _Path) {
-        
+
         ClearTransientChildren();
-        
+
         FileValidator.ValidateFile(_Path, ".lnmap", this);
 
         JsonNode JData = JsonValidator.ValidateJson<CollectionNodeVO>(_Path, this);
@@ -361,9 +362,9 @@ public partial class CollectionNode : Node, IPersistable
 
     private void LoadNetworkNode(NetworkNodeVO _NodeVO) {
         NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
-        
+
         SceneInstance.Load(_NodeVO);
-        
+
         AddChild(SceneInstance);
     }
 
@@ -373,55 +374,55 @@ public partial class CollectionNode : Node, IPersistable
 
         if (NA.HasNoValue)
         { throw new NotImplementedException(); }
-        
+
         foreach (string NBName in _NodeVO.Connections)
         {
             Maybe<NetworkNode> NB = GetChild<NetworkNode>(X => X.Name == NBName);
 
             if (NB.HasNoValue)
             { throw new NotImplementedException(); }
-            
+
             ConnectNodes(NA.Value, NB.Value);
         }
     }
-    
+
     public void TryLoadChallenge(string _Path) {
-        
+
         FileValidator.ValidateFile(_Path, ".lnchallenge", this);
-        
+
         Challenge = new MapChallenge(_Path);
         Challenge.Value.GenerateChallenge();
     }
-    
+
     private void ClearTransientChildren() {
         Connections.Clear();
         ConnectedNodes.Clear();
-        
+
         GetChildren<NodeConnection>().ForEach(X => X.Free());
         GetChildren<NetworkNode>().ForEach(X => X.Free());
     }
     #endregion
-    
+
     #region Challenges
 
     private Maybe<MapChallenge> Challenge = Maybe.None;
-    private bool IsRunningchallenge;
+    private bool IsRunningChallenge;
     private CancellationTokenSource CTSource = null!;
-    
+
     public async Task RunChallenge() {
-        if (IsRunningchallenge)
+        if (IsRunningChallenge)
         { ClearChallenge(); }
-        
+
         CTSource = new CancellationTokenSource();
 
-        IsRunningchallenge = true;
+        IsRunningChallenge = true;
 
         Dictionary<string, NetworkNode> NNs = GetChildren<NetworkNode>().ToDictionary(K => K.Name.ToString(), V => V);
 
         if (!Challenge.HasNoValue)
         {
-            GodotLogger.LogInfo($"No challenge loaded, aborting challenge generation"); 
-            
+            GodotLogger.LogInfo($"No challenge loaded, aborting challenge generation");
+
             return;
         }
         /*
@@ -436,21 +437,21 @@ public partial class CollectionNode : Node, IPersistable
         CancellationToken CT = CTSource.Token;
 
         LuaScript LS = await LuaScriptAssembler.AssembleScript(_PreLoad: true);
-        
+
         List<Task> NodesStartup = [];
         NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(LS, CT)));
 
         DetailView.UpdateRunning(true);
-        
+
         await Task.WhenAll(NodesStartup);
-        IsRunningchallenge = false;
+        IsRunningChallenge = false;
     }
 
     private void ClearChallenge() {
         GetChildren<NodeConnection>().ForEach(X => X.ClearMessages());
         CTSource.Cancel();
         CTSource.Dispose();
-        IsRunningchallenge = false;
+        IsRunningChallenge = false;
     }
 
     public void StopChallenge() {
@@ -458,7 +459,7 @@ public partial class CollectionNode : Node, IPersistable
         ClearChallenge();
         DetailView.UpdateRunning(false);
     }
-    
+
     #endregion
 
     #region DetailsView
@@ -466,7 +467,7 @@ public partial class CollectionNode : Node, IPersistable
         DetailView.UpdateNodes(_NodeIDs);
     }
     #endregion
-    
+
     #region Utils
     private Maybe<T> GetChild<T>(Func<T, bool> _Predicate) where T : Node
         => GetChildren()
@@ -483,7 +484,7 @@ public partial class CollectionNode : Node, IPersistable
 
     #region Scripts
     public void LoadScript(params string[] _Paths) {
-        
+
         foreach (string P in _Paths)
         {
             try
@@ -501,7 +502,7 @@ public partial class CollectionNode : Node, IPersistable
     static private IEnumerable<string> LoadScriptDir(string _DirPath) {
 
         List<string> Paths = [];
-        
+
         Paths.AddRange(Directory.GetFiles(_DirPath, "*.lua"));
 
         return Paths;
@@ -516,16 +517,17 @@ public partial class CollectionNode : Node, IPersistable
 
     #region Tidy up
     [Inject]
+    // ReSharper disable once FieldCanBeMadeReadOnly.Local
     private IDBWrapper DB = null!;
-    
+
     public override void _Notification(int _Notif)
     {
         if (_Notif == NotificationWMCloseRequest)
         {
             GodotLogger.LogDebug("Checkpointing DB");
-            DB.Checkpoint(); 
+            DB.Checkpoint();
         }
-        
+
         base._Notification(_Notif);
     }
     #endregion

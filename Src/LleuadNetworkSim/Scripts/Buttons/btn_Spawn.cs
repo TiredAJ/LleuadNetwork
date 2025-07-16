@@ -15,13 +15,13 @@ public partial class btn_Spawn : Button
     public override void _Toggled(bool _ToggledOn) {
 
         SwitchToggle(_ToggledOn);
-        
+
         base._Toggled(_ToggledOn);
     }
-    
-    public void SwitchToggle(bool _Toggled) {
+
+    private void SwitchToggle(bool _Toggled) {
         CollNode.Mode = _Toggled ? UIMode.SPAWNING : UIMode.NONE;
-        
+
         if (_Toggled)
         { ButtonParent.SpawnMode(); }
     }

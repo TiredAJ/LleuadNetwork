@@ -6,10 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CSharpFunctionalExtensions;
-
 using Godot;
-using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
@@ -21,7 +18,6 @@ using LleuadNetworkSim.Utils;
 
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using MoonSharp.VsCodeDebugger;
 
 using FileAccess = System.IO.FileAccess;
 using Script = MoonSharp.Interpreter.Script;
@@ -32,7 +28,7 @@ public class LuaController
 {
     readonly private Script Scrpt = new(/*CoreModules.Preset_SoftSandbox*/) {
         Options = {
-            ScriptLoader = new FileSystemScriptLoader() {
+            ScriptLoader = new FileSystemScriptLoader {
                 IgnoreLuaPathGlobal = false,
                 ModulePaths = [
                     "/usr/lib/lua/5.4/",
@@ -41,15 +37,15 @@ public class LuaController
             }
         }
     };
-    
+
     private string NodeID = string.Empty;
     readonly private Dictionary<string, DynValue> DataRegister = [];
     readonly private Dictionary<string, string> ScriptFiles = [];
     readonly private Dictionary<string, Message> MessagesInProcess = [];
-    
+
     private DynValue ProcessFunc = DynValue.Nil;
-    
-    //the number of available ports the parent network node has 
+
+    //the number of available ports the parent network node has
     public int PortCount { get; set; }
     public List<Message> Backlog = [];
     public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
@@ -61,7 +57,7 @@ public class LuaController
     public void LoadScript(LuaScript _LS, string _NodeID) {
 
         NodeID = _NodeID;
-        
+
         LoadGlobals();
 
         if (_LS.PreLoaded)
@@ -70,10 +66,10 @@ public class LuaController
         { Scrpt.LoadFile(_LS.FileLoc); }
 
         DynValue TempProcess = Scrpt.Globals.Get("Process");
-        
+
         if (TempProcess is not { Type: DataType.Function })
         { throw new ScriptMissingRequiredFuncException(Path.GetFileName(_LS.FileLoc), "ProcessMessage"); }
-        
+
         this.ProcessFunc = TempProcess;
     }
 
@@ -96,7 +92,7 @@ public class LuaController
         try
         {
             Message TestMessage = MessageGenerator.DebugMessage;
-            
+
             DynValue Res = ProcessFunc.Function.Call(TestMessage);
 
             if (Res.Type != DataType.Number || Res.CastToNumber().ToInt() == -1)
@@ -112,12 +108,12 @@ public class LuaController
 
         Challenge = DB.ChallengeColl()
                       .FindById(G_ChallengeID);
-        
+
         await Task.Run(() => {
                            Stopwatch SW = new();
 
                            bool FirstLoad = true;
-                           
+
                            while (!_CT.IsCancellationRequested)
                            {
                                SW.Restart();
@@ -139,7 +135,7 @@ public class LuaController
                                if (Backlog.Count == 0)
                                { PullBacklog(); }
                            }
-                           
+
                            GodotLogger.LogWarning("LuaController Finished!");
                        },
                        _CT);
@@ -173,7 +169,7 @@ public class LuaController
 
     /// <summary>
     /// Attempts to retrieve a value from the data register with a given key. Returns <see cref="DynValue.Nil"/>
-    ///  if not found. 
+    ///  if not found.
     /// </summary>
     /// <param name="_Key">The key of the value to get.</param>
     /// <returns>The value if present, otherwise <see cref="DynValue.Nil"/>.</returns>
@@ -192,7 +188,7 @@ public class LuaController
     private DynValue WriteToFile(string _FileName, string _Data) {
 
         string FileLoc;
-        
+
         if (ScriptFiles.TryGetValue(_FileName, out string? Value))
         { FileLoc = Value; }
         else
@@ -203,7 +199,7 @@ public class LuaController
             { Directory.CreateDirectory(FileLoc); }
 
             FileLoc = $"{FileLoc}/{Path.GetFileName(_FileName)}.txt";
-            
+
             if (!File.Exists(FileLoc))
             { File.Create(FileLoc); }
         }
@@ -211,9 +207,9 @@ public class LuaController
         try
         {
             using StreamWriter Writer = new(FileLoc, Encoding.UTF8, new FileStreamOptions(){Access = FileAccess.ReadWrite});
-        
+
             Writer.Write(_Data);
-            
+
             return DynValue.True;
         }
         catch (Exception Exc)
@@ -238,7 +234,7 @@ public class LuaController
 
         Message Msg = Backlog[0];
         Backlog.RemoveAt(0);
-        
+
         MessagesInProcess.Add(Msg.ID, Msg);
 
         return Msg;
@@ -246,7 +242,7 @@ public class LuaController
 
     /// <summary>
     /// Allows the script to send the <see cref="Message"/> it's currently
-    ///  processing to a specific port. 
+    ///  processing to a specific port.
     /// </summary>
     /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
     /// <param name="_ID">The ID of the message.</param>

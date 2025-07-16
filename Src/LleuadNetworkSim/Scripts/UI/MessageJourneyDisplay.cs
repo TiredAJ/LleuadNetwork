@@ -27,13 +27,13 @@ public partial class MessageJourneyDisplay : BaseRecordDisplay
     private LineEdit Hops = null!;
 
     public override void SetData(IBaseRecord? _BaseRecord) {
-        
+
         if (_BaseRecord is not MessageJourneyRecord MJR)
         {
             GodotLogger.LogWarning("Couldn't cast baserecord to MJR");
             return;
         }
-        
+
         ChallengeName.Text = MJR.Challenge?.ChallengeName.Or("Not in challenge");
         MessageID.Text = MJR.MessageID;
         Sender.Text = MJR.Sender.Or("No sender");

@@ -18,22 +18,22 @@ public partial class Packet : PathFollow2D
     private Sprite2D Sprite = null!;
 
     private float PathLength = -1;
-    
+
     private bool Run = false;
 
     public override void _EnterTree() {
 
         Node? Parent = GetParent();
-        
+
         if (Parent is not null)
         {
             Run = true;
 
             PathLength = (Parent as NodeConnection)!.Length;
         }
-        
+
         Sprite.SetGlobalRotationDegrees(0);
-        
+
         base._EnterTree();
     }
 
@@ -41,7 +41,7 @@ public partial class Packet : PathFollow2D
 
         if (!Run)
         { return; }
-        
+
         this.Progress += (float)(Speed * _Delta);
 
         if (ProgressRatio >= 0.98f)
@@ -49,12 +49,12 @@ public partial class Packet : PathFollow2D
             (GetParent() as NodeConnection)?.PacketArrived(this.Name);
             return;
         }
-        
+
         base._Process(_Delta);
     }
 
     public void PathUpdated(float _Length) {
-        
+
         PathLength = _Length;
 
         GetChild<Sprite2D>(0)
@@ -64,12 +64,12 @@ public partial class Packet : PathFollow2D
     public void SetType(string _Type) {
 
         string Type = _Type.ToLower();
-        
+
         if (Type.Contains("discovery"))
         { Sprite.Texture = PacketTextures[1]; }
         else
         { Sprite.Texture = PacketTextures[0]; }
-        
+
         GodotLogger.LogInfo($"Set type to {_Type}");
     }
 
@@ -77,13 +77,13 @@ public partial class Packet : PathFollow2D
     //
     //    if (_Noti == NotificationPredelete)
     //    { GodotLogger.LogInfo("Packet is about to be deleted!"); }
-    //    
+    //
     //    base._Notification(_Noti);
     //}
 
     //public override void _ExitTree() {
     //    GodotLogger.LogInfo("Packet has left tree");
-    //    
+    //
     //    base._ExitTree();
     //}
 }

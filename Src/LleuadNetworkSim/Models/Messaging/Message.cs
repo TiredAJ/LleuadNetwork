@@ -17,7 +17,7 @@ public class Message
     readonly public int MaxHops;
 
     public int Port { get; set; } = 0;
-    
+
     #region Headers
 
     #region DefaultHeaders
@@ -29,7 +29,7 @@ public class Message
         get => IntHeaders.GetHeader(Header.ID);
         init => IntHeaders.SetHeaderValue(Header.ID, value);
     }
-    
+
     /// <summary>
     /// Address of the sender node.
     /// </summary>
@@ -129,7 +129,7 @@ public class Message
 
     /// <summary>
     /// If this message is a chunk, what the total size is (in bytes)
-    ///  of it's blob (all chunks together). 
+    ///  of it's blob (all chunks together).
     /// </summary>
     public long TotalSize {
         get => Convert.ToInt64(IntHeaders.GetHeader(Header.TOTAL_SIZE));
@@ -144,16 +144,16 @@ public class Message
 
     public Headers CloneHeaders()
         => IntHeaders.Clone();
-    
+
     #endregion
 
     public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50) {
         IntHeaders = new Headers();
-        
+
         SenderAddress = _SenderAddress;
         DestinationAddress = _DestinationAddress;
         CreationTime = DateTime.UtcNow;
-        
+
         ID = Guid.CreateVersion7()
                  .ToBase64Name();
 
@@ -162,13 +162,13 @@ public class Message
         if (_Payload is not null)
         { Payload = _Payload; }
     }
-    
+
     public Maybe<string> Payload {
         get;
         set {
             if (value.HasValue)
             { ValidatePayload(value.Value); }
-            
+
             field = value;
         }
     } = string.Empty;
@@ -179,9 +179,9 @@ public class Message
         Payload = _str;
     }
 
-    public string? GetPayload() 
+    public string? GetPayload()
         => Payload.GetValueOrDefault();
-    
+
     public bool IsValid() {
         if (SenderAddress == Headers.DEFAULT_VAL
             || DestinationAddress == Headers.DEFAULT_VAL

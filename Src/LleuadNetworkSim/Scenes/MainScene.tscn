@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=29 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -20,19 +20,8 @@
 [ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
 [ext_resource type="Script" uid="uid://wlpw2251rq8l" path="res://Scripts/Buttons/btn_StopChallenge.cs" id="16_i0j58"]
 [ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
-[ext_resource type="Script" uid="uid://c4d8y4tocnton" path="res://Scripts/win_DetailView.cs" id="21_bpy1e"]
-[ext_resource type="Script" uid="uid://ces1jrqnbf656" path="res://Scripts/Buttons/chkbx_DetailView.cs" id="22_bpy1e"]
-[ext_resource type="Script" uid="uid://dbi4ymdmfrac3" path="res://Scripts/Buttons/optbtn_NodeSelection.cs" id="22_mymud"]
-[ext_resource type="Script" uid="uid://b8se3xs2gggqp" path="res://Scripts/Buttons/btn_Refresh.cs" id="23_3va76"]
-[ext_resource type="PackedScene" uid="uid://dog7v7afs11qw" path="res://Scenes/UI/final_message_display.tscn" id="23_c3pre"]
-[ext_resource type="PackedScene" uid="uid://dkupr6ewuc0b1" path="res://Scenes/UI/lpr_display.tscn" id="24_s1acj"]
-[ext_resource type="Script" uid="uid://ir7fh6edx23w" path="res://Scripts/Buttons/optbtn_Refresh.cs" id="24_wmecs"]
-[ext_resource type="PackedScene" uid="uid://dla0ibs0nvuf2" path="res://Scenes/UI/message_journey_display.tscn" id="25_t8ijv"]
-[ext_resource type="Script" uid="uid://dp54ee276wtwq" path="res://Scripts/Buttons/dbg_btn_Clear.cs" id="25_wmecs"]
-[ext_resource type="PackedScene" uid="uid://bok2v7iofg02c" path="res://Scenes/UI/challenge_display.tscn" id="26_rv6c1"]
+[ext_resource type="PackedScene" uid="uid://c3825ytt2j4mf" path="res://Scenes/detail_view.tscn" id="22_bpy1e"]
 [ext_resource type="Script" uid="uid://beary1w3x86qc" path="res://Scripts/DependencyRegistrationNode.cs" id="27_4sso6"]
-[ext_resource type="Script" uid="uid://bdr11g2sgmcab" path="res://Scripts/Buttons/btn_Filter.cs" id="28_r0vnq"]
-[ext_resource type="Script" uid="uid://c75imyeip7yvp" path="res://Scripts/UI/WinDetailsList.cs" id="30_u5v48"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4b75m"]
 
@@ -45,8 +34,6 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f140w"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0iob3"]
-
-[sub_resource type="ButtonGroup" id="ButtonGroup_gyaec"]
 
 [node name="MainScene" type="Node2D"]
 metadata/_edit_vertical_guides_ = [1000.0]
@@ -61,7 +48,7 @@ script = ExtResource("6_y4jh7")
 ConnectionTemplate = ExtResource("7_q68mp")
 NetworkNodeTemplate = ExtResource("4_qxria")
 ExceptionPopupTemplate = ExtResource("4_enc0b")
-DetailView = NodePath("../DetailView")
+DetailView = NodePath("")
 
 [node name="txtr_Background" type="TextureRect" parent="CollectionNode"]
 z_index = -2
@@ -288,172 +275,4 @@ access = 2
 filters = PackedStringArray("*.lua")
 use_native_dialog = true
 
-[node name="DetailView" type="Window" parent="." node_paths=PackedStringArray("NodeList", "DetailsList", "dbg_btn_Clear", "RecordDisplayParent")]
-title = "Details"
-initial_position = 2
-size = Vector2i(600, 790)
-visible = false
-wrap_controls = true
-transient = true
-script = ExtResource("21_bpy1e")
-NodeList = NodePath("VBoxContainer/VBoxContainer/optbtn_NodeSelection")
-DetailsList = NodePath("VBoxContainer/itmlst_Records")
-dbg_btn_Clear = NodePath("VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh/dbg_btn_Clear")
-RecordDisplayParent = NodePath("VBoxContainer/vbxc_RecordDisplayPane")
-FMRDisplayScene = ExtResource("23_c3pre")
-LPRDisplayScene = ExtResource("24_s1acj")
-MJRDisplayScene = ExtResource("25_t8ijv")
-ChallengeDisplayScene = ExtResource("26_rv6c1")
-
-[node name="txtr_Background" type="TextureRect" parent="DetailView"]
-z_index = -2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-mouse_filter = 2
-texture = ExtResource("1_7rqgy")
-expand_mode = 1
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DetailView"]
-custom_minimum_size = Vector2(0, 60)
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DetailView/VBoxContainer"]
-layout_mode = 2
-
-[node name="optbtn_NodeSelection" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer" node_paths=PackedStringArray("DetailView")]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-fit_to_longest_item = false
-allow_reselect = true
-script = ExtResource("22_mymud")
-DetailView = NodePath("../../..")
-
-[node name="hfc_MainControls" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="hfc_DisplayOptions" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls"]
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-
-[node name="chkbx_NoDisplay" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-button_group = SubResource("ButtonGroup_gyaec")
-text = "No Display"
-script = ExtResource("22_bpy1e")
-DetailView = NodePath("../../../../..")
-metadata/View = "None"
-
-[node name="chkbx_ScriptOutput" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-button_pressed = true
-button_group = SubResource("ButtonGroup_gyaec")
-text = "Script Output"
-script = ExtResource("22_bpy1e")
-DetailView = NodePath("../../../../..")
-metadata/View = "Script_Output"
-
-[node name="chkbx_MsgJourney" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-button_group = SubResource("ButtonGroup_gyaec")
-text = "Message Journey"
-script = ExtResource("22_bpy1e")
-DetailView = NodePath("../../../../..")
-metadata/View = "Message_Journey"
-
-[node name="chkbx_ChallengeOutput" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-button_group = SubResource("ButtonGroup_gyaec")
-text = "Challenge Output"
-script = ExtResource("22_bpy1e")
-DetailView = NodePath("../../../../..")
-metadata/View = "Challenge_Output"
-
-[node name="chkbx_FinalMessage" type="CheckBox" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_DisplayOptions" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-button_group = SubResource("ButtonGroup_gyaec")
-text = "Final Message"
-script = ExtResource("22_bpy1e")
-DetailView = NodePath("../../../../..")
-metadata/View = "Final_Message"
-
-[node name="Spacer" type="Container" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="hfc_Refresh" type="HFlowContainer" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls"]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-alignment = 2
-
-[node name="btn_ManualRefresh" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Refresh
-"
-script = ExtResource("23_3va76")
-DetailView = NodePath("../../../../..")
-
-[node name="optbtn_RefreshTimer" type="OptionButton" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-size_flags_horizontal = 3
-alignment = 1
-selected = 0
-item_count = 4
-popup/item_0/text = "Manual"
-popup/item_0/id = 0
-popup/item_1/text = "1 Second"
-popup/item_1/id = 1
-popup/item_2/text = "5 Second"
-popup/item_2/id = 2
-popup/item_3/text = "10 Second"
-popup/item_3/id = 3
-script = ExtResource("24_wmecs")
-DetailView = NodePath("../../../../..")
-
-[node name="dbg_btn_Clear" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/hfc_MainControls/hfc_Refresh" node_paths=PackedStringArray("DetailView")]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "DEBUG - Clear"
-script = ExtResource("25_wmecs")
-DetailView = NodePath("../../../../..")
-
-[node name="hbxc_Search" type="HBoxContainer" parent="DetailView/VBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-size_flags_vertical = 0
-
-[node name="txt_SearchBar" type="LineEdit" parent="DetailView/VBoxContainer/VBoxContainer/hbxc_Search"]
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "Search"
-editable = false
-select_all_on_focus = true
-
-[node name="btn_Search" type="Button" parent="DetailView/VBoxContainer/VBoxContainer/hbxc_Search" node_paths=PackedStringArray("DetailView")]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-disabled = true
-text = "Search"
-script = ExtResource("28_r0vnq")
-DetailView = NodePath("../../../..")
-
-[node name="vbxc_RecordDisplayPane" type="VBoxContainer" parent="DetailView/VBoxContainer"]
-custom_minimum_size = Vector2(0, 5)
-layout_mode = 2
-
-[node name="itmlst_Records" type="ItemList" parent="DetailView/VBoxContainer" node_paths=PackedStringArray("ParentDetailView")]
-layout_mode = 2
-size_flags_vertical = 3
-allow_search = false
-script = ExtResource("30_u5v48")
-ParentDetailView = NodePath("../..")
+[node name="DetailView" parent="." instance=ExtResource("22_bpy1e")]

@@ -7,7 +7,7 @@ namespace LleuadNetworkSim.Utils;
 
 public partial class PackedSceneCache<T> : Resource where T : Node
 {
-    required public PackedScene Scene { 
+    required public PackedScene Scene {
         get;
         set {
             Instance = Maybe<T>.None;

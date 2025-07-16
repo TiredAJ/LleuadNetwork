@@ -17,8 +17,7 @@ public sealed class Repo : IDBWrapper
 
 #if DEBUG
         Console.WriteLine($"Opening DB at {_Location}");
-#endif 
-
+#endif
         DB = new LiteDatabase(_Location);
 
         if (DB.UserVersion != DBConf.RecordVersion)
@@ -27,12 +26,12 @@ public sealed class Repo : IDBWrapper
             DB.Rebuild();
             DB.UserVersion = DBConf.RecordVersion;
         }
-        
+
         _LPRColl = DB.GetCollection<LuaProcessRecord>(DBConf.LPR_COLL_NAME);
         _JourneyColl = DB.GetCollection<MessageJourneyRecord>(DBConf.JOURNEY_COLL_NAME);
         _FinalMsgColl = DB.GetCollection<FinalMessageRecord>(DBConf.FINAL_MESSAGE_COLL_NAME);
         _ChallengeColl = DB.GetCollection<ChallengeRecord>(DBConf.CHALLENGE_COLL_NAME);
-        
+
         SetupColls();
     }
 
@@ -40,17 +39,17 @@ public sealed class Repo : IDBWrapper
         _LPRColl.EnsureIndex(X => X.NodeID);
         _LPRColl.EnsureIndex(X => X.Action);
         _LPRColl.Include(X => X.Challenge);
-        
+
         _JourneyColl.EnsureIndex(X => X.MessageID);
         _JourneyColl.EnsureIndex(X => X.Sender);
         _JourneyColl.EnsureIndex(X => X.Destination);
         _JourneyColl.Include(X => X.Challenge);
-        
+
         _FinalMsgColl.EnsureIndex(X => X.MessageID);
         _FinalMsgColl.EnsureIndex(X => X.Sender);
         _FinalMsgColl.EnsureIndex(X => X.Destination);
         _FinalMsgColl.Include(X => X.Challenge);
-        
+
         _ChallengeColl.EnsureIndex(X => X.ChallengeName);
     }
 
@@ -72,20 +71,20 @@ public sealed class Repo : IDBWrapper
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    
+
     ~Repo() => Dispose(false);
     #endregion
 
     #region Repos
     private ILiteCollection<LuaProcessRecord> _LPRColl { get; init; }
     public ILiteCollection<LuaProcessRecord> LPRColl() => _LPRColl;
-    
+
     private ILiteCollection<MessageJourneyRecord> _JourneyColl { get; init; }
     public ILiteCollection<MessageJourneyRecord> JourneyColl() => _JourneyColl;
-    
+
     private ILiteCollection<FinalMessageRecord> _FinalMsgColl { get; init; }
     public ILiteCollection<FinalMessageRecord> FinalMsgColl() => _FinalMsgColl;
-    
+
     private ILiteCollection<ChallengeRecord> _ChallengeColl { get; init; }
     public ILiteCollection<ChallengeRecord> ChallengeColl() => _ChallengeColl;
     #endregion
