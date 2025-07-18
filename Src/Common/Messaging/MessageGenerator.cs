@@ -1,4 +1,4 @@
-namespace LleuadNetworkSim.Models.Messaging;
+namespace Common.Messaging;
 
 public class MessageGenerator
 {

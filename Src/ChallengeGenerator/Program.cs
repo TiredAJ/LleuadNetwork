@@ -1,4 +1,4 @@
-﻿namespace ChallengeGenerator;
+﻿namespace LleuadNetworkSim.SubSrc.ChallengeGenerator;
 
 internal class Program
 {

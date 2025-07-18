@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
+using Common.Entities;
+
 using CSharpFunctionalExtensions;
 
 using Godot;
 using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
-using Godot.NativeInterop;
 
 using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
-using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Scripts.Buttons;
 using LleuadNetworkSim.Scripts.UI;
 using LleuadNetworkSim.Utils;

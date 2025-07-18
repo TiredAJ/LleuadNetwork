@@ -2,13 +2,15 @@ using System;
 
 using Godot;
 
+using LleuadNetworkSim.Scripts;
+
 namespace LleuadNetworkSim.Utils;
 
 public class ExceptionPopupWrapper
 {
     static public void Throw(Node _Parent, Exception _Exc) {
-        Scripts.ExceptionPopup ExcPopup = ResourceLoader.Load<PackedScene>("res://Scenes/exception_popup.tscn")
-                                                        .Instantiate<Scripts.ExceptionPopup>();
+        ExceptionPopup ExcPopup = ResourceLoader.Load<PackedScene>("res://Scenes/exception_popup.tscn")
+                                                .Instantiate<ExceptionPopup>();
 
         ExcPopup.Exc = _Exc;
 

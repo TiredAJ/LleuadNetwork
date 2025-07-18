@@ -1,9 +1,10 @@
 using System;
 
+using Common.Entities;
+
 using LiteDB;
 
 using LleuadNetworkSim.Config;
-using LleuadNetworkSim.Models.Repo.Entities;
 
 namespace LleuadNetworkSim.Models.Repo;
 

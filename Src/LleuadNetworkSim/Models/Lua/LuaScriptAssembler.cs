@@ -6,11 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using Common.Utils;
+
 using Godot;
 using Godot.Logging;
 
 using LleuadNetworkSim.Models.Exceptions.Lua;
-using LleuadNetworkSim.Utils;
 
 using MoreLinq;
 

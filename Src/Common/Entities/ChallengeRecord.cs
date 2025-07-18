@@ -1,11 +1,12 @@
-using System;
-
 using LiteDB;
 
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 public record ChallengeRecord : BaseRecord
 {
+    [BsonIgnore]
+    public const string COLL_NAME = "ChallengeCollection";
+    
     [BsonId]
     public ObjectId? ID { get; init; }
     public int TotalNodesInvolved { get; set; }

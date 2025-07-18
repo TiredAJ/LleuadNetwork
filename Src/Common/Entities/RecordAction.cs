@@ -1,4 +1,4 @@
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 public enum RecordAction {
     RECEIVED,

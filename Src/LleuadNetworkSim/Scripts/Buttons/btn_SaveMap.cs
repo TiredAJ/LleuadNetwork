@@ -1,11 +1,13 @@
 using Godot;
 
+using LleuadNetworkSim.Scripts.Nodes;
+
 namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class btn_SaveMap : FileButton
 {
     [Export]
-    private Nodes.CollectionNode CollNode = null!;
+    private CollectionNode CollNode = null!;
 
     public override void _Ready() {
 

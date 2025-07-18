@@ -41,5 +41,27 @@
     <Compile Update="SubSrc\Entities\Class1.cs">
       <Link>SubSrc\Models\Class1.cs</Link>
     </Compile>
+    <Compile Update="SubSrc\Common\Challenge\MapChallenge.cs">
+      <Link>SubSrc\Entities\Challenge\MapChallenge.cs</Link>
+    </Compile>
+    <Compile Update="SubSrc\Common\Messaging\Header.cs">
+      <Link>SubSrc\Entities\Messaging\Header.cs</Link>
+    </Compile>
+    <Compile Update="SubSrc\Common\Messaging\Headers.cs">
+      <Link>SubSrc\Entities\Messaging\Headers.cs</Link>
+    </Compile>
+    <Compile Update="SubSrc\Common\Messaging\Message.cs">
+      <Link>SubSrc\Entities\Messaging\Message.cs</Link>
+    </Compile>
+    <Compile Update="SubSrc\Common\Messaging\MessageGenerator.cs">
+      <Link>SubSrc\Entities\Messaging\MessageGenerator.cs</Link>
+    </Compile>
+    <Compile Update="SubSrc\Common\Messaging\ReadonlyMessage.cs">
+      <Link>SubSrc\Entities\Messaging\ReadonlyMessage.cs</Link>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 </Project>

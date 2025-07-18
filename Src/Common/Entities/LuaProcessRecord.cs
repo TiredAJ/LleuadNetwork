@@ -1,14 +1,15 @@
 using LiteDB;
 
-using LleuadNetworkSim.Config;
-
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 public record LuaProcessRecord : BaseRecord
 {
+    [BsonIgnore]
+    public const string COLL_NAME = "LPRCollection";
+    
     [BsonId]
     public ObjectId? ID { get; init; }
-    [BsonRef(DBConf.CHALLENGE_COLL_NAME)]
+    [BsonRef(ChallengeRecord.COLL_NAME)]
     public ChallengeRecord? Challenge { get; set; }
     required public string NodeID { get; init; }
     public string? Action { get; init; }

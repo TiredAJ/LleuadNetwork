@@ -1,6 +1,4 @@
-using System;
-
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 public record BaseRecord : IBaseRecord
 {

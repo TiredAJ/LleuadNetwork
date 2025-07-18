@@ -1,16 +1,19 @@
+using Common.Messaging;
+
 using LiteDB;
 
-using LleuadNetworkSim.Config;
-
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 /// <summary>
 /// A point in the journey of a message. Should be generated on message reception.
 /// </summary>
-public record MessageJourneyRecord : BaseRecord {
-
+public record MessageJourneyRecord : BaseRecord
+{
+    [BsonIgnore]
+    public const string COLL_NAME = "MessageJourneyCollection";
+    
     public ObjectId? ID { get; init; }
-    [BsonRef(DBConf.CHALLENGE_COLL_NAME)]
+    [BsonRef(ChallengeRecord.COLL_NAME)]
     public ChallengeRecord? Challenge { get; set; }
     public string MessageID { get; set; }
     public string Sender { get; set; }
@@ -22,7 +25,7 @@ public record MessageJourneyRecord : BaseRecord {
 
     public MessageJourneyRecord(){}
 
-    public MessageJourneyRecord(Messaging.Message _Msg, string _CurrentLoc, RecordAction _Action, ChallengeRecord? _Challenge) : base() {
+    public MessageJourneyRecord(Message _Msg, string _CurrentLoc, RecordAction _Action, ChallengeRecord? _Challenge) : base() {
         Challenge = _Challenge;
         MessageID = _Msg.ID;
         Sender = _Msg.SenderAddress;

@@ -1,10 +1,10 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LleuadNetworkSim", "LleuadNetworkSim.csproj", "{877CE6F4-01CB-41FC-BCE5-07B6978C03D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LleuadNetworkSim", "LleuadNetworkSim\LleuadNetworkSim.csproj", "{877CE6F4-01CB-41FC-BCE5-07B6978C03D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChallengeGenerator", "SubSrc\ChallengeGenerator\ChallengeGenerator.csproj", "{F44149B9-0A73-4CBB-B146-331824EDBF11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChallengeGenerator", "ChallengeGenerator\ChallengeGenerator.csproj", "{F44149B9-0A73-4CBB-B146-331824EDBF11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "SubSrc\Entities\Entities.csproj", "{721C0EA0-CD80-4E09-9CD7-C341C8B3E0CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{721C0EA0-CD80-4E09-9CD7-C341C8B3E0CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

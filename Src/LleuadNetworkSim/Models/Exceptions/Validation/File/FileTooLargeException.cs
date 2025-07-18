@@ -1,6 +1,6 @@
 using System;
 
-using LleuadNetworkSim.Utils;
+using Common.Utils;
 
 namespace LleuadNetworkSim.Models.Exceptions.Validation.File;
 

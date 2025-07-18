@@ -1,6 +1,4 @@
-using System;
-
-namespace LleuadNetworkSim.Models.Exceptions.Messages;
+namespace Common.Messaging.Exceptions;
 
 public class PayloadTooLargeException(int _Length, int _MaxLength) : Exception(DebugMessage(_Length, _MaxLength))
 {

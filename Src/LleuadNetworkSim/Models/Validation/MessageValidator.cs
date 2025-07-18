@@ -1,6 +1,6 @@
-using Godot.Logging;
+using Common.Messaging;
 
-using LleuadNetworkSim.Models.Messaging;
+using Godot.Logging;
 
 namespace LleuadNetworkSim.Models.Validation;
 

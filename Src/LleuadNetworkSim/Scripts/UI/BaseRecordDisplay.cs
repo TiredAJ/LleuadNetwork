@@ -1,6 +1,6 @@
-using Godot;
+using Common.Entities;
 
-using LleuadNetworkSim.Models.Repo.Entities;
+using Godot;
 
 namespace LleuadNetworkSim.Scripts.UI;
 

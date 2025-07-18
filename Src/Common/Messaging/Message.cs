@@ -1,14 +1,11 @@
-using System;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
+
+using Common.Utils;
+using Common.Messaging.Exceptions;
 
 using CSharpFunctionalExtensions;
 
-using LleuadNetworkSim.Models.Exceptions;
-using LleuadNetworkSim.Models.Exceptions.Messages;
-using LleuadNetworkSim.Utils;
-
-namespace LleuadNetworkSim.Models.Messaging;
+namespace Common.Messaging;
 
 public class Message
 {

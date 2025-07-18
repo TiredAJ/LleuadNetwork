@@ -1,8 +1,8 @@
+using Common.Entities;
+using Common.Utils;
+
 using Godot;
 using Godot.Logging;
-
-using LleuadNetworkSim.Models.Repo.Entities;
-using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Scripts.UI;
 

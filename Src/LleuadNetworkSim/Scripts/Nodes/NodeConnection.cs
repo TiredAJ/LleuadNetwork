@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-using Godot;
+using Common.Messaging;
 
-using LleuadNetworkSim.Models.Messaging;
+using Godot;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 

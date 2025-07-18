@@ -1,6 +1,6 @@
 using Godot;
 
-using LleuadNetworkSim.Scripts;
+namespace LleuadNetworkSim.Scripts.UI;
 
 public partial class WinDetailsList : ItemList
 {

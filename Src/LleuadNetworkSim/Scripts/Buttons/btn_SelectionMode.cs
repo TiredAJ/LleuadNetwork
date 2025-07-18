@@ -1,5 +1,7 @@
 using Godot;
 
+using LleuadNetworkSim.Scripts.Nodes;
+
 namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class btn_SelectionMode : Button
@@ -8,7 +10,7 @@ public partial class btn_SelectionMode : Button
     private SelectionButtonContainer SelectionContainer = null!;
 
     [Export]
-    private Nodes.CollectionNode CollNode = null!;
+    private CollectionNode CollNode = null!;
 
     [Export]
     private cntr_MainButtons ButtonParent = null!;

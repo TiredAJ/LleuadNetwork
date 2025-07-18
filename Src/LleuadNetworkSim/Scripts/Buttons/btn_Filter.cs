@@ -1,6 +1,6 @@
 using Godot;
 
-using LleuadNetworkSim.Scripts;
+namespace LleuadNetworkSim.Scripts.Buttons;
 
 public partial class btn_Filter : Button
 {

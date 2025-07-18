@@ -1,19 +1,20 @@
-using System;
+using Common.Messaging;
 
 using LiteDB;
 
-using LleuadNetworkSim.Config;
-using LleuadNetworkSim.Utils;
-
-namespace LleuadNetworkSim.Models.Repo.Entities;
+namespace Common.Entities;
 
 /// <summary>
 /// Records the state of a message once it's dropped/consumed.
 /// </summary>
-public record FinalMessageRecord : BaseRecord {
+public record FinalMessageRecord : BaseRecord
+{
+    [BsonIgnore]
+    public const string COLL_NAME = "FinalMessageCollection";
+    
     [BsonId]
     public ObjectId ID { get; init; }
-    [BsonRef(DBConf.CHALLENGE_COLL_NAME)]
+    [BsonRef(ChallengeRecord.COLL_NAME)]
     public ChallengeRecord? Challenge { get; set; }
     public string MessageID { get; set; }
     public string Sender { get; set; }
@@ -30,7 +31,7 @@ public record FinalMessageRecord : BaseRecord {
 
     public FinalMessageRecord(){}
 
-    public FinalMessageRecord(Messaging.Message _Msg, string _CurLoc, bool _Consumed, ChallengeRecord? _Challenge) : base() {
+    public FinalMessageRecord(Message _Msg, string _CurLoc, bool _Consumed, ChallengeRecord? _Challenge) : base() {
         Challenge = _Challenge;
         MessageID = _Msg.ID;
         Sender = _Msg.SenderAddress;

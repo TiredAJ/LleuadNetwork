@@ -1,5 +1,7 @@
 using Godot;
 
+using Common.Entities;
+
 namespace LleuadNetworkSim.Config;
 
 static public class DBConf
@@ -7,13 +9,13 @@ static public class DBConf
     static public string ConnectionString
         => ProjectSettings.GlobalizePath("user://Data.db");
 
-    public const string LPR_COLL_NAME = "LPRCollection";
+    public const string LPR_COLL_NAME = LuaProcessRecord.COLL_NAME;
 
-    public const string CHALLENGE_COLL_NAME = "ChallengeCollection";
+    public const string CHALLENGE_COLL_NAME = ChallengeRecord.COLL_NAME;
 
-    public const string JOURNEY_COLL_NAME = "MessageJourneyCollection";
+    public const string JOURNEY_COLL_NAME = MessageJourneyRecord.COLL_NAME;
 
-    public const string FINAL_MESSAGE_COLL_NAME = "FinalMessageCollection";
+    public const string FINAL_MESSAGE_COLL_NAME = FinalMessageRecord.COLL_NAME;
 
     static public int MaxPageSize
         => 200;

@@ -1,4 +1,5 @@
 using LiteDB;
+
 // ReSharper disable InconsistentNaming
 
 namespace LleuadNetworkSim.Utils;

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 using CSharpFunctionalExtensions;
 
-namespace LleuadNetworkSim.Models.Messaging;
+namespace Common.Messaging;
 
 public struct Headers
 {

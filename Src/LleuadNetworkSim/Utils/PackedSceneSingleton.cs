@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 
 using Godot;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace LleuadNetworkSim.Utils;

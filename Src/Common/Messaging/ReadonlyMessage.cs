@@ -1,13 +1,6 @@
-using System;
 using System.Text;
 
-using CSharpFunctionalExtensions;
-
-using LleuadNetworkSim.Models.Exceptions;
-using LleuadNetworkSim.Models.Exceptions.Messages;
-using LleuadNetworkSim.Utils;
-
-namespace LleuadNetworkSim.Models.Messaging;
+namespace Common.Messaging;
 
 public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50)
     : Message(_SenderAddress, _DestinationAddress, _Payload, _MaxHops)
