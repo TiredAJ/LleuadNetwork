@@ -116,7 +116,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Packets and messaging
-    private ConcurrentQueue<Message> Backlog = [];
+    public ConcurrentQueue<Message> Backlog = [];
     private LuaController LC = new();
     private ChallengeRecord? Challenge;
 
@@ -131,8 +131,6 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
                         LC.Challenge = Challenge;
 
-                        //LC.LoadDebugServer();
-
                         LC.LoadScript(_LS, this.Name);
 
                         LC.PortCount = Connections.Count;
@@ -143,7 +141,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
                         LC.ExtSendMessage = SendMessage;
                         LC.PullBacklog = PullFromBacklog;
 
-                        return LC.Start(_CT);
+                        return LC.StartAsync(_CT);
                     }, _CT);
 
     public void DebugSendMessage(string _ID) {

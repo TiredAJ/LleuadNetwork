@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -21,6 +22,7 @@ using LleuadNetworkSim.Models;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Messaging;
 using LleuadNetworkSim.Models.Repo;
+using LleuadNetworkSim.Models.Repo.Entities;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
@@ -29,6 +31,7 @@ using MoonSharp.Interpreter;
 
 using MoreLinq;
 // ReSharper disable ArrangeMissingParentheses
+// ReSharper disable RedundantJumpStatement
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
@@ -42,9 +45,14 @@ public partial class CollectionNode : Node, IPersistable
 
     [Export]
     private PackedScene ExceptionPopupTemplate = null!;
-
+    
     [Export]
-    private win_DetailView DetailView = null!;
+    private PackedScene DetailViewScene {
+        get => DetailViewSingleton.Scene;
+        set => DetailViewSingleton = new PackedSceneSingleton<win_DetailView> {Scene = value};
+    }
+
+    private PackedSceneSingleton<win_DetailView> DetailViewSingleton = null!;
 
     public override void _Ready() {
 
@@ -56,6 +64,8 @@ public partial class CollectionNode : Node, IPersistable
 #if DEBUG
         G_ChallengeID = new ObjectId(1751909515, 16211519, 1177, 8867193);
 #endif
+
+        AddChild(DetailViewSingleton.GetInstance());
 
         bool HasLoadedMap = false;
         bool HasLoadedScript = false;
@@ -419,21 +429,21 @@ public partial class CollectionNode : Node, IPersistable
 
         Dictionary<string, NetworkNode> NNs = GetChildren<NetworkNode>().ToDictionary(K => K.Name.ToString(), V => V);
 
-        if (!Challenge.HasNoValue)
+        if (Challenge.HasNoValue)
         {
             GodotLogger.LogInfo($"No challenge loaded, aborting challenge generation");
-
             return;
         }
-        /*
+
         Dictionary<string, List<Message>> Data = Challenge.Value.GenerateChallenge(NNs.Keys.ToList());
 
         foreach (KeyValuePair<string, NetworkNode> KVP in NNs)
         { KVP.Value.Backlog = new ConcurrentQueue<Message>(Data[KVP.Key]); }
 
-        G_TotalMessagesInPlay = Data.Sum(X => X.Value.LPRecordCount);
-        G_ChallengeID = Repo.LogEvent(new ChallengeRecord(Data.LPRecordCount, G_TotalMessagesInPlay, Challenge.Value.Name));
-        */
+        G_TotalMessagesInPlay = Data.Sum(X => X.Value.Count);
+        G_ChallengeID = DB.ChallengeColl()
+                          .Insert(new ChallengeRecord(NNs.Count, G_TotalMessagesInPlay, Challenge.Value.Name));
+
         CancellationToken CT = CTSource.Token;
 
         LuaScript LS = await LuaScriptAssembler.AssembleScript(_PreLoad: true);
@@ -441,7 +451,7 @@ public partial class CollectionNode : Node, IPersistable
         List<Task> NodesStartup = [];
         NodesStartup.AddRange(NNs.Values.Select(NN => NN.StartNode(LS, CT)));
 
-        DetailView.UpdateRunning(true);
+        DetailViewSingleton.GetInstance().UpdateRunning(true);
 
         await Task.WhenAll(NodesStartup);
         IsRunningChallenge = false;
@@ -457,14 +467,14 @@ public partial class CollectionNode : Node, IPersistable
     public void StopChallenge() {
         CTSource.Cancel();
         ClearChallenge();
-        DetailView.UpdateRunning(false);
+        DetailViewSingleton.GetInstance().UpdateRunning(false);
     }
 
     #endregion
 
     #region DetailsView
     private void UpdateDetailView(List<string> _NodeIDs) {
-        DetailView.UpdateNodes(_NodeIDs);
+        DetailViewSingleton.GetInstance().UpdateNodes(_NodeIDs);
     }
     #endregion
 
@@ -475,6 +485,30 @@ public partial class CollectionNode : Node, IPersistable
            .Where(X => !X.IsQueuedForDeletion())
            .FirstOrDefault(_Predicate)
            .AsMaybe();
+
+    private T GetChild<T>() where T : Node {
+        T[] Results = GetChildren()
+                      .OfType<T>()
+                      .Where(X => !X.IsQueuedForDeletion())
+                      .ToArray();
+
+        if (Results.Length != 1)
+        { throw new InvalidDataException($"Expected one child but found {Results.Length}"); }
+
+        return Results[0];
+    }
+
+    private Maybe<T> MaybeGetChild<T>() where T : Node {
+        T[] Results = GetChildren()
+                      .OfType<T>()
+                      .Where(X => !X.IsQueuedForDeletion())
+                      .ToArray();
+
+        if (Results.Length != 1)
+        { GodotLogger.LogWarning($"Expected one child but found {Results.Length}"); }
+
+        return Results[0];
+    }
 
     private IEnumerable<T> GetChildren<T>() where T : Node
         => GetChildren()
@@ -531,4 +565,8 @@ public partial class CollectionNode : Node, IPersistable
         base._Notification(_Notif);
     }
     #endregion
+
+    public void ToggleDetailWindow(bool _ToggleState) {
+        DetailViewSingleton.GetInstance().Visible = _ToggleState;
+    }
 }

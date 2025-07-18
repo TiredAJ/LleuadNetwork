@@ -53,33 +53,35 @@ public partial class win_DetailView : Window
     [Export]
     private PackedScene FMRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead.");
-        set => FMRDisp = new PackedSceneCache<FinalMessageDisplay>{Scene = value};
+        set => FMRDisp = new PackedSceneSingleton<FinalMessageDisplay>{Scene = value};
     }
     [Export]
     private PackedScene LPRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead.");
-        set => LPRDisp = new PackedSceneCache<LPRDisplay> {Scene = value};
+        set => LPRDisp = new PackedSceneSingleton<LPRDisplay> {Scene = value};
     }
     [Export]
     private PackedScene MJRDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead.");
-        set => MJRDisp = new PackedSceneCache<MessageJourneyDisplay> {Scene = value};
+        set => MJRDisp = new PackedSceneSingleton<MessageJourneyDisplay> {Scene = value};
     }
     [Export]
     private PackedScene ChallengeDisplayScene {
         get => throw new NotImplementedException("Please use the cached version instead.");
-        set => ChallengeDisp = new PackedSceneCache<ChallengeDisplay> {Scene = value};
+        set => ChallengeDisp = new PackedSceneSingleton<ChallengeDisplay> {Scene = value};
     }
 
-    private PackedSceneCache<FinalMessageDisplay> FMRDisp = null!;
-    private PackedSceneCache<LPRDisplay> LPRDisp = null!;
-    private PackedSceneCache<MessageJourneyDisplay> MJRDisp = null!;
-    private PackedSceneCache<ChallengeDisplay> ChallengeDisp = null!;
+    private PackedSceneSingleton<FinalMessageDisplay> FMRDisp = null!;
+    private PackedSceneSingleton<LPRDisplay> LPRDisp = null!;
+    private PackedSceneSingleton<MessageJourneyDisplay> MJRDisp = null!;
+    private PackedSceneSingleton<ChallengeDisplay> ChallengeDisp = null!;
 
     [Inject]
     private IDBWrapper DB = null!;
 
     public override void _Ready() {
+        this.Visible = false;
+
         Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
 
         RefreshTimer = new Timer((_) => CallDeferredThreadGroup(nameof(_Refresh)));
@@ -87,6 +89,11 @@ public partial class win_DetailView : Window
 #if DEBUG
         dbg_btn_Clear.Visible = true;
 #endif
+
+        this.Position = this.GetParent()
+                            .GetViewport()
+                            .GetWindow()
+                            .Position + new Vector2I(800, 600);
 
         ChosenDisplay = LPRDisp.GetInstance();
 
@@ -99,7 +106,7 @@ public partial class win_DetailView : Window
     //    if (_Property != "FMRDisp")
     //    { return base._Set(_Property, _Value); }
     //
-    //    FMRDisp = new PackedSceneCache<FinalMessageDisplay>() { Scene = (PackedScene)_Value };
+    //    FMRDisp = new PackedSceneSingleton<FinalMessageDisplay>() { Scene = (PackedScene)_Value };
     //    return true;
     //
     //}

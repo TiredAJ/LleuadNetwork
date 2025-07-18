@@ -5,7 +5,7 @@ using Godot;
 
 namespace LleuadNetworkSim.Utils;
 
-public partial class PackedSceneCache<T> : Resource where T : Node
+public partial class PackedSceneSingleton<T> : Resource where T : Node
 {
     required public PackedScene Scene {
         get;

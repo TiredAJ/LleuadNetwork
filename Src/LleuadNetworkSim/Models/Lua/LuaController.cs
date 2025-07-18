@@ -26,7 +26,25 @@ namespace LleuadNetworkSim.Models.Lua;
 
 public class LuaController
 {
-    readonly private Script Scrpt = new(/*CoreModules.Preset_SoftSandbox*/) {
+    private Script? Scrpt;
+
+    private string NodeID = string.Empty;
+    readonly private Dictionary<string, DynValue> DataRegister = [];
+    readonly private Dictionary<string, string> ScriptFiles = [];
+    readonly private Dictionary<string, Message> MessagesInProcess = [];
+
+    private DynValue ProcessFunc = DynValue.Nil;
+
+    //the number of available ports the parent network node has
+    public int PortCount { get; set; }
+    public List<Message> Backlog { get; set; } = [];
+    public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
+    public Action PullBacklog { get; set; } = () => { };
+
+    public IDBWrapper DB { get; set; } = null!;
+    public ChallengeRecord? Challenge { get; set; }
+
+    static private Script CreateScript() => new(/*CoreModules.Preset_SoftSandbox*/) {
         Options = {
             ScriptLoader = new FileSystemScriptLoader {
                 IgnoreLuaPathGlobal = false,
@@ -38,23 +56,9 @@ public class LuaController
         }
     };
 
-    private string NodeID = string.Empty;
-    readonly private Dictionary<string, DynValue> DataRegister = [];
-    readonly private Dictionary<string, string> ScriptFiles = [];
-    readonly private Dictionary<string, Message> MessagesInProcess = [];
-
-    private DynValue ProcessFunc = DynValue.Nil;
-
-    //the number of available ports the parent network node has
-    public int PortCount { get; set; }
-    public List<Message> Backlog = [];
-    public Action<int, Message> ExtSendMessage { get; set; } = (_, _) => {};
-    public Action PullBacklog { get; set; } = () => { };
-
-    public IDBWrapper DB = null!;
-    public ChallengeRecord? Challenge;
-
     public void LoadScript(LuaScript _LS, string _NodeID) {
+
+        Scrpt = CreateScript();
 
         NodeID = _NodeID;
 
@@ -85,7 +89,9 @@ public class LuaController
         Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
         Scrpt.Globals["Node_ID"] = NodeID;
         Scrpt.Globals["print"] = (Action<string>)Log;
+#pragma warning disable CC0021
         Scrpt.Globals["Log"] = (Action<string, string>)DBLog;
+#pragma warning restore CC0021
     }
 
     private void RunTest() {
@@ -102,7 +108,7 @@ public class LuaController
         { throw new ScriptTestFuncFailureException(Exc); }
     }
 
-    public async Task Start(CancellationToken _CT) {
+    public async Task StartAsync(CancellationToken _CT) {
 
         Closure Func = ProcessFunc.Function;
 
@@ -133,24 +139,13 @@ public class LuaController
                                Task.Delay(Math.Clamp((1000 - SW.Elapsed.Milliseconds), 0, 500), _CT);
 
                                if (Backlog.Count == 0)
-                               { PullBacklog(); }
+                               { PullBacklog?.Invoke(); }
                            }
 
                            GodotLogger.LogWarning("LuaController Finished!");
                        },
                        _CT);
     }
-
-    //public void LoadDebugServer() {
-    //    try
-    //    { Server.Value.Start(); }
-    //    catch (InvalidOperationException)
-    //    { }
-    //    catch (Exception Exc)
-    //    {
-    //        Debug.WriteLine($"Couldn't load debug server due to {Exc.Message}");
-    //    }
-    //}
 
     #region Passthrough
     /// <summary>
@@ -250,7 +245,7 @@ public class LuaController
         if (!MessagesInProcess.Remove(_ID, out Message? Msg))
         { return; }
 
-        ExtSendMessage(_Port - 1, Msg);
+        ExtSendMessage?.Invoke(_Port - 1, Msg);
     }
 
     /// <summary>
@@ -259,7 +254,7 @@ public class LuaController
     /// <param name="_Port">The port to send the <see cref="Message"/> through.</param>
     /// <param name="_Msg">The <see cref="Message"/> to send.</param>
     private void SendMessage(int _Port, Message _Msg) {
-        ExtSendMessage(_Port, _Msg);
+        ExtSendMessage?.Invoke(_Port, _Msg);
     }
 
     /// <summary>
@@ -277,15 +272,14 @@ public class LuaController
         if (!MessagesInProcess.TryGetValue(_Msg.ID, out Message? Msg))
         { return "Does not exist"; }
 
-        if (MessageValidator.MessageValid(Msg))
-        //if (MessageValidator.MessageValid(Msg, _Msg))
-        {
-            Backlog.Add(Msg);
-            MessagesInProcess.Remove(_Msg.ID);
-            return "Backlog'd";
-        }
+        if (!MessageValidator.MessageValid(Msg))
+        { return "Message failed Validation"; }
 
-        return "Message failed Validation";
+        //if (MessageValidator.MessageValid(Msg, _Msg))
+        Backlog.Add(Msg);
+        MessagesInProcess.Remove(_Msg.ID);
+        return "Backlog'd";
+
     }
 
     private void DBLog(string _Type, string _Message) {
@@ -296,11 +290,12 @@ public class LuaController
             DB.LPRColl()
               .Insert(new LuaProcessRecord { NodeID = NodeID, Action = _Type, Information = _Message, Challenge = Challenge});
         }
-        catch (Exception e)
+        catch (Exception EXC)
         {
-            Console.WriteLine(e);
+            Console.WriteLine(EXC);
             throw;
         }
     }
     #endregion
 }
+

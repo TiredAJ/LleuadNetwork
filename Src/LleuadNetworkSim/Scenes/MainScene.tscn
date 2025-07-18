@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bhmm832v4d0x6"]
+[gd_scene load_steps=30 format=3 uid="uid://bhmm832v4d0x6"]
 
 [ext_resource type="Texture2D" uid="uid://b0s764acagoyx" path="res://Assets/Background.png" id="1_7rqgy"]
 [ext_resource type="Script" uid="uid://ls87yki3lmx8" path="res://Scripts/Buttons/btn_Spawn.cs" id="2_y4jh7"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://blwthrbqsbd0t" path="res://Scripts/Buttons/btn_RunChallenge.cs" id="15_hx8n4"]
 [ext_resource type="Script" uid="uid://bhf4ycogw5xr" path="res://Scripts/Buttons/btn_LoadChallenge.cs" id="16_6rnll"]
 [ext_resource type="Script" uid="uid://wlpw2251rq8l" path="res://Scripts/Buttons/btn_StopChallenge.cs" id="16_i0j58"]
+[ext_resource type="Script" uid="uid://cgjwbapf8a677" path="res://Scenes/btn_DetailsWindow.cs" id="18_p5ymy"]
 [ext_resource type="Script" uid="uid://cpr2f6f0irq4h" path="res://Scripts/Buttons/btn_LoadScript.cs" id="20_gyaec"]
 [ext_resource type="PackedScene" uid="uid://c3825ytt2j4mf" path="res://Scenes/detail_view.tscn" id="22_bpy1e"]
 [ext_resource type="Script" uid="uid://beary1w3x86qc" path="res://Scripts/DependencyRegistrationNode.cs" id="27_4sso6"]
@@ -43,12 +44,12 @@ process_priority = -1
 process_physics_priority = -1
 script = ExtResource("27_4sso6")
 
-[node name="CollectionNode" type="Node" parent="." node_paths=PackedStringArray("DetailView")]
+[node name="CollectionNode" type="Node" parent="."]
 script = ExtResource("6_y4jh7")
 ConnectionTemplate = ExtResource("7_q68mp")
 NetworkNodeTemplate = ExtResource("4_qxria")
 ExceptionPopupTemplate = ExtResource("4_enc0b")
-DetailView = NodePath("")
+DetailViewScene = ExtResource("22_bpy1e")
 
 [node name="txtr_Background" type="TextureRect" parent="CollectionNode"]
 z_index = -2
@@ -191,6 +192,20 @@ CollNode = NodePath("../../../../CollectionNode")
 ButtonParent = NodePath("../..")
 metadata/Type = "Spawn"
 
+[node name="btn_DetailsWindow" type="Button" parent="Controls/fc_MainButtons/VFlowContainer" node_paths=PackedStringArray("ColNode")]
+custom_minimum_size = Vector2(130, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/focus = SubResource("StyleBoxEmpty_f140w")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_0iob3")
+theme_override_styles/pressed = ExtResource("6_0iob3")
+toggle_mode = true
+text = "Toggle Details
+View"
+script = ExtResource("18_p5ymy")
+ColNode = NodePath("../../../../CollectionNode")
+metadata/Type = "Spawn"
+
 [node name="fc_SaveLoadButtons" type="FlowContainer" parent="Controls"]
 layout_mode = 0
 offset_left = -931.0
@@ -274,5 +289,3 @@ file_mode = 3
 access = 2
 filters = PackedStringArray("*.lua")
 use_native_dialog = true
-
-[node name="DetailView" parent="." instance=ExtResource("22_bpy1e")]

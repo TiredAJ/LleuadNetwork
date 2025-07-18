@@ -36,4 +36,10 @@
   <ItemGroup>
     <Folder Include="Scenes\" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="SubSrc\Entities\Class1.cs">
+      <Link>SubSrc\Models\Class1.cs</Link>
+    </Compile>
+  </ItemGroup>
 </Project>
