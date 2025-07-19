@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Common.Entities;
+using Common.Json;
 using Common.Messaging;
 
 using Godot;
@@ -17,7 +18,6 @@ using Godot.Logging;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
-using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Scripts.Nodes;

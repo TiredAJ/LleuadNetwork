@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 using Common.Challenge;
 using Common.Entities;
+using Common.Json;
 using Common.Messaging;
 using Common.Utils;
 
@@ -26,7 +27,6 @@ using LiteDB;
 using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
-using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Utils;
 
 using MoonSharp.Interpreter;
@@ -327,16 +327,16 @@ public partial class CollectionNode : Node, IPersistable
     }
     public void Load(IBaseVO _VOData) {
 
-        if (_VOData is not CollectionNodeVO CollNodeVO)
+        if (_VOData is not MapVO Map)
         { throw new NotImplementedException(); }
 
-        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
+        foreach (NetworkNodeVO NN in Map.NetworkNodes)
         { LoadNetworkNode(NN); }
 
-        foreach (NetworkNodeVO NN in CollNodeVO.NetworkNodes)
+        foreach (NetworkNodeVO NN in Map.NetworkNodes)
         { ConnectLoadedNodes(NN); }
 
-        UpdateDetailView(CollNodeVO.NetworkNodes.Select(X => X.Name).ToList());
+        UpdateDetailView(Map.NetworkNodes.Select(X => X.Name).ToList());
     }
 
     public void SaveMap(string _Path) {
@@ -366,11 +366,14 @@ public partial class CollectionNode : Node, IPersistable
 
         FileValidator.ValidateFile(_Path, ".lnmap", this);
 
-        JsonNode JData = JsonValidator.ValidateJson<CollectionNodeVO>(_Path, this);
+        Maybe<Exception> exc = JsonValidator.ValidateJson<MapVO>(_Path, out JsonNode? JData);
 
-        CollectionNodeVO CollNodeVO = JData.Deserialize<CollectionNodeVO>()!;
+        if (exc.HasValue)
+        { ExceptionPopupWrapper.Throw(this, exc.Value); }
 
-        Load(CollNodeVO);
+        MapVO Map = JData.Deserialize<MapVO>()!;
+
+        Load(Map);
     }
 
     private void LoadNetworkNode(NetworkNodeVO _NodeVO) {

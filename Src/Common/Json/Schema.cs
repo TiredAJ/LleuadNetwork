@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LleuadNetworkSim.Models.Validation.Json;
+namespace Common.Json;
 
 #pragma warning disable CS8618
 
 public interface IBaseVO
 { }
 
-public record CollectionNodeVO : IBaseVO
+public record MapVO : IBaseVO
 {
     static public int SchemaVersion => 2;
     public int _Version { get => 2; }

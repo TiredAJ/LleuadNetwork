@@ -205,7 +205,7 @@ dotnet_naming_rule.all_should_be_pascal_case.style = pascal_case
 
 dotnet_naming_symbols.interface.applicable_kinds = interface
 dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.interface.required_modifiers =
+dotnet_naming_symbols.interface.required_modifiers = 
 
 dotnet_naming_symbols.all.applicable_kinds = namespace, property, field, event, parameter, local, class, struct, interface, enum, delegate, method, local_function
 dotnet_naming_symbols.all.applicable_accessibilities = *
@@ -217,19 +217,19 @@ dotnet_naming_symbols.const.required_modifiers = const
 
 # Naming styles
 
-dotnet_naming_style.pascal_case.required_prefix =
-dotnet_naming_style.pascal_case.required_suffix =
-dotnet_naming_style.pascal_case.word_separator =
+dotnet_naming_style.pascal_case.required_prefix = 
+dotnet_naming_style.pascal_case.required_suffix = 
+dotnet_naming_style.pascal_case.word_separator = 
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 
 dotnet_naming_style.begins_with_i.required_prefix = I
-dotnet_naming_style.begins_with_i.required_suffix =
-dotnet_naming_style.begins_with_i.word_separator =
+dotnet_naming_style.begins_with_i.required_suffix = 
+dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
-dotnet_naming_style.uppercase.required_prefix =
-dotnet_naming_style.uppercase.required_suffix =
-dotnet_naming_style.uppercase.word_separator =
+dotnet_naming_style.uppercase.required_prefix = 
+dotnet_naming_style.uppercase.required_suffix = 
+dotnet_naming_style.uppercase.word_separator = 
 dotnet_naming_style.uppercase.capitalization = all_upper
 
 [*.{cs,vb}]
@@ -262,13 +262,17 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 
 # ReSharper properties
-resharper_align_linq_query = true
-resharper_align_multiline_binary_patterns = true
+resharper_align_first_arg_by_paren = false
+resharper_align_linq_query = false
+resharper_align_multiline_argument = true
+resharper_align_multiline_binary_expressions_chain = false
+resharper_align_multiline_binary_patterns = false
 resharper_align_multiline_calls_chain = true
 resharper_align_multiline_expression = true
 resharper_align_multiline_extends_list = true
 resharper_align_multiline_for_stmt = true
 resharper_align_multiline_parameter = true
+resharper_align_multiline_statement_conditions = true
 resharper_align_multiple_declaration = true
 resharper_align_multline_type_parameter_constrains = true
 resharper_align_multline_type_parameter_list = true
@@ -277,14 +281,18 @@ resharper_blank_lines_after_block_statements = 1
 resharper_blank_lines_around_property = 1
 resharper_blank_lines_before_single_line_comment = 1
 resharper_braces_redundant = true
-resharper_csharp_align_first_arg_by_paren = true
+resharper_csharp_align_first_arg_by_paren = false
+resharper_csharp_align_multiline_argument = false
+resharper_csharp_align_multiline_calls_chain = false
+resharper_csharp_align_multiline_parameter = false
 resharper_csharp_allow_comment_after_lbrace = true
 resharper_csharp_empty_block_style = together
+resharper_csharp_indent_invocation_pars = none
 resharper_csharp_insert_final_newline = true
 resharper_csharp_keep_blank_lines_in_declarations = 1
 resharper_csharp_wrap_after_declaration_lpar = true
 resharper_csharp_wrap_before_declaration_rpar = true
-resharper_indent_anonymous_method_block = true
+resharper_indent_anonymous_method_block = false
 resharper_keep_existing_primary_constructor_declaration_parens_arrangement = false
 resharper_parentheses_non_obvious_operations = none, multiplicative, additive, arithmetic, shift, relational, equality, bitwise_and, bitwise_exclusive_or, bitwise_inclusive_or, bitwise, conditional_and, conditional_or, conditional
 resharper_place_accessorholder_attribute_on_same_line = false
@@ -292,6 +300,7 @@ resharper_place_accessor_attribute_on_same_line = true
 resharper_place_field_attribute_on_same_line = false
 resharper_place_record_field_attribute_on_same_line = true
 resharper_static_members_qualify_with = current_type
+resharper_use_continuous_indent_inside_parens = false
 resharper_wrap_before_primary_constructor_declaration_lpar = false
 resharper_wrap_before_primary_constructor_declaration_rpar = false
 resharper_wrap_chained_method_calls = chop_always

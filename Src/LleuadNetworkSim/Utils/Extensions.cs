@@ -1,6 +1,7 @@
+using Common.Json;
+
 using Godot;
 
-using LleuadNetworkSim.Models.Validation.Json;
 using LleuadNetworkSim.Scripts.Nodes;
 
 namespace LleuadNetworkSim.Utils;

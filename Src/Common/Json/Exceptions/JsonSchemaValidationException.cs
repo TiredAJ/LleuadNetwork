@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 using MoreLinq;
 
 using NJsonSchema.Validation;
 
-namespace LleuadNetworkSim.Models.Exceptions.Validation.Json;
+namespace Common.Json.Exceptions;
 
 public class JsonSchemaValidationException(string _Path, ICollection<ValidationError> _Errors) : Exception(DebugMessage(_Path, _Errors))
 {

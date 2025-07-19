@@ -1,6 +1,4 @@
-using System;
-
-namespace LleuadNetworkSim.Models.Exceptions.Validation.Json;
+namespace Common.Json.Exceptions;
 
 public class JsonSchemaVersionException : Exception
 {
