@@ -18,4 +18,11 @@
       <PackageReference Include="NJsonSchema" Version="11.3.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Conf\MessageTypes.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CustomToolNamespace>Common.Conf.MessageTypes</CustomToolNamespace>
+      </None>
+    </ItemGroup>
+
 </Project>

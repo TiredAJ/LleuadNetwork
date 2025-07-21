@@ -1,0 +1,122 @@
+[
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "TCP"
+    },
+    "SizeRange": {
+      "Item1": 2000,
+      "Item2": 80085
+    },
+    "CompletionPercentage": 90,
+    "Name": "Media/Image"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "TCP"
+    },
+    "SizeRange": {
+      "Item1": 80000,
+      "Item2": 4000000
+    },
+    "CompletionPercentage": 80,
+    "Name": "Media/Video"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "TCP"
+    },
+    "SizeRange": {
+      "Item1": 2500,
+      "Item2": 65000
+    },
+    "CompletionPercentage": 95,
+    "Name": "Media/Audio"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "TCP"
+    },
+    "SizeRange": {
+      "Item1": 1000,
+      "Item2": 800000
+    },
+    "CompletionPercentage": 95,
+    "Name": "Text/Text"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "HTTP"
+    },
+    "SizeRange": {
+      "Item1": 50000,
+      "Item2": 95000
+    },
+    "CompletionPercentage": 100,
+    "Name": "Web/Page"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "FTP"
+    },
+    "SizeRange": {
+      "Item1": 2500,
+      "Item2": 5000000
+    },
+    "CompletionPercentage": 100,
+    "Name": "Data/File"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "FTP"
+    },
+    "SizeRange": {
+      "Item1": 8000000,
+      "Item2": 24000000
+    },
+    "CompletionPercentage": 100,
+    "Name": "Data/BigFile"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": false,
+      "Name": "UDP"
+    },
+    "SizeRange": {
+      "Item1": 500,
+      "Item2": 800000
+    },
+    "CompletionPercentage": 65,
+    "Name": "Data/Stream"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "SMTP"
+    },
+    "SizeRange": {
+      "Item1": 500,
+      "Item2": 6000
+    },
+    "CompletionPercentage": 100,
+    "Name": "Comm/Email"
+  },
+  {
+    "Protocol" : {
+      "IsOrdered": true,
+      "Name": "SMTP"
+    },
+    "SizeRange": {
+      "Item1": 8000,
+      "Item2": 20000
+    },
+    "CompletionPercentage": 100,
+    "Name": "Comm/RichEmail"
+  }
+]

@@ -2,6 +2,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
+using ChallengeGenerator.Exceptions;
+
+using Common.Challenge;
+using Common.Challenge.JSON;
 using Common.Json;
 using Common.Json.Exceptions;
 
@@ -17,9 +21,13 @@ static internal class Program
 {
     static private ChallengeData Challenge = new();
     static private string? MapName = null;
+
+    static private string MessageTypesFile = "./Conf/MessageTypes.json"; 
     
     static void Main(string[] _Args) {
 
+        ArgHandler.HandleArgs(_Args);
+        
         MapVO? Map = null;
         
         PrintTitle();
@@ -35,6 +43,8 @@ static internal class Program
         Challenge.NodeCount = GetNodeCount(Map);
 
         Challenge.MessageCount = GetMessageCount();
+        
+        SelectMessageTypes();
     }
 
     static private void PrintTitle() {
@@ -81,7 +91,7 @@ static internal class Program
                 Map = JNode.Deserialize<MapVO>()!;
 
                 if (Map is null)
-                { throw new JSONDeserialisationException(nameof(Common.Json.MapVO)); }
+                { throw new JSONDeserialisationException(nameof(MapVO)); }
                 
                 Thread.Sleep(300);
             });
@@ -117,8 +127,9 @@ static internal class Program
             PrintTitle();
 
             ChosenNodeCount = AnsiConsole.Prompt(
-            new TextPrompt<int>($"[cyan1]There are [bold]{_Map?.NetworkNodes.Length}[/] node(s) in this map. " +
+            new TextPrompt<int>($"[cyan1]There are [bold]{_Map!.NetworkNodes.Length}[/] node(s) in this map. " +
                                 $"How many would you like to use?[/]")
+                .DefaultValue<int>(_Map!.NetworkNodes.Length)
                 .Validate((_Val) => (_Val <= _Map?.NetworkNodes.Length) && (_Val > 0))
             );
         } while (
@@ -137,6 +148,7 @@ static internal class Program
             
             ChosenMsgCount = AnsiConsole.Prompt(
             new TextPrompt<int>($"[cyan1]How many messages would you like in the challenge? [bold][[10-{short.MaxValue}]][/][/]")
+                .DefaultValue<int>(Challenge.NodeCount * 10)
                 .Validate((_Val) => (_Val <= short.MaxValue) && (_Val > 10))
             );
         } while (
@@ -147,6 +159,63 @@ static internal class Program
     }
 
     static private void SelectMessageTypes() {
-        Panel TypeSelectorPanel = new Panel(new SelectionPrompt<>())
+
+        if (!File.Exists(MessageTypesFile))
+        {
+            Exception EXC = new FileNotFoundException($"Cannot find {MessageTypesFile} File!");
+            
+            AnsiConsole.WriteException(EXC);
+            throw EXC;
+        }
+
+        using StreamReader Reader = new(MessageTypesFile);
+        List<MessageType>? AvailableTypes =
+            JsonSerializer.Deserialize<List<MessageType>>(Reader.BaseStream,
+            SourceGenerationContext.Default.ListMessageType);
+
+        if (AvailableTypes is null)
+        {
+            Exception EXC = new JSONDeserialisationException(nameof(MapVO));
+            
+            AnsiConsole.WriteException(EXC);
+            throw EXC;
+        }
+
+        if (AvailableTypes.Count < 1)
+        {
+            Exception EXC = new NoMessageTypesAvailableException(MessageTypesFile);
+            
+            AnsiConsole.WriteException(EXC);
+            throw EXC;
+        }
+
+        List<MessageType> SelectedMessageTypes = [];
+
+        do
+        {
+            SelectedMessageTypes = AnsiConsole.Prompt(new MultiSelectionPrompt<MessageType>()
+                .Title("[cyan1]Please select what message types you'd like in this challenge.[/]")
+                .Required(true)
+                .AddChoices(AvailableTypes)
+                .UseConverter(X => X.ToString())
+                .InstructionsText("[grey](Press [blue]<space>[/] to toggle a message type, [green]<enter>[/] to accept)[/]")
+            );
+
+            if (SelectedMessageTypes.Count < 1)
+            { AnsiConsole.MarkupLine("[red]You must select at least one message type[/]"); }
+            
+            
+            
+        } while (
+            AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1] You've selected: [grey]{PrintSelectedOptions(SelectedMessageTypes)}[/]Are you happy with these choices?[/]"))            
+            );
+    }
+
+    static private string PrintSelectedOptions(List<MessageType> _SelectedMessageTypes) {
+        StringBuilder SB = new StringBuilder();
+        
+        _SelectedMessageTypes.ForEach(X => SB.Append($"\t{X.Name}\n"));
+
+        return SB.ToString();
     }
 }
