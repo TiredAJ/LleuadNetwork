@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -12,6 +13,7 @@ using Common.Json.Exceptions;
 using CSharpFunctionalExtensions;
 
 using Spectre.Console;
+using Spectre.Console.Rendering;
 
 using static Common.Conf;
 
@@ -26,9 +28,7 @@ static internal class Program
     
     static void Main(string[] _Args) {
 
-        ArgHandler.HandleArgs(_Args);
-        
-        MapVO? Map = null;
+        //ArgHandler.HandleArgs(_Args);
         
         PrintTitle();
         
@@ -36,19 +36,25 @@ static internal class Program
 
         AnsiConsole.MarkupLine($"[cyan1]Using [[{MapPath}]][/]");
 
-        Map = LoadMap(MapPath);
+        Challenge.Map = LoadMap(MapPath);
         
         MapName = Path.GetFileName(MapPath);
         
-        Challenge.NodeCount = GetNodeCount(Map);
+        Challenge.NodeCount = GetNodeCount(Challenge.Map);
 
         Challenge.MessageCount = GetMessageCount();
         
         SelectMessageTypes();
+
+        SetMessageTypeDistribution();
+
+        DisplaySummary();
     }
 
     static private void PrintTitle() {
-        StringBuilder SB = new StringBuilder("[blue bold]LleuadNetwork Challenge Generator");
+        AnsiConsole.Clear();
+        
+        StringBuilder SB = new("[blue bold]LleuadNetwork Challenge Generator");
 
         if (MapName is not null)
         { SB.Append($" - {MapName}"); }
@@ -58,6 +64,9 @@ static internal class Program
 
         if (Challenge.MessageCount > -1)
         { SB.Append($" - {Challenge.MessageCount} messages"); }
+
+        if (Challenge.MessageDistribution.Count > 0)
+        { SB.Append($" - [[{Challenge.MessageDistribution.Keys.ZipStr(X => X.Name,"|")}]]"); }
 
         SB.Append("[/]");
         
@@ -123,7 +132,6 @@ static internal class Program
 
         do
         {
-            AnsiConsole.Clear();
             PrintTitle();
 
             ChosenNodeCount = AnsiConsole.Prompt(
@@ -143,7 +151,6 @@ static internal class Program
 
         do
         {
-            AnsiConsole.Clear();
             PrintTitle();
             
             ChosenMsgCount = AnsiConsole.Prompt(
@@ -203,11 +210,10 @@ static internal class Program
 
             if (SelectedMessageTypes.Count < 1)
             { AnsiConsole.MarkupLine("[red]You must select at least one message type[/]"); }
-            
-            
-            
+
+            SelectedMessageTypes.ForEach(X => Challenge.MessageDistribution.Add(X, 0));
         } while (
-            AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1] You've selected: [grey]{PrintSelectedOptions(SelectedMessageTypes)}[/]Are you happy with these choices?[/]"))            
+            !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1] You've selected: [grey82]\n{PrintSelectedOptions(SelectedMessageTypes)}[/]Are you happy with these choices?[/]"))            
             );
     }
 
@@ -217,5 +223,82 @@ static internal class Program
         _SelectedMessageTypes.ForEach(X => SB.Append($"\t{X.Name}\n"));
 
         return SB.ToString();
+    }
+
+    static private void SetMessageTypeDistribution() {
+        int AvailablePercentage = 100;
+        List<MessageType> AvailableTypes = new List<MessageType>(Challenge.MessageDistribution.Keys);
+
+        MessageType ExitMessageType = MessageType.Default(_Name: "Finished");
+
+        var DistributionPrompt = new SelectionPrompt<MessageType>()
+            .UseConverter(X => (
+                (X.Name == "Finished" || Challenge.MessageDistribution[X] == 0)
+                    ? X.Name
+                    : $"{X.Name} ({Challenge.MessageDistribution[X]}%)"
+            ))
+            .AddChoices(AvailableTypes);
+        
+        do
+        {  
+            PrintTitle();
+
+            DistributionPrompt.Title($"[cyan1]Please select what message types you'd to set the distribution of. " +
+                                     $"[grey]({AvailablePercentage}% remaining)[/][/]");
+            
+            MessageType SelectedOption = AnsiConsole.Prompt(DistributionPrompt);
+
+            if (SelectedOption.Name == "Finished")
+            {
+                if (AvailablePercentage > 0)
+                { continue; }
+                break;
+            }
+
+            PrintTitle();
+
+            int SpecificAvailablePercentage = Challenge.MessageDistribution[SelectedOption] + AvailablePercentage;
+            
+            int Percentage = AnsiConsole.Prompt(new TextPrompt<int>(
+                $"[cyan1]Please enter the percentage distribution you'd like for [green]{SelectedOption.Name}[/][/]")
+                .Validate(X => X <= SpecificAvailablePercentage && X >= 0)
+                .DefaultValue(SpecificAvailablePercentage)
+            );
+
+            Challenge.MessageDistribution[SelectedOption] = Percentage;
+            AvailablePercentage = 100 - Challenge.MessageDistribution.Values.Sum();
+
+            Debug.WriteLine(AvailablePercentage);
+            
+            if (AvailablePercentage == 0)
+            { DistributionPrompt.AddChoice(ExitMessageType); }
+
+        } while (true);
+    }
+
+    static private void DisplaySummary() {
+        AnsiConsole.Clear();
+
+        int NodeCount = Challenge.Map!.NetworkNodes.Length;
+        int ConnectionCount = Challenge.Map!.NetworkNodes.Sum(X => X.Connections.Length);
+
+        Tree SummaryTree = new("[cyan1 bold]Summary[/]");
+
+        TreeNode MapNode = SummaryTree.AddNode(new Text($"Map: {MapName}"));
+        
+        TreeNode NodesNode = MapNode.AddNode(new Text($"Nodes: {NodeCount}"));
+        NodesNode.AddNodes(Challenge.Map!.NetworkNodes.Select(X => X.Name));
+        
+        MapNode.AddNode(new Text($"Connections: {ConnectionCount}"));
+
+        TreeNode MessageNode = SummaryTree.AddNode(new Text("Messages"));
+
+        IEnumerable<string> MsgDistribution = Challenge.MessageDistribution
+            .OrderByDescending(X => X.Value)
+            .Select(X => $"{X.Key.Name} ({X.Value}%)");
+        
+        MessageNode.AddNodes(MsgDistribution);
+        
+        AnsiConsole.Write(SummaryTree);
     }
 }

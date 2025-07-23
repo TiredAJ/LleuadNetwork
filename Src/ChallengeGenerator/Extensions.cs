@@ -4,7 +4,7 @@ namespace ChallengeGenerator;
 
 static public class Extensions
 {
-    static public string ZipStr<T>(this IEnumerable<T> _Enumerable) {
+    static public string ZipStr<T>(this IEnumerable<T> _Enumerable, string _Separator = ", ") {
         StringBuilder SB = new();
 
         bool IsFirstElement = true;
@@ -17,9 +17,12 @@ static public class Extensions
                 IsFirstElement = false;
             }
             else
-            { SB.Append($", {X}"); }
+            { SB.Append($"{_Separator}{X}"); }
         }
             
         return SB.ToString();
+    }
+    static public string ZipStr<T>(this IEnumerable<T> _Enumerable, Func<T, string> _Selector, string _Separator = ", ") {
+        return ZipStr(_Enumerable.Select(_Selector), _Separator);
     }
 }

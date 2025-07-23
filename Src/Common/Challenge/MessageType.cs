@@ -20,4 +20,11 @@ public class MessageType
     public override string ToString() {
         return $"{Name} ({Protocol.Name}) - [[{SizeRange.Min}B-{SizeRange.Min}B]] - {CompletionPercentage}%";
     }
+
+    static public MessageType Default(int _CompletionPercentage = 100, string _Name = "DEFAULT") => new MessageType() {
+        CompletionPercentage = _CompletionPercentage,
+        Name = _Name,
+        SizeRange = (0, 0),
+        Protocol = new ProtocolType() { Name = "DEFAULT", IsOrdered = true }
+    };
 }
