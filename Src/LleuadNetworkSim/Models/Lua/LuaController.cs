@@ -98,7 +98,7 @@ public class LuaController
     private void RunTest() {
         try
         {
-            Message TestMessage = MessageGenerator.DebugMessage;
+            Message TestMessage = MessageBuilder.DebugMessage().Build();
 
             DynValue Res = ProcessFunc.Function.Call(TestMessage);
 
@@ -217,7 +217,7 @@ public class LuaController
     /// </summary>
     /// <returns>A <see cref="Message"/> with default values</returns>
     static private Message GetNewMessage()
-        => MessageGenerator.DefaultMessage();
+        => MessageBuilder.Default().Build();
 
     /// <summary>
     /// Allows the script to retrieve a <see cref="Message"/> from the backlog

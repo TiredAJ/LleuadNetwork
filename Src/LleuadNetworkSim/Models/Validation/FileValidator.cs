@@ -5,7 +5,7 @@ using Godot;
 using LleuadNetworkSim.Models.Exceptions.Validation.File;
 using LleuadNetworkSim.Utils;
 
-using static Common.Conf;
+using static Common.Conf.Conf;
 
 namespace LleuadNetworkSim.Models.Validation;
 

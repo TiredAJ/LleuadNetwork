@@ -1,0 +1,96 @@
+{
+  "NodeCount": 3,
+  "MessageCount": 30,
+  "SerialisableDict": {
+    "01983dea-8bc4-73a5-9417-e1fc62463fcf": {
+      "Item1": {
+        "Name": "Text/Text",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "TCP"
+        },
+        "SizeRange": {
+          "Item1": 1000,
+          "Item2": 800000
+        },
+        "CompletionPercentage": 95
+      },
+      "Item2": 34
+    },
+    "01983dea-8bc4-753c-a7a8-361789632f8f": {
+      "Item1": {
+        "Name": "Web/Page",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "HTTP"
+        },
+        "SizeRange": {
+          "Item1": 50000,
+          "Item2": 95000
+        },
+        "CompletionPercentage": 100
+      },
+      "Item2": 56
+    },
+    "01983dea-8bc4-705e-b280-9b396eff5703": {
+      "Item1": {
+        "Name": "Data/File",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "FTP"
+        },
+        "SizeRange": {
+          "Item1": 2500,
+          "Item2": 5000000
+        },
+        "CompletionPercentage": 100
+      },
+      "Item2": 10
+    }
+  },
+  "Map": {
+    "_Version": 2,
+    "NetworkNodes": [
+      {
+        "_Version": 2,
+        "Name": "3zC\u002B5cSadkCneViiTK23MQ==",
+        "Connections": [
+          "Xx4w9PE5U0qgjmy54DWBrQ==",
+          "vsc42_2o6UyZT6ZYbncGaA=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 811,
+          "Y": 214
+        }
+      },
+      {
+        "_Version": 2,
+        "Name": "vsc42_2o6UyZT6ZYbncGaA==",
+        "Connections": [
+          "Xx4w9PE5U0qgjmy54DWBrQ==",
+          "3zC\u002B5cSadkCneViiTK23MQ=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 425,
+          "Y": 524
+        }
+      },
+      {
+        "_Version": 2,
+        "Name": "Xx4w9PE5U0qgjmy54DWBrQ==",
+        "Connections": [
+          "3zC\u002B5cSadkCneViiTK23MQ==",
+          "vsc42_2o6UyZT6ZYbncGaA=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 201,
+          "Y": 202
+        }
+      }
+    ]
+  },
+  "Name": "Test3.lnchng"
+}

@@ -143,8 +143,8 @@ public class Message
         => IntHeaders.Clone();
 
     #endregion
-
-    public Message(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50) {
+    
+    public Message(string _SenderAddress = "", string _DestinationAddress = "", string? _Payload = null, int _MaxHops = 50) {
         IntHeaders = new Headers();
 
         SenderAddress = _SenderAddress;
@@ -226,4 +226,13 @@ public class Message
 
     public TimeSpan GetAliveTime()
         => DateTime.UtcNow - CreationTime;
+    
+    static public ReadonlyMessage ToReadonly(Message _Msg)
+        => new ReadonlyMessage(_Msg);
+
+    public ReadonlyMessage ToReadonly()
+        => new ReadonlyMessage(this);
+
+    static public MessageBuilder Builder
+        => new();
 }

@@ -2,6 +2,8 @@ using System.Collections.Immutable;
 
 using CSharpFunctionalExtensions;
 
+using static Common.Conf.Conf;
+
 namespace Common.Messaging;
 
 public struct Headers
@@ -21,7 +23,7 @@ public struct Headers
         new KeyValuePair<string, string>("HOPS", "0"),
         new KeyValuePair<string, string>("RECEIVE_RESPONSE_REQUIRED", "FALSE"),
         new KeyValuePair<string, string>("MESSAGE_SIZE", "0"),
-        new KeyValuePair<string, string>("MAX_MESSAGE_SIZE", "1000"),
+        new KeyValuePair<string, string>("MAX_MESSAGE_SIZE", MAX_MESSAGE_SIZE.ToString()),
         new KeyValuePair<string, string>("TOTAL_SIZE", "-1"),
         new KeyValuePair<string, string>("LAST_NODE_ID", DEFAULT_VAL)
     ]);

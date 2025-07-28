@@ -1,0 +1,95 @@
+{
+  "NodeCount": 3,
+  "MessageCount": 30,
+  "SerialisableDict": {
+    "01983dda-e140-7edd-bb9c-43f59a0f2ad7": {
+      "Item1": {
+        "Name": "Media/Video",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "TCP"
+        },
+        "SizeRange": {
+          "Item1": 80000,
+          "Item2": 4000000
+        },
+        "CompletionPercentage": 80
+      },
+      "Item2": 56
+    },
+    "01983dda-e140-7f3f-813c-5c14ee9ac627": {
+      "Item1": {
+        "Name": "Web/Page",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "HTTP"
+        },
+        "SizeRange": {
+          "Item1": 50000,
+          "Item2": 95000
+        },
+        "CompletionPercentage": 100
+      },
+      "Item2": 23
+    },
+    "01983dda-e140-7d92-93cf-ae2aa4671ff2": {
+      "Item1": {
+        "Name": "Data/BigFile",
+        "Protocol": {
+          "IsOrdered": true,
+          "Name": "FTP"
+        },
+        "SizeRange": {
+          "Item1": 8000000,
+          "Item2": 24000000
+        },
+        "CompletionPercentage": 100
+      },
+      "Item2": 21
+    }
+  },
+  "Map": {
+    "_Version": 2,
+    "NetworkNodes": [
+      {
+        "_Version": 2,
+        "Name": "3zC\u002B5cSadkCneViiTK23MQ==",
+        "Connections": [
+          "Xx4w9PE5U0qgjmy54DWBrQ==",
+          "vsc42_2o6UyZT6ZYbncGaA=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 811,
+          "Y": 214
+        }
+      },
+      {
+        "_Version": 2,
+        "Name": "vsc42_2o6UyZT6ZYbncGaA==",
+        "Connections": [
+          "Xx4w9PE5U0qgjmy54DWBrQ==",
+          "3zC\u002B5cSadkCneViiTK23MQ=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 425,
+          "Y": 524
+        }
+      },
+      {
+        "_Version": 2,
+        "Name": "Xx4w9PE5U0qgjmy54DWBrQ==",
+        "Connections": [
+          "3zC\u002B5cSadkCneViiTK23MQ==",
+          "vsc42_2o6UyZT6ZYbncGaA=="
+        ],
+        "Pos": {
+          "_Version": 2,
+          "X": 201,
+          "Y": 202
+        }
+      }
+    ]
+  }
+}

@@ -25,4 +25,7 @@ static public class Extensions
     static public string ZipStr<T>(this IEnumerable<T> _Enumerable, Func<T, string> _Selector, string _Separator = ", ") {
         return ZipStr(_Enumerable.Select(_Selector), _Separator);
     }
+
+    static public byte[] GetBytes(this string _Val)
+        => Encoding.UTF8.GetBytes(_Val);
 }

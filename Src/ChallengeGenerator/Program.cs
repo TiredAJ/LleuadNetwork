@@ -6,23 +6,27 @@ using System.Text.Json.Nodes;
 using ChallengeGenerator.Exceptions;
 
 using Common.Challenge;
-using Common.Challenge.JSON;
 using Common.Json;
 using Common.Json.Exceptions;
 
 using CSharpFunctionalExtensions;
 
-using Spectre.Console;
-using Spectre.Console.Rendering;
+using FileUtils;
 
-using static Common.Conf;
+using Spectre.Console;
+
+using static Common.Conf.Conf;
+
+using SourceGenerationContext = Common.Json.SourceGenerationContext;
 
 namespace ChallengeGenerator;
 
 static internal class Program
 {
-    static private ChallengeData Challenge = new();
+    static private ChallengeVO Challenge = new();
     static private string? MapName = null;
+    static private string? MapPath = "";
+    static private string TmpFolderPath = "";
 
     static private string MessageTypesFile = "./Conf/MessageTypes.json"; 
     
@@ -32,7 +36,7 @@ static internal class Program
         
         PrintTitle();
         
-        string MapPath = GetMap();
+        MapPath = GetMap();
 
         AnsiConsole.MarkupLine($"[cyan1]Using [[{MapPath}]][/]");
 
@@ -42,15 +46,18 @@ static internal class Program
         
         Challenge.NodeCount = GetNodeCount(Challenge.Map);
 
-        Challenge.MessageCount = GetMessageCount();
+        Challenge.ItemCount = GetItemCount();
         
         SelectMessageTypes();
 
         SetMessageTypeDistribution();
+        
+        string MsgFile = GenerateMessages();
 
-        DisplaySummary();
+        ConfirmChallenge();
     }
 
+    #region Misc
     static private void PrintTitle() {
         AnsiConsole.Clear();
         
@@ -62,8 +69,8 @@ static internal class Program
         if (Challenge.NodeCount > -1)
         { SB.Append($" - {Challenge.NodeCount} nodes"); }
 
-        if (Challenge.MessageCount > -1)
-        { SB.Append($" - {Challenge.MessageCount} messages"); }
+        if (Challenge.ItemCount > -1)
+        { SB.Append($" - {Challenge.ItemCount} messages"); }
 
         if (Challenge.MessageDistribution.Count > 0)
         { SB.Append($" - [[{Challenge.MessageDistribution.Keys.ZipStr(X => X.Name,"|")}]]"); }
@@ -72,7 +79,9 @@ static internal class Program
         
         AnsiConsole.MarkupLine(SB.ToString());
     }
+    #endregion
 
+    #region Step 1 - Map
     static private MapVO? LoadMap(string _MapPath)
     {
         MapVO? Map = null;
@@ -125,7 +134,9 @@ static internal class Program
             )
         );
     }
-    
+    #endregion
+
+    #region Step 2 - Node Count
     static private int GetNodeCount(MapVO? _Map)
     {
         int ChosenNodeCount;
@@ -145,26 +156,34 @@ static internal class Program
         );
         return ChosenNodeCount;
     }
+    #endregion
 
-    static private int GetMessageCount() {
+    #region Step 3 = Items
+    static private int GetItemCount() {
         int ChosenMsgCount;
 
         do
         {
             PrintTitle();
+            string Prompt = $"[cyan1]How many Items would you like in the challenge? [bold][[{Challenge.NodeCount}-{MAX_ITEMS}]][/][/]" +
+                            $"\n[grey82]An item is the object to \"send\". An amount of messages that can transport all the items will be " +
+                            $"calculated[/]";
             
             ChosenMsgCount = AnsiConsole.Prompt(
-            new TextPrompt<int>($"[cyan1]How many messages would you like in the challenge? [bold][[10-{short.MaxValue}]][/][/]")
+            new TextPrompt<int>(Prompt)
                 .DefaultValue<int>(Challenge.NodeCount * 10)
                 .Validate((_Val) => (_Val <= short.MaxValue) && (_Val > 10))
             );
         } while (
-            !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1]You have chosen [bold]{ChosenMsgCount}[/] messages to generate. Is this amount correct?[/]"))
+            !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1]You have chosen [bold]{ChosenMsgCount}[/] items to generate. " +
+                                                       $"Is this amount correct?[/]"))
         );
 
         return ChosenMsgCount;
     }
+    #endregion
 
+    #region Step 4 - Message Types
     static private void SelectMessageTypes() {
 
         if (!File.Exists(MessageTypesFile))
@@ -196,10 +215,12 @@ static internal class Program
             throw EXC;
         }
 
-        List<MessageType> SelectedMessageTypes = [];
+        List<MessageType> SelectedMessageTypes;
 
         do
         {
+            PrintTitle();
+            
             SelectedMessageTypes = AnsiConsole.Prompt(new MultiSelectionPrompt<MessageType>()
                 .Title("[cyan1]Please select what message types you'd like in this challenge.[/]")
                 .Required(true)
@@ -213,25 +234,33 @@ static internal class Program
 
             SelectedMessageTypes.ForEach(X => Challenge.MessageDistribution.Add(X, 0));
         } while (
-            !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1] You've selected: [grey82]\n{PrintSelectedOptions(SelectedMessageTypes)}[/]Are you happy with these choices?[/]"))            
+            !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1] You've selected: [grey82]\n{PrintSelectedOptions(SelectedMessageTypes)}[/]Are you " +
+                                                       $"happy with these choices?[/]"))            
             );
     }
 
     static private string PrintSelectedOptions(List<MessageType> _SelectedMessageTypes) {
-        StringBuilder SB = new StringBuilder();
+        StringBuilder SB = new();
         
         _SelectedMessageTypes.ForEach(X => SB.Append($"\t{X.Name}\n"));
 
         return SB.ToString();
     }
-
+    
     static private void SetMessageTypeDistribution() {
         int AvailablePercentage = 100;
-        List<MessageType> AvailableTypes = new List<MessageType>(Challenge.MessageDistribution.Keys);
+
+        if (Challenge.MessageDistribution.Count == 1)
+        {
+            Challenge.MessageDistribution[Challenge.MessageDistribution.First().Key] = 100;
+            return;
+        }
+        
+        List<MessageType> AvailableTypes = new(Challenge.MessageDistribution.Keys);
 
         MessageType ExitMessageType = MessageType.Default(_Name: "Finished");
 
-        var DistributionPrompt = new SelectionPrompt<MessageType>()
+        SelectionPrompt<MessageType> DistributionPrompt = new SelectionPrompt<MessageType>()
             .UseConverter(X => (
                 (X.Name == "Finished" || Challenge.MessageDistribution[X] == 0)
                     ? X.Name
@@ -275,7 +304,18 @@ static internal class Program
 
         } while (true);
     }
+    #endregion
 
+    #region Step 5 - Message Gen
+    static private string GenerateMessages() {
+        TmpFolderPath = Directory.CreateDirectory(
+        Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())).Name;
+        
+        return new MessageGenerator(Challenge.MessageDistribution, Challenge.ItemCount, TmpFolderPath).GenerateMessages();
+    }
+    #endregion
+
+    #region Step 6 - Challenge Summary 
     static private void DisplaySummary() {
         AnsiConsole.Clear();
 
@@ -284,21 +324,68 @@ static internal class Program
 
         Tree SummaryTree = new("[cyan1 bold]Summary[/]");
 
-        TreeNode MapNode = SummaryTree.AddNode(new Text($"Map: {MapName}"));
+        TreeNode MapNode = SummaryTree.AddNode(new Markup($"[cyan1 bold]Map:[/] {MapName}"));
         
-        TreeNode NodesNode = MapNode.AddNode(new Text($"Nodes: {NodeCount}"));
+        TreeNode NodesNode = MapNode.AddNode(new Markup($"[cyan1]Nodes[/] [grey82]({NodeCount})[/]"));
         NodesNode.AddNodes(Challenge.Map!.NetworkNodes.Select(X => X.Name));
+
+        IEnumerable<string> AllConnections = Challenge.Map!.NetworkNodes
+            .Select(X => X.Connections.Select(Y => $"[green]{X.Name}[/] [cyan2]->[/] [green]{Y}[/]"))
+            .SelectMany(X => X);
         
-        MapNode.AddNode(new Text($"Connections: {ConnectionCount}"));
+        TreeNode ConnectionsNode = MapNode.AddNode(new Markup($"[cyan1]Connections[/] [grey82]({ConnectionCount})[/]"));
+        ConnectionsNode.AddNodes(AllConnections);
 
-        TreeNode MessageNode = SummaryTree.AddNode(new Text("Messages"));
+        TreeNode MessageNode = SummaryTree.AddNode(new Markup("[cyan1 bold]Messages[/]"));
 
+        MessageNode.AddNode($"[cyan1]Amount to Generate:[/] {Challenge.ItemCount}");
+        
         IEnumerable<string> MsgDistribution = Challenge.MessageDistribution
             .OrderByDescending(X => X.Value)
-            .Select(X => $"{X.Key.Name} ({X.Value}%)");
+            .Select(X => $"{X.Key.Name} [grey82]({X.Value}%)[/]");
         
-        MessageNode.AddNodes(MsgDistribution);
+        MessageNode.AddNode(new Markup($"[cyan1]Types[/] [grey82]({Challenge.MessageDistribution.Count})[/]")).AddNodes(MsgDistribution);
         
         AnsiConsole.Write(SummaryTree);
     }
+
+    static private void ConfirmChallenge() {
+        DisplaySummary();
+        
+        AnsiConsole.WriteLine();
+
+        bool Confirmation = AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1]Would you like to use this challenge?[/]"));
+
+        if (!Confirmation)
+        { return; }
+
+        string ChallengeName =
+            AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a name for the challenge[/]")).Trim();
+
+        string ChallengeSaveFolder =
+            AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a folder to save the challenge to[/]")
+                .Validate(_S => Directory.Exists(_S.Trim())));
+
+        ChallengeName += CHALLENGE_EXTENSION;
+
+        Challenge.Name = ChallengeName;
+        
+        using StreamWriter Writer = new(Path.Combine(ChallengeSaveFolder, ChallengeName));
+        
+        JsonSerializer.Serialize(Writer.BaseStream, Challenge, SourceGenerationContext.Default.ChallengeVO);
+    }
+    #endregion
+    
+    #region Step 7 - Challenge Zipping
+    static private string ZipChallenge(string _MsgFile) {
+
+        string TmpMapFile = Path.Combine(TmpFolderPath, "Map.json");
+        
+        File.Copy(MapPath, TmpMapFile);
+        
+        //get path of challenge file
+        
+        //Zipper.
+    }
+    #endregion
 }
