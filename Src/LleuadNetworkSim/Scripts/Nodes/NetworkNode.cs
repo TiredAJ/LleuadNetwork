@@ -147,7 +147,7 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
 
     public void DebugSendMessage(string _ID) {
 
-        Message Msg = new(this.Name, _ID, $"Hello from {this.Name}!! This is a payload")
+        Message Msg = new(this.Name, _ID)
             { Lifespan = TimeSpan.FromMinutes(2) };
 
         Msg.Port = -1;

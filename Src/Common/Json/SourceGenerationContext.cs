@@ -12,6 +12,6 @@ namespace Common.Json;
 [JsonSerializable(typeof(ChallengeVO))]
 [JsonSerializable(typeof(MapVO))]
 [JsonSerializable(typeof(NetworkNodeVO))]
-[JsonSerializable(typeof(List<Message>))]
+[JsonSerializable(typeof(Dictionary<string, List<Message>>))]
 public partial class SourceGenerationContext : JsonSerializerContext
 { }

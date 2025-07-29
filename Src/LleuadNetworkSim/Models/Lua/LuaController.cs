@@ -79,19 +79,19 @@ public class LuaController
     }
 
     private void LoadGlobals() {
-        Scrpt.Globals["Reg_Save"] = (Func<string, DynValue, bool>)Save;
-        Scrpt.Globals["Reg_Load"] = (Func<string, DynValue>)(Load);
-        Scrpt.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
-        Scrpt.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
-        Scrpt.Globals["Backlog_Return"] = (Func<Message, string>)ReturnToBacklog;
-        Scrpt.Globals["Backlog_GetCount"] = (Func<int>)(() => Backlog.Count);
-        Scrpt.Globals["Msg_GetNewMessage"] = (Func<Message>)GetNewMessage;
-        Scrpt.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
-        Scrpt.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
-        Scrpt.Globals["Node_ID"] = NodeID;
-        Scrpt.Globals["print"] = (Action<string>)Log;
+        Scrpt!.Globals["Reg_Save"] = (Func<string, DynValue, bool>)Save;
+        Scrpt!.Globals["Reg_Load"] = (Func<string, DynValue>)(Load);
+        Scrpt!.Globals["Port_GetCount"] = (Func<int>)(() => PortCount);
+        Scrpt!.Globals["Backlog_Get"] = (Func<Message?>)BacklogGetMessage;
+        Scrpt!.Globals["Backlog_Return"] = (Func<Message, string>)ReturnToBacklog;
+        Scrpt!.Globals["Backlog_GetCount"] = (Func<int>)(() => Backlog.Count);
+        Scrpt!.Globals["Msg_GetNewMessage"] = (Func<Message>)GetNewMessage;
+        Scrpt!.Globals["Msg_DirectToPort"] = (Action<int, string>)SendMessage;
+        Scrpt!.Globals["Msg_Send"] = (Action<int, Message>)SendMessage;
+        Scrpt!.Globals["Node_ID"] = NodeID;
+        Scrpt!.Globals["print"] = (Action<string>)Log;
 #pragma warning disable CC0021
-        Scrpt.Globals["Log"] = (Action<string, string>)DBLog;
+        Scrpt!.Globals["Log"] = (Action<string, string>)DBLog;
 #pragma warning restore CC0021
     }
 

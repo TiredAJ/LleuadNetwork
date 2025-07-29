@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Text.Json;
-
 using Common.Challenge;
-using Common.Json;
 using Common.Messaging;
+
+using MoreLinq;
 
 using static Common.Conf.Conf;
 
@@ -12,11 +10,14 @@ namespace ChallengeGenerator;
 public class MessageGenerator
 {
     readonly private Dictionary<MessageType, int> Distribution = [];
+    readonly private List<string> Nodes = [];
     private string TempFolderPath = "";
     
-    public MessageGenerator(Dictionary<MessageType, int> _Distribution, int _NoItems, string _TempFolder) {
+    public MessageGenerator(Dictionary<MessageType, int> _Distribution, List<string> _Nodes, int _NoItems, string _TempFolder) {
+        Nodes = _Nodes;
+        
         foreach (KeyValuePair<MessageType, int> KVP in _Distribution)
-        { Distribution.Add(KVP.Key, (_NoItems / 100) * KVP.Value); }
+        { Distribution.Add(KVP.Key, (int)((_NoItems / 100f) * KVP.Value)); }
 
         TempFolderPath = _TempFolder;
     }
@@ -25,59 +26,62 @@ public class MessageGenerator
     /// Generates the messages and saves them to a temporary file.
     /// </summary>
     /// <returns>The path to the temporary file.</returns>
-    public string GenerateMessages() {
-        List<Message> Messages = [];
-        
-        foreach (KeyValuePair<MessageType, int> KVP in Distribution)
-        { Messages.AddRange(GenerateMessages(KVP.Key, KVP.Value)); }
+    public Dictionary<string, List<Message>> GenerateMessages() {
+        Dictionary<string, List<Message>> TmpMsgs = [];
 
-        return SaveToFile(Messages);
+        foreach (KeyValuePair<string, List<Message>> KVP2 in Distribution.SelectMany(KVP => GenerateMessages(KVP.Key, KVP.Value)))
+        {
+            if (TmpMsgs.TryGetValue(KVP2.Key, out List<Message>? Msgs))
+            { Msgs.AddRange(KVP2.Value); }
+            else
+            { TmpMsgs.Add(KVP2.Key, KVP2.Value); } 
+        }
+
+        return TmpMsgs;
     }
     
-    private List<Message> GenerateMessages(MessageType _MT, int _Count) {
-        List<Message> TmpMsgs = [];
-        
+    private Dictionary<string, List<Message>> GenerateMessages(MessageType _MT, int _Count) {
+        Dictionary<string, List<Message>> TmpMsgs = [];
+
         for (int i = 0; i < _Count; i++)
-        { TmpMsgs.AddRange(GenerateMessagesForItem(_MT)); }
+        {
+            List<string> ChosenNodes = Nodes.RandomSubset(2).ToList();
+
+            List<Message> Msgs = GenerateMessagesForItem(_MT, ChosenNodes[0], ChosenNodes[1]);
+            
+            if (TmpMsgs.TryGetValue(ChosenNodes[0], out List<Message>? MsgsVal))
+            { MsgsVal.AddRange(MsgsVal); }
+            else
+            { TmpMsgs.Add(ChosenNodes[0], Msgs); }
+        }
 
         return TmpMsgs;
     }
 
-    private List<Message> GenerateMessagesForItem(MessageType _MT) {
+    static private List<Message> GenerateMessagesForItem(MessageType _MT, string _DestNode, string _SenderNode) {
         List<Message> TmpMessages = [];
         
         long ItemSize = Random.Shared.NextInt64(_MT.SizeRange.Min, _MT.SizeRange.Max);
 
-        long NoMessagesNeeded = ItemSize / MAX_MESSAGE_SIZE;
+        long NoMessagesNeeded = (long)Math.Ceiling(ItemSize / (double)MAX_MESSAGE_SIZE);
         long SizeRemaining = ItemSize % MAX_MESSAGE_SIZE;
 
         for (int i = 0; i < NoMessagesNeeded; i++)
         {
-            var Msg = Message.Builder
+            MessageBuilder? Msg = MessageBuilder.Default()
                 .WithIndex(i)
                 .WithMessageType(_MT.Name)
                 .WithMessageSize(MAX_MESSAGE_SIZE)
-                .WithTotalSize(ItemSize);
+                .WithTotalSize(ItemSize)
+                .WithDestinationAddress(_DestNode)
+                .WithSenderAddress(_SenderNode);
 
-            if (i == NoMessagesNeeded--)
+            if (i == --NoMessagesNeeded)
             { Msg.WithMessageSize((int)SizeRemaining); }
             
             TmpMessages.Add(Msg.Build());
         }
 
         return TmpMessages;
-    }
-
-    private string SaveToFile(List<Message> _Msgs) {
-        
-        string FilePath = Path.Combine(TempFolderPath, "Messages.json");
-        
-        string TempFile = Path.Combine(FilePath, Path.GetRandomFileName());
-        
-        using StreamWriter Writer = new(TempFile);
-
-        JsonSerializer.Serialize(Writer.BaseStream, _Msgs, SourceGenerationContext.Default.ListMessage);
-
-        return TempFile;
     }
 }

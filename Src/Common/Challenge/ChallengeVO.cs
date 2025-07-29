@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 
 using Common.Json;
+using Common.Messaging;
 
 namespace Common.Challenge;
 
@@ -29,14 +30,17 @@ public class ChallengeVO
         get => MessageDistribution.ToDictionary(Key => Key.Key.MessageTypeGUID, Val => (MessageType: Val.Key, Distribution: Val.Value)); 
         set => MessageDistribution = value.ToDictionary(Key => Key.Value.Item1, Val => Val.Value.Item2);
     }
-    
+
     /// <summary>
     /// The map used for this challenge.
     /// </summary>
-    public MapVO? Map { get; set; } = null;
+    public MapVO Map { get; set; } = null!;
 
     /// <summary>
     /// The name of this challenge.
     /// </summary>
     public string Name { get; set; } = "DEFAULT";
+
+    [JsonIgnore]
+    public Dictionary<string, List<Message>> GeneratedMessages { get; set; } = [];
 }

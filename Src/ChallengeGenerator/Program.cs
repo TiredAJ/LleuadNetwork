@@ -25,8 +25,9 @@ static internal class Program
 {
     static private ChallengeVO Challenge = new();
     static private string? MapName = null;
-    static private string? MapPath = "";
+    static private string MapPath = "";
     static private string TmpFolderPath = "";
+    static private string ChallengeSaveFolder = "";
 
     static private string MessageTypesFile = "./Conf/MessageTypes.json"; 
     
@@ -51,10 +52,16 @@ static internal class Program
         SelectMessageTypes();
 
         SetMessageTypeDistribution();
+
+        TmpFolderPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+        Directory.CreateDirectory(TmpFolderPath);
         
-        string MsgFile = GenerateMessages();
+        GenerateMessages();
 
         ConfirmChallenge();
+
+        ZipChallenge();
     }
 
     #region Misc
@@ -171,8 +178,8 @@ static internal class Program
             
             ChosenMsgCount = AnsiConsole.Prompt(
             new TextPrompt<int>(Prompt)
-                .DefaultValue<int>(Challenge.NodeCount * 10)
-                .Validate((_Val) => (_Val <= short.MaxValue) && (_Val > 10))
+                .DefaultValue(15)
+                .Validate((_Val) => (_Val <= MAX_ITEMS) && (_Val >= Challenge.NodeCount))
             );
         } while (
             !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1]You have chosen [bold]{ChosenMsgCount}[/] items to generate. " +
@@ -307,11 +314,11 @@ static internal class Program
     #endregion
 
     #region Step 5 - Message Gen
-    static private string GenerateMessages() {
-        TmpFolderPath = Directory.CreateDirectory(
-        Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())).Name;
+    static private void GenerateMessages() {
+        List<string> NodeIDs = Challenge.Map.NetworkNodes.Select(X => X.Name)
+            .ToList();
         
-        return new MessageGenerator(Challenge.MessageDistribution, Challenge.ItemCount, TmpFolderPath).GenerateMessages();
+        Challenge.GeneratedMessages = new MessageGenerator(Challenge.MessageDistribution, NodeIDs, Challenge.ItemCount, TmpFolderPath).GenerateMessages();
     }
     #endregion
 
@@ -359,33 +366,93 @@ static internal class Program
         if (!Confirmation)
         { return; }
 
-        string ChallengeName =
+        Challenge.Name =
             AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a name for the challenge[/]")).Trim();
 
-        string ChallengeSaveFolder =
+        ChallengeSaveFolder =
             AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a folder to save the challenge to[/]")
                 .Validate(_S => Directory.Exists(_S.Trim())));
 
-        ChallengeName += CHALLENGE_EXTENSION;
-
-        Challenge.Name = ChallengeName;
-        
-        using StreamWriter Writer = new(Path.Combine(ChallengeSaveFolder, ChallengeName));
-        
-        JsonSerializer.Serialize(Writer.BaseStream, Challenge, SourceGenerationContext.Default.ChallengeVO);
+        Challenge.Name += CHALLENGE_EXTENSION;
     }
     #endregion
     
     #region Step 7 - Challenge Zipping
-    static private string ZipChallenge(string _MsgFile) {
+    static private void ZipChallenge() {
+        PrintTitle();
 
+        Random RndOffset = new Random((int)DateTime.Now.Ticks);
+        
+        AnsiConsole.Status()
+            .Start("[cyan1]Exporting challenge...[/]",
+            _CTX => {
+                CopyMap(_CTX);
+                
+                Thread.Sleep(RndOffset.Next(800, 1500));
+
+                ExportMessages(_CTX);
+                
+                Thread.Sleep(RndOffset.Next(800, 1500));
+                
+                ExportChallengeDataFile(_CTX);
+                
+                Thread.Sleep(RndOffset.Next(800, 1500));
+                
+                ExportChallengeZip(_CTX);
+                
+                Thread.Sleep(RndOffset.Next(800, 1500));
+            });
+        
+        AnsiConsole.Clear();
+        
+        AnsiConsole.Markup($"[cyan1 bold]Export has completed. " +
+                           $"You can find it at [[[italic]{Path.Combine(ChallengeSaveFolder, Challenge.Name)}[/]]]. " +
+                           $"please restart application to make a new challenge.[/]");
+    }
+
+    static private void ExportMessages(StatusContext _CTX) {
+        AnsiConsole.MarkupLine("[italic]Exporting messages...[/]");
+        _CTX.Spinner(Spinner.Known.BouncingBar);
+        
+        string TmpMsgFile = Path.Combine(TmpFolderPath, "Messages.json");
+        
+        using StreamWriter Writer = new(TmpMsgFile);
+
+        JsonSerializer.Serialize(Writer.BaseStream, Challenge.GeneratedMessages, SourceGenerationContext.Default.DictionaryStringListMessage);
+        
+        Writer.Flush();
+    }
+
+    static private void CopyMap(StatusContext _CTX) {
+        AnsiConsole.MarkupLine("[italic]Copying map...[/]");
+        _CTX.Spinner(Spinner.Known.BouncingBar);
+                
         string TmpMapFile = Path.Combine(TmpFolderPath, "Map.json");
-        
+
         File.Copy(MapPath, TmpMapFile);
+    }
+
+    static private void ExportChallengeDataFile(StatusContext _CTX)
+    {
+        AnsiConsole.MarkupLine("[italic]Exporting challenge data...[/]");
+        _CTX.Spinner(Spinner.Known.BouncingBar);
         
-        //get path of challenge file
+        string TmpChallengeFile = Path.Combine(TmpFolderPath, "Challenge.json");
+
+        using StreamWriter Writer = new(TmpChallengeFile);
+
+        JsonSerializer.Serialize(Writer.BaseStream, Challenge, SourceGenerationContext.Default.ChallengeVO);
+
+        Writer.Flush();
+    }
+
+    static private void ExportChallengeZip(StatusContext _CTX) {
+        AnsiConsole.MarkupLine("[italic]Exporting challenge...[/]");
+        _CTX.Spinner(Spinner.Known.BouncingBar);
+
+        string ChallengeSaveFile = Path.Combine(ChallengeSaveFolder, Challenge.Name);
         
-        //Zipper.
+        Zipper.Compress(ChallengeSaveFile, TmpFolderPath);
     }
     #endregion
 }

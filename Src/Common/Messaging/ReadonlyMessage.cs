@@ -2,8 +2,8 @@ using System.Text;
 
 namespace Common.Messaging;
 
-public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, string? _Payload = null, int _MaxHops = 50)
-    : Message(_SenderAddress, _DestinationAddress, _Payload, _MaxHops)
+public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, int _MaxHops = 50)
+    : Message(_SenderAddress, _DestinationAddress, _MaxHops)
 {
     #region Headers
 
@@ -132,7 +132,7 @@ public class ReadonlyMessage(string _SenderAddress, string _DestinationAddress, 
     #endregion
 
     public ReadonlyMessage(Message _Msg)
-        : this(_Msg.SenderAddress, _Msg.SenderAddress, _Msg.Payload.GetValueOrDefault(), _Msg.MaxHops) {
+        : this(_Msg.SenderAddress, _Msg.SenderAddress, _Msg.MaxHops) {
 
         IntHeaders = _Msg.CloneHeaders();
     }

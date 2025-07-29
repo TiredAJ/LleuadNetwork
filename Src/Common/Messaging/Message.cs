@@ -3,8 +3,6 @@ using System.Text;
 using Common.Utils;
 using Common.Messaging.Exceptions;
 
-using CSharpFunctionalExtensions;
-
 namespace Common.Messaging;
 
 public class Message
@@ -24,7 +22,7 @@ public class Message
     /// </summary>
     public string ID {
         get => IntHeaders.GetHeader(Header.ID);
-        init => IntHeaders.SetHeaderValue(Header.ID, value);
+        private set => IntHeaders.SetHeaderValue(Header.ID, value);
     }
 
     /// <summary>
@@ -144,48 +142,29 @@ public class Message
 
     #endregion
     
-    public Message(string _SenderAddress = "", string _DestinationAddress = "", string? _Payload = null, int _MaxHops = 50) {
+    public Message(string _SenderAddress = "", string _DestinationAddress = "", int _MaxHops = 50) {
         IntHeaders = new Headers();
 
         SenderAddress = _SenderAddress;
         DestinationAddress = _DestinationAddress;
         CreationTime = DateTime.UtcNow;
 
-        ID = Guid.CreateVersion7()
-                 .ToBase64Name();
+        GenerateID();
 
         MaxHops = _MaxHops;
-
-        if (_Payload is not null)
-        { Payload = _Payload; }
     }
 
-    public Maybe<string> Payload {
-        get;
-        set {
-            if (value.HasValue)
-            { ValidatePayload(value.Value); }
-
-            field = value;
-        }
-    } = string.Empty;
-
-    public void SetPayload(string _str) {
-        ValidatePayload(_str);
-
-        Payload = _str;
+    internal void GenerateID()
+    {
+        ID = Guid.CreateVersion7()
+            .ToBase64Name();
     }
-
-    public string? GetPayload()
-        => Payload.GetValueOrDefault();
 
     public bool IsValid() {
-        if (SenderAddress == Headers.DEFAULT_VAL
-            || DestinationAddress == Headers.DEFAULT_VAL
-            || CreationTime == DateTime.MinValue)
-        { return false; }
 
-        return MessageSize == SizeInBytes(Payload.Value);
+        return SenderAddress == Headers.DEFAULT_VAL
+               && DestinationAddress == Headers.DEFAULT_VAL
+               && CreationTime == DateTime.MinValue;
     }
 
     private int SizeInBytes(string _Value) => MessageEncoding.GetByteCount(_Value);
@@ -200,7 +179,7 @@ public class Message
     }
 
     public Message Clone() {
-        return new Message(SenderAddress, DestinationAddress, Payload.GetValueOrDefault())
+        return new Message(SenderAddress, DestinationAddress)
         {
             CreationTime = CreationTime,
             Hops = Hops,
@@ -221,7 +200,7 @@ public class Message
                 $"[Type: {MessageType}],[Encoding: {MessageEncoding}],[Index: {Index}]," +
                 $"[Priority: {Priority}],[Creation Time: {CreationTime}],[Lifespan: {Lifespan}]," +
                 $"[Hops: {Hops}],[Response Req: {ResponseRequired}],[Size: {MessageSize}]," +
-                $"[Max Size: {MaxMessageSize}],[Total Size: {TotalSize}]\n[Payload: {Payload}]";
+                $"[Max Size: {MaxMessageSize}],[Total Size: {TotalSize}]";
     }
 
     public TimeSpan GetAliveTime()

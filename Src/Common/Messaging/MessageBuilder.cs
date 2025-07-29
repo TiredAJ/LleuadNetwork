@@ -1,12 +1,20 @@
+using System.Text;
+
 using BuilderGenerator;
+
+using static Common.Conf.Conf;
 
 namespace Common.Messaging;
 
 [BuilderFor(typeof(Message))]
 public partial class MessageBuilder
 {
+    public MessageBuilder() {
+        PostBuildAction = X => X.GenerateID();
+    }
+    
     static public MessageBuilder DebugMessage()
-        => new MessageBuilder()
+        => Default()
             .WithMessageType("DEBUG")
             .WithSenderAddress("N/A")
             .WithDestinationAddress("N/A");
@@ -14,5 +22,8 @@ public partial class MessageBuilder
     static public MessageBuilder Default()
         => new MessageBuilder()
             .WithSenderAddress("")
-            .WithDestinationAddress("");
+            .WithDestinationAddress("")
+            .WithMessageEncoding(Encoding.UTF8)
+            .WithMaxMessageSize(MAX_MESSAGE_SIZE)
+            .WithResponseRequired(false);
 }
