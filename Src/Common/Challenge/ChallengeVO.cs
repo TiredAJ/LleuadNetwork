@@ -34,6 +34,7 @@ public class ChallengeVO
     /// <summary>
     /// The map used for this challenge.
     /// </summary>
+    [JsonIgnore]
     public MapVO Map { get; set; } = null!;
 
     /// <summary>

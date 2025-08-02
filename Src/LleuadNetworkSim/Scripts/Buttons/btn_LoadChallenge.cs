@@ -12,7 +12,7 @@ public partial class btn_LoadChallenge : FileButton
     public override void _Ready() {
 
         FD.FileSelected += CollNode.TryLoadChallenge;
-
+        
         base._Ready();
     }
 }

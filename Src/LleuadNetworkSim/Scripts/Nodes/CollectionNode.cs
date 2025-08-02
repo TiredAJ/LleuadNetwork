@@ -33,6 +33,8 @@ using MoonSharp.Interpreter;
 
 using MoreLinq;
 
+using static Common.Conf.Conf;
+
 // ReSharper disable ArrangeMissingParentheses
 // ReSharper disable RedundantJumpStatement
 
@@ -362,8 +364,6 @@ public partial class CollectionNode : Node, IPersistable
     }
     public void LoadMap(string _Path) {
 
-        ClearTransientChildren();
-
         FileValidator.ValidateFile(_Path, ".lnmap", this);
 
         Maybe<Exception> exc = JsonValidator.ValidateJson<MapVO>(_Path, out JsonNode? JData);
@@ -372,8 +372,14 @@ public partial class CollectionNode : Node, IPersistable
         { ExceptionPopupWrapper.Throw(this, exc.Value); }
 
         MapVO Map = JData.Deserialize<MapVO>()!;
+        
+        LoadMap(Map);
+    }
 
-        Load(Map);
+    private void LoadMap(MapVO _Map) {
+        ClearTransientChildren();
+        
+        Load(_Map);
     }
 
     private void LoadNetworkNode(NetworkNodeVO _NodeVO) {
@@ -404,10 +410,9 @@ public partial class CollectionNode : Node, IPersistable
 
     public void TryLoadChallenge(string _Path) {
 
-        FileValidator.ValidateFile(_Path, ".lnchallenge", this);
+        FileValidator.ValidateFile(_Path, CHALLENGE_EXTENSION, this);
 
-        Challenge = new MapChallenge(_Path);
-        Challenge.Value.GenerateChallenge();
+        MapChallenge.LoadChallenge(_Path);
     }
 
     private void ClearTransientChildren() {

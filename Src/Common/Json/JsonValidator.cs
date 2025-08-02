@@ -23,7 +23,7 @@ static public class JsonValidator
         string StrJData = Reader.ReadToEnd();
 
         ICollection<ValidationError> Errors = [];
-
+        
         try
         { Errors = Schema.Validate(StrJData); }
         catch (Exception Exc)

@@ -27,4 +27,10 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="GodotSharp">
+        <HintPath>..\..\..\..\.nuget\packages\godotsharp\4.4.1\lib\net8.0\GodotSharp.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

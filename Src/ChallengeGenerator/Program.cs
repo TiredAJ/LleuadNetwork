@@ -372,8 +372,6 @@ static internal class Program
         ChallengeSaveFolder =
             AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a folder to save the challenge to[/]")
                 .Validate(_S => Directory.Exists(_S.Trim())));
-
-        Challenge.Name += CHALLENGE_EXTENSION;
     }
     #endregion
     
@@ -414,7 +412,7 @@ static internal class Program
         AnsiConsole.MarkupLine("[italic]Exporting messages...[/]");
         _CTX.Spinner(Spinner.Known.BouncingBar);
         
-        string TmpMsgFile = Path.Combine(TmpFolderPath, "Messages.json");
+        string TmpMsgFile = Path.Combine(TmpFolderPath, ZIP_MESSAGES_FILE);
         
         using StreamWriter Writer = new(TmpMsgFile);
 
@@ -427,7 +425,7 @@ static internal class Program
         AnsiConsole.MarkupLine("[italic]Copying map...[/]");
         _CTX.Spinner(Spinner.Known.BouncingBar);
                 
-        string TmpMapFile = Path.Combine(TmpFolderPath, "Map.json");
+        string TmpMapFile = Path.Combine(TmpFolderPath, ZIP_MAP_FILE);
 
         File.Copy(MapPath, TmpMapFile);
     }
@@ -437,7 +435,7 @@ static internal class Program
         AnsiConsole.MarkupLine("[italic]Exporting challenge data...[/]");
         _CTX.Spinner(Spinner.Known.BouncingBar);
         
-        string TmpChallengeFile = Path.Combine(TmpFolderPath, "Challenge.json");
+        string TmpChallengeFile = Path.Combine(TmpFolderPath, ZIP_CHALLENGE_FILE);
 
         using StreamWriter Writer = new(TmpChallengeFile);
 
@@ -450,7 +448,7 @@ static internal class Program
         AnsiConsole.MarkupLine("[italic]Exporting challenge...[/]");
         _CTX.Spinner(Spinner.Known.BouncingBar);
 
-        string ChallengeSaveFile = Path.Combine(ChallengeSaveFolder, Challenge.Name);
+        string ChallengeSaveFile = Path.Combine(ChallengeSaveFolder, Challenge.Name, CHALLENGE_EXTENSION);
         
         Zipper.Compress(ChallengeSaveFile, TmpFolderPath);
     }
