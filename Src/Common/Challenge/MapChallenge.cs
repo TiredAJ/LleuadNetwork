@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 
 using Common.Json;
@@ -15,7 +16,7 @@ namespace Common.Challenge;
 
 public class MapChallenge
 {
-    readonly private Dictionary<string, List<Message>> Challenge = [];
+    private Dictionary<string, List<Message>> Messages = [];
     private Dictionary<MessageType, int> Distribution = [];
     private List<string> NodeAddresses = [];
 
@@ -57,10 +58,10 @@ public class MapChallenge
                 Msg.DestinationAddress = AvailableAddr.RandomSubset(1).First();
             }
 
-            Challenge.Add(Sender, Messages.ToList());
+            this.Messages.Add(Sender, Messages.ToList());
         }
 
-        return Challenge;
+        return Messages;
     }
 
     private Message[] DistributeMessages() {
@@ -79,24 +80,38 @@ public class MapChallenge
     }
 
     static public Result<MapChallenge> LoadChallenge(string _FilePath) {
-        string TempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-        Directory.CreateDirectory(TempPath);
+        DirectoryInfo TmpDir = FileUtils.FileUtils.CreateTempFolder();
         
-        Result Res = Zipper.Extract(_FilePath, TempPath);
+        Result Res = Zipper.Extract(_FilePath, TmpDir.FullName);
+        
+        Debug.WriteLine($"Creating temp dir at {TmpDir.FullName}");
 
         if (Res.IsFailure)
         { return Res.ConvertFailure<MapChallenge>(); }
 
-        MapChallenge NewMapChallenge = new MapChallenge();
+        MapChallenge NewMapChallenge = new();
         
-        string ChallengeDataPath = Path.Combine(TempPath, ZIP_CHALLENGE_FILE);
-        string MapPath = Path.Combine(TempPath, ZIP_MAP_FILE);
-        string MessagesPath = Path.Combine(TempPath, ZIP_MESSAGES_FILE);
+        string ChallengeDataPath = Path.Combine(TmpDir.FullName, ZIP_CHALLENGE_FILE);
+        string MapPath = Path.Combine(TmpDir.FullName, ZIP_MAP_FILE);
+        string MessagesPath = Path.Combine(TmpDir.FullName, ZIP_MESSAGES_FILE);
 
-        LoadChallengeData(ChallengeDataPath, NewMapChallenge);
-        LoadMap(MapPath, NewMapChallenge);
-        LoadMessages(MessagesPath, NewMapChallenge);
+        Result ChallengeRes = LoadChallengeData(ChallengeDataPath, NewMapChallenge);
+
+        if (ChallengeRes.IsFailure)
+        { return ChallengeRes.ConvertFailure<MapChallenge>(); }
+        
+        Result MapRes = LoadMap(MapPath, NewMapChallenge);
+        
+        if (MapRes.IsFailure)
+        { return MapRes.ConvertFailure<MapChallenge>(); }
+        
+        Result MsgRes = LoadMessages(MessagesPath, NewMapChallenge);
+        
+        if (MsgRes.IsFailure)
+        { return MsgRes.ConvertFailure<MapChallenge>(); }
+
+        return Result.Success(NewMapChallenge); 
     }
 
     static private Result LoadChallengeData(string _ChallengeDataPath, MapChallenge _NewMapChallenge) {
@@ -105,7 +120,7 @@ public class MapChallenge
         Maybe<ChallengeVO> MbChallenge = Maybe<ChallengeVO>.None;
         
         try
-        { MbChallenge = JsonSerializer.Deserialize(Reader.BaseStream, SourceGenerationContext.Default.ChallengeVO).AsMaybe(); }
+        { MbChallenge = JsonSerializer.Deserialize(Reader.BaseStream, VO_SrcGenCtx.Default.ChallengeVO).AsMaybe(); }
         catch (Exception EXC)
         { Result.Failure(EXC.Message); }
         
@@ -121,10 +136,42 @@ public class MapChallenge
     static private Result LoadMap(string _MapPath, MapChallenge _NewMapChallenge) {
         using Stream Reader = new StreamReader(_MapPath).BaseStream;
 
-        MapVO? Map = JsonSerializer.Deserialize(Reader, SourceGenerationContext.Default.MapVO);
+        MapVO? Map;
+
+        try
+        { Map = JsonSerializer.Deserialize(Reader, VO_SrcGenCtx.Default.MapVO); }
+        catch (Exception EXC)
+        { return Result.Failure(EXC.Message); }
+
+        if (Map is null)
+        { return Result.Failure("Map was null"); }
+        
+        _NewMapChallenge.Map = Map;
+
+        return Result.Success();
     }
 
-    static private void LoadMessages(string _MessagePath, MapChallenge _Challenge) {
+    static private Result LoadMessages(string _MessagePath, MapChallenge _NewMapChallenge) {
+        using Stream Reader = new StreamReader(_MessagePath).BaseStream;
+
+        Dictionary<string, List<Message>>? GeneratedMessages;
+
+        try
+        {
+            GeneratedMessages =
+                JsonSerializer.Deserialize(Reader, MsgDistribution_SrcGenCtx.Default.DictionaryStringListMessage);
+        }
+        catch (Exception EXC)
+        {
+            Debug.WriteLine(EXC);
+            return Result.Failure(EXC.Message);
+        }
+
+        if (GeneratedMessages is null)
+        { return Result.Failure("Messages was null"); }
         
+        _NewMapChallenge.Messages = GeneratedMessages;
+
+        return Result.Success();
     }
 }

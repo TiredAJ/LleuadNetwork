@@ -17,24 +17,18 @@ using Spectre.Console;
 
 using static Common.Conf.Conf;
 
-using SourceGenerationContext = Common.Json.SourceGenerationContext;
-
 namespace ChallengeGenerator;
 
 static internal class Program
 {
-    static private ChallengeVO Challenge = new();
-    static private string? MapName = null;
+    static readonly private ChallengeVO Challenge = new();
+    static private string? MapName;
     static private string MapPath = "";
     static private string TmpFolderPath = "";
     static private string ChallengeSaveFolder = "";
+    static private string ChallengeSaveFile = "";
 
-    static private string MessageTypesFile = "./Conf/MessageTypes.json"; 
-    
-    static void Main(string[] _Args) {
-
-        //ArgHandler.HandleArgs(_Args);
-        
+    static void Main() {
         PrintTitle();
         
         MapPath = GetMap();
@@ -155,8 +149,8 @@ static internal class Program
             ChosenNodeCount = AnsiConsole.Prompt(
             new TextPrompt<int>($"[cyan1]There are [bold]{_Map!.NetworkNodes.Length}[/] node(s) in this map. " +
                                 $"How many would you like to use?[/]")
-                .DefaultValue<int>(_Map!.NetworkNodes.Length)
-                .Validate((_Val) => (_Val <= _Map?.NetworkNodes.Length) && (_Val > 0))
+                .DefaultValue(_Map.NetworkNodes.Length)
+                .Validate((_Val) => (_Val <= _Map.NetworkNodes.Length) && (_Val > 0))
             );
         } while (
             !AnsiConsole.Prompt(new ConfirmationPrompt($"[cyan1]You have chosen [bold]{ChosenNodeCount}[/] nodes to use. Is this amount correct?[/]"))
@@ -193,18 +187,18 @@ static internal class Program
     #region Step 4 - Message Types
     static private void SelectMessageTypes() {
 
-        if (!File.Exists(MessageTypesFile))
+        if (!File.Exists(MESSAGE_TYPES_FILE))
         {
-            Exception EXC = new FileNotFoundException($"Cannot find {MessageTypesFile} File!");
+            Exception EXC = new FileNotFoundException($"Cannot find {MESSAGE_TYPES_FILE} File!");
             
             AnsiConsole.WriteException(EXC);
             throw EXC;
         }
 
-        using StreamReader Reader = new(MessageTypesFile);
+        using StreamReader Reader = new(MESSAGE_TYPES_FILE);
         List<MessageType>? AvailableTypes =
             JsonSerializer.Deserialize<List<MessageType>>(Reader.BaseStream,
-            SourceGenerationContext.Default.ListMessageType);
+            MsgType_SrcGenCtx.Default.ListMessageType);
 
         if (AvailableTypes is null)
         {
@@ -216,7 +210,7 @@ static internal class Program
 
         if (AvailableTypes.Count < 1)
         {
-            Exception EXC = new NoMessageTypesAvailableException(MessageTypesFile);
+            Exception EXC = new NoMessageTypesAvailableException(MESSAGE_TYPES_FILE);
             
             AnsiConsole.WriteException(EXC);
             throw EXC;
@@ -326,17 +320,17 @@ static internal class Program
     static private void DisplaySummary() {
         AnsiConsole.Clear();
 
-        int NodeCount = Challenge.Map!.NetworkNodes.Length;
-        int ConnectionCount = Challenge.Map!.NetworkNodes.Sum(X => X.Connections.Length);
+        int NodeCount = Challenge.Map.NetworkNodes.Length;
+        int ConnectionCount = Challenge.Map.NetworkNodes.Sum(X => X.Connections.Length);
 
         Tree SummaryTree = new("[cyan1 bold]Summary[/]");
 
         TreeNode MapNode = SummaryTree.AddNode(new Markup($"[cyan1 bold]Map:[/] {MapName}"));
         
         TreeNode NodesNode = MapNode.AddNode(new Markup($"[cyan1]Nodes[/] [grey82]({NodeCount})[/]"));
-        NodesNode.AddNodes(Challenge.Map!.NetworkNodes.Select(X => X.Name));
+        NodesNode.AddNodes(Challenge.Map.NetworkNodes.Select(X => X.Name));
 
-        IEnumerable<string> AllConnections = Challenge.Map!.NetworkNodes
+        IEnumerable<string> AllConnections = Challenge.Map.NetworkNodes
             .Select(X => X.Connections.Select(Y => $"[green]{X.Name}[/] [cyan2]->[/] [green]{Y}[/]"))
             .SelectMany(X => X);
         
@@ -366,12 +360,28 @@ static internal class Program
         if (!Confirmation)
         { return; }
 
-        Challenge.Name =
-            AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a name for the challenge[/]")).Trim();
+        bool IsNameValid = true;
+        
+        do
+        {
+            if (!IsNameValid)
+            { AnsiConsole.MarkupLine("[red]File name already exists at that location, please choose a new name and path[/]"); }
+            
+            Challenge.Name =
+                AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a name for the challenge[/]")).Trim();
 
-        ChallengeSaveFolder =
-            AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a folder to save the challenge to[/]")
-                .Validate(_S => Directory.Exists(_S.Trim())));
+            ChallengeSaveFolder =
+                AnsiConsole.Prompt(new TextPrompt<string>("[cyan1]Please enter a folder to save the challenge to[/]")
+                    .Validate(_S => Directory.Exists(_S.Trim())));
+            
+            ChallengeSaveFile = Path.Combine(ChallengeSaveFolder, Challenge.Name + CHALLENGE_EXTENSION);
+
+            if (File.Exists(ChallengeSaveFile))
+            { IsNameValid = false; }
+            else
+            { IsNameValid = true; }
+            
+        } while (!IsNameValid);
     }
     #endregion
     
@@ -416,7 +426,7 @@ static internal class Program
         
         using StreamWriter Writer = new(TmpMsgFile);
 
-        JsonSerializer.Serialize(Writer.BaseStream, Challenge.GeneratedMessages, SourceGenerationContext.Default.DictionaryStringListMessage);
+        JsonSerializer.Serialize(Writer.BaseStream, Challenge.GeneratedMessages, MsgDistribution_SrcGenCtx.Default.DictionaryStringListMessage);
         
         Writer.Flush();
     }
@@ -439,7 +449,7 @@ static internal class Program
 
         using StreamWriter Writer = new(TmpChallengeFile);
 
-        JsonSerializer.Serialize(Writer.BaseStream, Challenge, SourceGenerationContext.Default.ChallengeVO);
+        JsonSerializer.Serialize(Writer.BaseStream, Challenge, VO_SrcGenCtx.Default.ChallengeVO);
 
         Writer.Flush();
     }
@@ -447,8 +457,6 @@ static internal class Program
     static private void ExportChallengeZip(StatusContext _CTX) {
         AnsiConsole.MarkupLine("[italic]Exporting challenge...[/]");
         _CTX.Spinner(Spinner.Known.BouncingBar);
-
-        string ChallengeSaveFile = Path.Combine(ChallengeSaveFolder, Challenge.Name, CHALLENGE_EXTENSION);
         
         Zipper.Compress(ChallengeSaveFile, TmpFolderPath);
     }

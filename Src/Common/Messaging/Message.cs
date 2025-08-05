@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 
 using Common.Utils;
 using Common.Messaging.Exceptions;
@@ -7,6 +8,7 @@ namespace Common.Messaging;
 
 public class Message
 {
+    [JsonIgnore]
     protected Headers IntHeaders;
 
     readonly public int MaxHops;
@@ -52,9 +54,15 @@ public class Message
     /// <summary>
     /// The encoding used for the payload.
     /// </summary>
+    [JsonIgnore]
     public Encoding MessageEncoding {
         get => Encoding.GetEncoding(IntHeaders.GetHeader(Header.ENCODING));
         set => IntHeaders.SetHeaderValue(Header.ENCODING, value.WebName);
+    }
+
+    public string MessageEncodingStr {
+        get => IntHeaders.GetHeader(Header.ENCODING);
+        set => IntHeaders.SetHeaderValue(Header.ENCODING, value);
     }
 
     /// <summary>
@@ -141,6 +149,10 @@ public class Message
         => IntHeaders.Clone();
 
     #endregion
+
+    public Message() {
+        IntHeaders = new Headers();
+    }
     
     public Message(string _SenderAddress = "", string _DestinationAddress = "", int _MaxHops = 50) {
         IntHeaders = new Headers();

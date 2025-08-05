@@ -412,7 +412,12 @@ public partial class CollectionNode : Node, IPersistable
 
         FileValidator.ValidateFile(_Path, CHALLENGE_EXTENSION, this);
 
-        MapChallenge.LoadChallenge(_Path);
+        Challenge = MapChallenge.LoadChallenge(_Path).AsMaybe();
+
+        if (Challenge.HasNoValue)
+        { GodotLogger.LogError($"Failed to load challenge {_Path}"); return; }
+        
+        LoadMap(Challenge.Value.Map);
     }
 
     private void ClearTransientChildren() {
@@ -581,3 +586,4 @@ public partial class CollectionNode : Node, IPersistable
         DetailViewSingleton.GetInstance().Visible = _ToggleState;
     }
 }
+ 

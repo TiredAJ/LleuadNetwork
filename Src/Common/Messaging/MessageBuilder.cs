@@ -24,6 +24,7 @@ public partial class MessageBuilder
             .WithSenderAddress("")
             .WithDestinationAddress("")
             .WithMessageEncoding(Encoding.UTF8)
+            .WithMessageEncodingStr("UTF-8")
             .WithMaxMessageSize(MAX_MESSAGE_SIZE)
             .WithResponseRequired(false);
 }
