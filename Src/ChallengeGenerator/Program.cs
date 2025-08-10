@@ -94,11 +94,17 @@ static internal class Program
                 AnsiConsole.MarkupLine("[italic]Validating json[/]");
                 Thread.Sleep(350);
                 
-                Maybe<Exception> EXC = JsonValidator.ValidateJson<MapVO>(_MapPath, out JsonNode? JNode);
+                Maybe<Exception> EXC = JsonValidator.ValidateJson<MapVO>(_MapPath, out Stream? JStream);
 
                 if (EXC.HasValue)
                 {
                     AnsiConsole.WriteException(EXC.Value);
+                    return;
+                }
+
+                if (JStream is null)
+                {
+                    AnsiConsole.WriteException(new Exception("JStream was null!"));
                     return;
                 }
                 
@@ -106,11 +112,13 @@ static internal class Program
 
                 AnsiConsole.MarkupLine("[italic]Deserialising file[/]");
                 Thread.Sleep(300);
-                
-                Map = JNode.Deserialize<MapVO>()!;
 
-                if (Map is null)
+                Result<MapVO> MapRes = JSONHelper.Deserialise<MapVO>(JStream);
+                
+                if (MapRes.IsFailure)
                 { throw new JSONDeserialisationException(nameof(MapVO)); }
+
+                Map = MapRes.Value;
                 
                 Thread.Sleep(300);
             });
@@ -195,12 +203,9 @@ static internal class Program
             throw EXC;
         }
 
-        using StreamReader Reader = new(MESSAGE_TYPES_FILE);
-        List<MessageType>? AvailableTypes =
-            JsonSerializer.Deserialize<List<MessageType>>(Reader.BaseStream,
-            MsgType_SrcGenCtx.Default.ListMessageType);
+        Result<List<MessageType>> AvailableTypes = JSONHelper.DeserialiseFromFile<List<MessageType>>(MESSAGE_TYPES_FILE);
 
-        if (AvailableTypes is null)
+        if (AvailableTypes.IsFailure)
         {
             Exception EXC = new JSONDeserialisationException(nameof(MapVO));
             
@@ -208,7 +213,7 @@ static internal class Program
             throw EXC;
         }
 
-        if (AvailableTypes.Count < 1)
+        if (AvailableTypes.Value.Count < 1)
         {
             Exception EXC = new NoMessageTypesAvailableException(MESSAGE_TYPES_FILE);
             
@@ -225,7 +230,7 @@ static internal class Program
             SelectedMessageTypes = AnsiConsole.Prompt(new MultiSelectionPrompt<MessageType>()
                 .Title("[cyan1]Please select what message types you'd like in this challenge.[/]")
                 .Required(true)
-                .AddChoices(AvailableTypes)
+                .AddChoices(AvailableTypes.Value)
                 .UseConverter(X => X.ToString())
                 .InstructionsText("[grey](Press [blue]<space>[/] to toggle a message type, [green]<enter>[/] to accept)[/]")
             );
@@ -424,11 +429,7 @@ static internal class Program
         
         string TmpMsgFile = Path.Combine(TmpFolderPath, ZIP_MESSAGES_FILE);
         
-        using StreamWriter Writer = new(TmpMsgFile);
-
-        JsonSerializer.Serialize(Writer.BaseStream, Challenge.GeneratedMessages, MsgDistribution_SrcGenCtx.Default.DictionaryStringListMessage);
-        
-        Writer.Flush();
+        JSONHelper.SerialiseToFile(TmpMsgFile, Challenge.GeneratedMessages);
     }
 
     static private void CopyMap(StatusContext _CTX) {
@@ -447,11 +448,7 @@ static internal class Program
         
         string TmpChallengeFile = Path.Combine(TmpFolderPath, ZIP_CHALLENGE_FILE);
 
-        using StreamWriter Writer = new(TmpChallengeFile);
-
-        JsonSerializer.Serialize(Writer.BaseStream, Challenge, VO_SrcGenCtx.Default.ChallengeVO);
-
-        Writer.Flush();
+        JSONHelper.SerialiseToFile(TmpChallengeFile, Challenge);
     }
 
     static private void ExportChallengeZip(StatusContext _CTX) {

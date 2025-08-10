@@ -4,10 +4,12 @@ using Godot;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace LleuadNetworkSim.Utils;
+namespace LleuadNetworkSim.Utils.GodotUtils;
 
 public partial class PackedSceneSingleton<T> : Resource where T : Node
 {
+    public bool HasInstance => Instance.HasValue;
+    
     required public PackedScene Scene {
         get;
         set {

@@ -37,6 +37,7 @@ project/assembly_name="LleuadNetworkSim"
 
 [editor]
 
+run/main_run_args="--challenge=/home/aj/Repos/LleuadNetwork/Src/LleuadNetworkSim/Misc/ExampleFiles/Challenges/Test16.lnchng"
 naming/script_name_casing=1
 
 [editor_plugins]

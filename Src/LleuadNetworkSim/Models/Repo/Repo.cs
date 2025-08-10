@@ -17,7 +17,7 @@ public sealed class Repo : IDBWrapper
         { _Location = DBConf.ConnectionString; }
 
 #if DEBUG
-        Console.WriteLine($"Opening DB at {_Location}");
+        //Console.WriteLine($"Opening DB at {_Location}");
 #endif
         DB = new LiteDatabase(_Location);
 

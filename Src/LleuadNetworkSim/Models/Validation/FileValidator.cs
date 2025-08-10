@@ -24,7 +24,7 @@ static public class FileValidator
         
         if (Path.GetExtension(_FilePath) != _ExpectedExtension)
         { ExceptionPopupWrapper.Throw(_Caller, new InvalidFileTypeException(_FilePath, MAP_EXTENSION)); }
-
+        
         long FileSize = new FileInfo(_FilePath).Length;
 
         if (FileSize > MAX_FILE_SIZE)

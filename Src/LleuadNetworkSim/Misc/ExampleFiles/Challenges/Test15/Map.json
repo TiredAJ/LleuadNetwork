@@ -1,0 +1,24 @@
+{
+  "NetworkNodes": [
+    {
+      "Name": "_KJMuW8mlk",
+      "Connections": [
+        "YeLbMe7Syk"
+      ],
+      "Pos": {
+        "X": 253,
+        "Y": 219
+      }
+    },
+    {
+      "Name": "YeLbMe7Syk",
+      "Connections": [
+        "_KJMuW8mlk"
+      ],
+      "Pos": {
+        "X": 509,
+        "Y": 464
+      }
+    }
+  ]
+}
