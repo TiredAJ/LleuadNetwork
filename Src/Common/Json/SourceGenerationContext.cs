@@ -5,14 +5,10 @@ using Common.Messaging;
 
 namespace Common.Json;
 
-[JsonSerializable(typeof(List<MessageType>))]
-[JsonSourceGenerationOptions(WriteIndented = false, IncludeFields = true, UseStringEnumConverter = true)]
-public partial class MsgType_SrcGenCtx : JsonSerializerContext 
-{}
-
 [JsonSerializable(typeof(Dictionary<string, List<Message>>))]
+[JsonSerializable(typeof(List<MessageType>))]
 [JsonSourceGenerationOptions(WriteIndented = false, IncludeFields = true, UseStringEnumConverter = true, IgnoreReadOnlyFields = true)]
-public partial class MsgDistribution_SrcGenCtx : JsonSerializerContext
+public partial class Collection_SrcGenCtx : JsonSerializerContext
 { }
 
 [JsonSerializable(typeof(ChallengeVO))]
@@ -22,6 +18,4 @@ public partial class MsgDistribution_SrcGenCtx : JsonSerializerContext
 [JsonSerializable(typeof(ProtocolType))]
 [JsonSourceGenerationOptions(WriteIndented = false, IncludeFields = true, UseStringEnumConverter = true)]
 public partial class VO_SrcGenCtx : JsonSerializerContext
-{
-    
-}
+{ }

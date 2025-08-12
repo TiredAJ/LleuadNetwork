@@ -1,8 +1,8 @@
-using Common.Conf;
-
 using Godot;
 
 using LleuadNetworkSim.Scripts.Nodes;
+
+using static Common.Conf.Conf;
 
 namespace LleuadNetworkSim.Scripts.Buttons;
 
@@ -13,7 +13,11 @@ public partial class btn_LoadChallenge : FileButton
 
     public override void _Ready() {
 
-        FD.Filters = [$"*{Conf.CHALLENGE_EXTENSION};LleuadNetwork Challenge file"];
+        FD.Filters = [$"*{CHALLENGE_EXTENSION};LleuadNetwork Challenge file"];
+        
+        #if DEBUG
+        FD.CurrentPath = "/home/aj/Repos/LleuadNetwork/Src/LleuadNetworkSim/Misc/ExampleFiles/Challenges";
+        #endif
         
         FD.FileSelected += CollNode.TryLoadChallenge;
         

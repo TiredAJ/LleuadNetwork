@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using LiteDB;
 
 // ReSharper disable InconsistentNaming

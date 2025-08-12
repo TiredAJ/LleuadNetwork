@@ -86,7 +86,7 @@ public class MapChallenge
         Result Res = Zipper.Extract(_FilePath, TmpDir.FullName);
         
         Debug.WriteLine($"Creating temp dir at {TmpDir.FullName}");
-
+        
         if (Res.IsFailure)
         { return Res.ConvertFailure<MapChallenge>(); }
 
@@ -115,12 +115,10 @@ public class MapChallenge
     }
 
     static private Result LoadChallengeData(string _ChallengeDataPath, MapChallenge _NewMapChallenge) {
-        using StreamReader Reader = new(_ChallengeDataPath);
-
         Maybe<ChallengeVO> MbChallenge = Maybe<ChallengeVO>.None;
-        
+
         try
-        { MbChallenge = JsonSerializer.Deserialize(Reader.BaseStream, VO_SrcGenCtx.Default.ChallengeVO).AsMaybe(); }
+        { MbChallenge = JSONHelper.DeserialiseFromFile<ChallengeVO>(_ChallengeDataPath).AsMaybe(); }
         catch (Exception EXC)
         { Result.Failure(EXC.Message); }
         
@@ -134,32 +132,37 @@ public class MapChallenge
     }
 
     static private Result LoadMap(string _MapPath, MapChallenge _NewMapChallenge) {
-        using Stream Reader = new StreamReader(_MapPath).BaseStream;
+        Result<MapVO> Map;
 
-        MapVO? Map;
+        Maybe<Exception> R = JsonValidator.ValidateJson<MapVO>(_MapPath, out Stream? JStream);
 
+        if (R.HasValue)
+        { return Result.Failure(R.Value.Message); }
+        
         try
-        { Map = JsonSerializer.Deserialize(Reader, VO_SrcGenCtx.Default.MapVO); }
+        { Map = JSONHelper.Deserialise<MapVO>(JStream!); }
         catch (Exception EXC)
         { return Result.Failure(EXC.Message); }
 
-        if (Map is null)
-        { return Result.Failure("Map was null"); }
+        if (Map.IsFailure)
+        { return Result.Failure("Map failed to deserialise."); }
         
-        _NewMapChallenge.Map = Map;
+        _NewMapChallenge.Map = Map.Value;
 
         return Result.Success();
     }
 
     static private Result LoadMessages(string _MessagePath, MapChallenge _NewMapChallenge) {
-        using Stream Reader = new StreamReader(_MessagePath).BaseStream;
-
         Dictionary<string, List<Message>>? GeneratedMessages;
 
         try
         {
-            GeneratedMessages =
-                JsonSerializer.Deserialize(Reader, MsgDistribution_SrcGenCtx.Default.DictionaryStringListMessage);
+            Result<Dictionary<string, List<Message>>> GenMsgRes = JSONHelper.DeserialiseFromFile<Dictionary<string, List<Message>>>(_MessagePath);
+
+            if (GenMsgRes.IsFailure)
+            { return Result.Failure("Failed to deserialise GeneratedMessages"); }
+
+            GeneratedMessages = GenMsgRes.Value;
         }
         catch (Exception EXC)
         {

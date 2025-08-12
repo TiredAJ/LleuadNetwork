@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -13,6 +11,7 @@ using System.Threading.Tasks;
 using Common.Challenge;
 using Common.Entities;
 using Common.Json;
+using Common.Json.Exceptions;
 using Common.Messaging;
 using Common.Utils;
 
@@ -28,6 +27,7 @@ using LleuadNetworkSim.Models.Lua;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Models.Validation;
 using LleuadNetworkSim.Utils;
+using LleuadNetworkSim.Utils.GodotUtils;
 
 using MoonSharp.Interpreter;
 
@@ -40,7 +40,7 @@ using static Common.Conf.Conf;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
-public partial class CollectionNode : Node, IPersistable
+public partial class CollectionNode : Node
 {
     [Export]
     private PackedScene ConnectionTemplate = null!;
@@ -54,10 +54,12 @@ public partial class CollectionNode : Node, IPersistable
     [Export]
     private PackedScene DetailViewScene {
         get => DetailViewSingleton.Scene;
-        set => DetailViewSingleton = new PackedSceneSingleton<win_DetailView> {Scene = value};
+        set => DetailViewSingleton = new Utils.GodotUtils.PackedSceneSingleton<win_DetailView> {Scene = value};
     }
 
     private PackedSceneSingleton<win_DetailView> DetailViewSingleton = null!;
+
+    private InstancePool<NetworkNode> NodePool;
 
     public override void _Ready() {
 
@@ -72,18 +74,25 @@ public partial class CollectionNode : Node, IPersistable
 
         AddChild(DetailViewSingleton.GetInstance());
 
+        NodePool = new InstancePool<NetworkNode>(NetworkNodeTemplate);
+
+        NodePool.Initialise().Fire();
+
         bool HasLoadedMap = false;
         bool HasLoadedScript = false;
         bool HasLoadedChallenge = false;
 
-        foreach (string? Arg in OS.GetCmdlineUserArgs())
+        foreach (string? Arg in OS.GetCmdlineArgs())
         {
             if (HasLoadedMap && HasLoadedChallenge && HasLoadedScript)
             { break; }
 
             if (!HasLoadedMap && Arg.Contains("--map="))
             {
-                LoadMap(Arg[6..]);
+                if (HasLoadedChallenge)
+                { GodotLogger.LogWarning("Cannot load a map if challenge has been loaded!"); continue; }
+                
+                LoadMapFromFile(Arg[6..]);
                 HasLoadedMap = true; continue;
             }
 
@@ -95,6 +104,9 @@ public partial class CollectionNode : Node, IPersistable
 
             if (!HasLoadedChallenge && Arg.Contains("--challenge="))
             {
+                if (HasLoadedMap)
+                { GodotLogger.LogWarning("Cannot load a challenge if a map has been loaded!"); continue; }
+                
                 TryLoadChallenge(Arg[12..]);
                 HasLoadedChallenge = true; continue;
             }
@@ -183,7 +195,7 @@ public partial class CollectionNode : Node, IPersistable
         if (Mode != UIMode.SPAWNING)
         { return; }
 
-        NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
+        NetworkNode SceneInstance = NodePool.Get();
 
         SceneInstance.Position = _Location;
         SceneInstance.Name = Guid.NewGuid().ToBase64Name();
@@ -229,7 +241,11 @@ public partial class CollectionNode : Node, IPersistable
         foreach (string Key in DeletableKeys)
         { Connections.Remove(Key); }
 
-        _Node.QueueFree();
+        _Node.Reset();
+        
+        NodePool.Return(_Node);
+        
+        RemoveChild(_Node);
     }
     #endregion
 
@@ -295,6 +311,31 @@ public partial class CollectionNode : Node, IPersistable
         AddChild(ConnAB);
         AddChild(ConnBA);
     }
+    
+    private void ConnectNodes(HashSet<string> _Conn) {
+
+        HashSet<string> NodeNames = _Conn.SelectMany(X => X.Split("--"))
+            .ToHashSet();
+        
+        Dictionary<StringName, NetworkNode> Nodes = GetChildren()
+            .OfType<NetworkNode>()
+            .Where(X => NodeNames.Contains(X.Name))
+            .ToDictionary(K => K.Name, V => V);
+        
+        foreach (string Conn in _Conn)
+        {
+            string ID_A = Conn.Split("--")[0];
+            string ID_B = Conn.Split("--")[1];
+
+            if (!Nodes.TryGetValue(ID_A, out NetworkNode? NodeA) || !Nodes.TryGetValue(ID_B, out NetworkNode? NodeB))
+            {
+                //TODO throw
+                return;
+            }
+
+            ConnectNodes(NodeA, NodeB);
+        }
+    }
     #endregion
 
     #region Messages
@@ -314,33 +355,6 @@ public partial class CollectionNode : Node, IPersistable
     #endregion
 
     #region Persist
-
-    public JsonObject Save() {
-
-        JsonObject JData = new JsonObject();
-        JsonArray JArray = new JsonArray();
-
-        foreach (NetworkNode NN in GetChildren().OfType<NetworkNode>())
-        { JArray.Add(NN.Save()); }
-
-        JData.Add("NetworkNodes", JArray);
-
-        return JData;
-    }
-    public void Load(IBaseVO _VOData) {
-
-        if (_VOData is not MapVO Map)
-        { throw new NotImplementedException(); }
-
-        foreach (NetworkNodeVO NN in Map.NetworkNodes)
-        { LoadNetworkNode(NN); }
-
-        foreach (NetworkNodeVO NN in Map.NetworkNodes)
-        { ConnectLoadedNodes(NN); }
-
-        UpdateDetailView(Map.NetworkNodes.Select(X => X.Name).ToList());
-    }
-
     public void SaveMap(string _Path) {
 
         if (!Path.HasExtension(_Path))
@@ -349,65 +363,69 @@ public partial class CollectionNode : Node, IPersistable
             _Path = Path.ChangeExtension(_Path, "lnmap");
         }
 
-        JsonObject JData = Save();
+        MapVO Map = new();
 
-        using StreamWriter Writer = new (_Path);
+        List<NetworkNodeVO> Nodes = GetChildren()
+            .OfType<NetworkNode>()
+            .Select(X => X.ToVO())
+            .ToList();
+        
+        Map.NetworkNodes = Nodes.ToArray();
 
-        JsonSerializerOptions JSO = new() {
-            AllowTrailingCommas = false,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            AllowOutOfOrderMetadataProperties = false
-        };
+        //unique connections only
+        HashSet<string> TempConnections = [];
+        
+        foreach (NetworkNodeVO NN in Nodes)
+        {
+            foreach (string Conn in NN.Connections)
+            { TempConnections.Add(MiscUtils.OrderedNames(NN.Name, Conn)); } 
+        }
 
-        Writer.Write(JData.ToJsonString(JSO));
+        Map.UniqueConnections = TempConnections;
+
+        JSONHelper.SerialiseToFile(_Path, Map);
     }
-    public void LoadMap(string _Path) {
-
-        FileValidator.ValidateFile(_Path, ".lnmap", this);
-
-        Maybe<Exception> exc = JsonValidator.ValidateJson<MapVO>(_Path, out JsonNode? JData);
-
+    
+    public void LoadMapFromFile(string _Path) {
+        FileValidator.ValidateFile(_Path, MAP_EXTENSION, this);
+        
+        Maybe<Exception> exc = JsonValidator.ValidateJson<MapVO>(_Path, out Stream? JStream);
+        
         if (exc.HasValue)
         { ExceptionPopupWrapper.Throw(this, exc.Value); }
 
-        MapVO Map = JData.Deserialize<MapVO>()!;
-        
-        LoadMap(Map);
-    }
+        if (JStream is null)
+        { ExceptionPopupWrapper.Throw(this, new Exception("JStream was null!")); return; }
 
+        Result<MapVO> MapRes = JSONHelper.Deserialise<MapVO>(JStream);
+        
+        if (MapRes.IsFailure)
+        { ExceptionPopupWrapper.Throw(this, new JSONDeserialisationException(nameof(MapVO))); return; }
+        
+        LoadMap(MapRes.Value);
+    }
+    
     private void LoadMap(MapVO _Map) {
         ClearTransientChildren();
         
-        Load(_Map);
+        foreach (NetworkNodeVO NN in _Map.NetworkNodes)
+        { LoadNetworkNode(NN); }
+        
+        ConnectNodes(_Map.UniqueConnections);
+        
+        if (DetailViewSingleton.HasInstance && DetailViewSingleton.GetInstance().IsVisible())
+        { UpdateDetailView(_Map.NetworkNodes.Select(X => X.Name).ToList()); }
     }
 
     private void LoadNetworkNode(NetworkNodeVO _NodeVO) {
-        NetworkNode SceneInstance = (NetworkNodeTemplate.Instantiate() as NetworkNode)!;
-
-        SceneInstance.Load(_NodeVO);
-
-        AddChild(SceneInstance);
+        NetworkNode NodeInstance = NodePool.Get();
+        
+        NodeInstance.Load(_NodeVO);
+        
+        AddChild(NodeInstance);
+        
     }
-
-    private void ConnectLoadedNodes(NetworkNodeVO _NodeVO) {
-
-        Maybe<NetworkNode> NA = GetChild<NetworkNode>(X => X.Name == _NodeVO.Name);
-
-        if (NA.HasNoValue)
-        { throw new NotImplementedException(); }
-
-        foreach (string NBName in _NodeVO.Connections)
-        {
-            Maybe<NetworkNode> NB = GetChild<NetworkNode>(X => X.Name == NBName);
-
-            if (NB.HasNoValue)
-            { throw new NotImplementedException(); }
-
-            ConnectNodes(NA.Value, NB.Value);
-        }
-    }
-
+    
     public void TryLoadChallenge(string _Path) {
 
         FileValidator.ValidateFile(_Path, CHALLENGE_EXTENSION, this);
@@ -424,13 +442,16 @@ public partial class CollectionNode : Node, IPersistable
         Connections.Clear();
         ConnectedNodes.Clear();
 
-        GetChildren<NodeConnection>().ForEach(X => X.Free());
-        GetChildren<NetworkNode>().ForEach(X => X.Free());
+        GetChildren<NodeConnection>().ForEach(X => X.QueueFree());
+        GetChildren<NetworkNode>().ForEach(X => {
+            X.Reset();
+            NodePool.Return(X);
+            RemoveChild(X);
+        });
     }
     #endregion
 
     #region Challenges
-
     private Maybe<MapChallenge> Challenge = Maybe.None;
     private bool IsRunningChallenge;
     private CancellationTokenSource CTSource = null!;
@@ -443,13 +464,13 @@ public partial class CollectionNode : Node, IPersistable
 
         IsRunningChallenge = true;
 
-        Dictionary<string, NetworkNode> NNs = GetChildren<NetworkNode>().ToDictionary(K => K.Name.ToString(), V => V);
-
         if (Challenge.HasNoValue)
         {
             GodotLogger.LogInfo($"No challenge loaded, aborting challenge generation");
             return;
         }
+
+        Dictionary<string, NetworkNode> NNs = GetChildren<NetworkNode>().ToDictionary(K => K.Name.ToString(), V => V);
 
         Dictionary<string, List<Message>> Data = Challenge.Value.GenerateChallenge(NNs.Keys.ToList());
 
@@ -491,6 +512,10 @@ public partial class CollectionNode : Node, IPersistable
     #region DetailsView
     private void UpdateDetailView(List<string> _NodeIDs) {
         DetailViewSingleton.GetInstance().UpdateNodes(_NodeIDs);
+    }
+    
+    public void ToggleDetailWindow(bool _ToggleState) {
+        DetailViewSingleton.GetInstance().Visible = _ToggleState;
     }
     #endregion
 
@@ -534,7 +559,6 @@ public partial class CollectionNode : Node, IPersistable
 
     #region Scripts
     public void LoadScript(params string[] _Paths) {
-
         foreach (string P in _Paths)
         {
             try
@@ -581,9 +605,5 @@ public partial class CollectionNode : Node, IPersistable
         base._Notification(_Notif);
     }
     #endregion
-
-    public void ToggleDetailWindow(bool _ToggleState) {
-        DetailViewSingleton.GetInstance().Visible = _ToggleState;
-    }
 }
  

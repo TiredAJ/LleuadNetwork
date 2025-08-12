@@ -22,7 +22,7 @@ using LleuadNetworkSim.Utils;
 
 namespace LleuadNetworkSim.Scripts.Nodes;
 
-public partial class NetworkNode : CharacterBody2D, IPersistable
+public partial class NetworkNode : CharacterBody2D
 {
     #region Family
     [Export]
@@ -108,8 +108,6 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
                 default:
                     break;
             }
-
-            Debug.WriteLine("Clicked");
         }
 
         base._InputEvent(_Viewport, _Event, _ShapeIdx);
@@ -274,29 +272,30 @@ public partial class NetworkNode : CharacterBody2D, IPersistable
     #endregion
 
     #region Persistence
-    public JsonObject Save() {
-        JsonArray JArray = [];
-
-        foreach (string Key in Connections.Keys)
-        { JArray.Add(Key); }
-
-        return new JsonObject{
-            ["Name"] = this.Name.ToString(),
-            ["Connections"] = JArray,
-            ["Pos"] = new JsonObject() {
-                ["X"] = Position.X,
-                ["Y"] = Position.Y
-            },
+    public NetworkNodeVO ToVO()
+        => new() {
+            Name = this.Name, 
+            Connections = Connections.Keys.ToArray(), 
+            Pos = this.Position
         };
+
+    public void Load(NetworkNodeVO _VOData) {
+
+        this.Name = _VOData.Name;
+        this.Position = _VOData.Pos.ToVec2();
     }
 
-    public void Load(IBaseVO _VOData) {
+    public async Task LoadAsync(NetworkNodeVO _VOData) {
 
-        if (_VOData is not NetworkNodeVO VO)
-        { throw new NotImplementedException(); }
-
-        this.Name = VO.Name;
-        this.Position = VO.Pos.ToVec2();
+        this.Name = _VOData.Name;
+        this.Position = _VOData.Pos.ToVec2();
     }
     #endregion
+
+    public void Reset() {
+        Connections.Clear();
+        Selected = false;
+        Backlog.Clear();
+        //TODO maybe clear LC?
+    }
 }

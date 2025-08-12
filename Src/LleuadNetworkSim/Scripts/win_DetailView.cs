@@ -11,11 +11,10 @@ using Godot;
 using Godot.DependencyInjection.Attributes;
 using Godot.Logging;
 
-using LleuadNetworkSim.Config;
 using LleuadNetworkSim.Models.Repo;
 using LleuadNetworkSim.Scripts.Buttons;
 using LleuadNetworkSim.Scripts.UI;
-using LleuadNetworkSim.Utils;
+using LleuadNetworkSim.Utils.GodotUtils;
 
 using Timer = System.Threading.Timer;
 
@@ -26,7 +25,7 @@ public partial class win_DetailView : Window
 {
     private List<string> NodeIDs = [];
     private Views Selectedview = Views.LUA_PROCESS;
-    private bool IsAutoRefreshing = false;
+    private bool IsAutoRefreshing;
     private Timer RefreshTimer = null!;
     private Maybe<string> _SelectedNodeID = Maybe<string>.None;
     private Maybe<string> _FilterCriteria = Maybe<string>.None;
@@ -80,17 +79,17 @@ public partial class win_DetailView : Window
     private IDBWrapper DB = null!;
 
     public override void _Ready() {
-        this.Visible = false;
+        Visible = false;
 
-        Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
+        //Console.WriteLine($"Loading from [{DBConf.ConnectionString}]");
 
-        RefreshTimer = new Timer((_) => CallDeferredThreadGroup(nameof(_Refresh)));
+        RefreshTimer = new Timer(_ => CallDeferredThreadGroup(nameof(_Refresh)));
 
 #if DEBUG
         dbg_btn_Clear.Visible = true;
 #endif
 
-        this.Position = this.GetParent()
+        Position = GetParent()
                             .GetViewport()
                             .GetWindow()
                             .Position + new Vector2I(800, 600);

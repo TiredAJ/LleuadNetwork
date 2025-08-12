@@ -12,17 +12,16 @@ namespace Common.Json;
 
 static public class JsonValidator
 {
-    static public Maybe<Exception> ValidateJson<T>(string _JDataPath, out JsonNode? _JNode) where T : class {
-
-        _JNode = false;
+    static public Maybe<Exception> ValidateJson<T>(string _JDataPath, out Stream? _JStream) where T : class {
+        _JStream = null;
         
-        using StreamReader Reader = new(_JDataPath);
+        StreamReader Reader = new(_JDataPath);
 
         JsonSchema Schema = JsonSchema.FromType<T>();
 
         string StrJData = Reader.ReadToEnd();
 
-        ICollection<ValidationError> Errors = [];
+        ICollection<ValidationError> Errors;
         
         try
         { Errors = Schema.Validate(StrJData); }
@@ -37,22 +36,26 @@ static public class JsonValidator
         if (JData is null)
         { return new NotImplementedException(); }
 
-        //CheckSchemaVersion(JData, _Caller);
-        
-        _JNode = JData;
+        Maybe<Exception> EXC = CheckSchemaVersion(JData);
+
+        if (EXC.HasValue)
+        { return EXC; }
+
+        _JStream = Reader.BaseStream;
+        _JStream.Position = 0;
         
         return Maybe<Exception>.None;
     }
 
     static private Maybe<Exception> CheckSchemaVersion(JsonNode _JData) {
 
-        if (_JData["_ObjVersion"]!.ToInt32() != MapVO.SchemaVersion)
+        if (_JData["__Version"]?.GetValue<int>() != MapVO.SchemaVersion)
         {
             return new JsonSchemaVersionException("MapVO", MapVO.SchemaVersion,
-                                               _JData["_ObjVersion"]!.ToInt32());
+                                               _JData["__Version"]?.GetValue<int>());
         }
         
-        return _JData["NetworkNodes"]!.AsArray().Any(X => X!["_ObjVersion"]!.ToInt32() != NetworkNodeVO.SchemaVersion) 
+        return _JData["NetworkNodes"]!.AsArray().Any(X => X!["__Version"]?.GetValue<int>() != NetworkNodeVO.SchemaVersion) 
                    ? new JsonSchemaVersionException("MapVO", NetworkNodeVO.SchemaVersion) 
                    : Maybe<Exception>.None;
     }

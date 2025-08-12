@@ -1,0 +1,80 @@
+{
+  "__Version": 3,
+  "NetworkNodes": [
+    {
+      "__Version": 2,
+      "Name": "K-e5-Ck_J3Eg",
+      "Connections": [
+        "mywInI_3I29A"
+      ],
+      "Pos": {
+        "__Version": 2,
+        "X": 797,
+        "Y": 275
+      }
+    },
+    {
+      "__Version": 2,
+      "Name": "GmxXaRfplf3A",
+      "Connections": [
+        "mywInI_3I29A",
+        "-hFTR2SMOWtQ",
+        "i85Q7Zy6ngfg"
+      ],
+      "Pos": {
+        "__Version": 2,
+        "X": 583,
+        "Y": 559
+      }
+    },
+    {
+      "__Version": 2,
+      "Name": "i85Q7Zy6ngfg",
+      "Connections": [
+        "-hFTR2SMOWtQ",
+        "GmxXaRfplf3A"
+      ],
+      "Pos": {
+        "__Version": 2,
+        "X": 193,
+        "Y": 676
+      }
+    },
+    {
+      "__Version": 2,
+      "Name": "-hFTR2SMOWtQ",
+      "Connections": [
+        "GmxXaRfplf3A",
+        "mywInI_3I29A",
+        "i85Q7Zy6ngfg"
+      ],
+      "Pos": {
+        "__Version": 2,
+        "X": 203,
+        "Y": 320
+      }
+    },
+    {
+      "__Version": 2,
+      "Name": "mywInI_3I29A",
+      "Connections": [
+        "K-e5-Ck_J3Eg",
+        "GmxXaRfplf3A",
+        "-hFTR2SMOWtQ"
+      ],
+      "Pos": {
+        "__Version": 2,
+        "X": 415,
+        "Y": 212
+      }
+    }
+  ],
+  "UniqueConnections": [
+    "K-e5-Ck_J3Eg--mywInI_3I29A",
+    "GmxXaRfplf3A--mywInI_3I29A",
+    "-hFTR2SMOWtQ--GmxXaRfplf3A",
+    "GmxXaRfplf3A--i85Q7Zy6ngfg",
+    "-hFTR2SMOWtQ--i85Q7Zy6ngfg",
+    "-hFTR2SMOWtQ--mywInI_3I29A"
+  ]
+}
