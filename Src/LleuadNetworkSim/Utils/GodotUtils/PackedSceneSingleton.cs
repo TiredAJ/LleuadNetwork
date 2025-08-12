@@ -6,6 +6,7 @@ using Godot;
 
 namespace LleuadNetworkSim.Utils.GodotUtils;
 
+//TODO: TEST - maybe this
 public partial class PackedSceneSingleton<T> : Resource where T : Node
 {
     public bool HasInstance => Instance.HasValue;

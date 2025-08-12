@@ -4,6 +4,7 @@ using Godot.Logging;
 
 namespace LleuadNetworkSim.Models.Validation;
 
+//TODO: TEST - all of these
 static public class MessageValidator
 {
     static public bool MessageValid(Message _Msg) {

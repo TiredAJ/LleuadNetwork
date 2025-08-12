@@ -1,5 +1,6 @@
 namespace Common.Challenge;
 
+//TODO: TEST - serialisation
 public class ProtocolType
 {
     required public bool IsOrdered { get; set; }

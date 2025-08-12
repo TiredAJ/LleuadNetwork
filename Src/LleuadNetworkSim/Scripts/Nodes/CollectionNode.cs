@@ -273,6 +273,7 @@ public partial class CollectionNode : Node
         ConnectNodes(NodeA, NodeB);
     }
 
+    //TODO: TEST - this
     private void ConnectNodes(NetworkNode _NA, NetworkNode _NB) {
 
         string ID = Convert.ToBase64String(_NA.Name.ToString().AddValue(_NB.Name));
@@ -312,6 +313,7 @@ public partial class CollectionNode : Node
         AddChild(ConnBA);
     }
     
+    //TODO: TEST - this
     private void ConnectNodes(HashSet<string> _Conn) {
 
         HashSet<string> NodeNames = _Conn.SelectMany(X => X.Split("--"))
@@ -339,6 +341,7 @@ public partial class CollectionNode : Node
     #endregion
 
     #region Messages
+    //TODO: TEST - maybe this
     public void TrySendMessage() {
         if (SelectedNodes.Count != 2)
         { return; }
@@ -355,6 +358,7 @@ public partial class CollectionNode : Node
     #endregion
 
     #region Persist
+    //TODO: TEST - maybe this
     public void SaveMap(string _Path) {
 
         if (!Path.HasExtension(_Path))
@@ -386,6 +390,7 @@ public partial class CollectionNode : Node
         JSONHelper.SerialiseToFile(_Path, Map);
     }
     
+    //TODO: TEST - maybe this
     public void LoadMapFromFile(string _Path) {
         FileValidator.ValidateFile(_Path, MAP_EXTENSION, this);
         
@@ -405,6 +410,7 @@ public partial class CollectionNode : Node
         LoadMap(MapRes.Value);
     }
     
+    //TODO: TEST - maybe this
     private void LoadMap(MapVO _Map) {
         ClearTransientChildren();
         
@@ -519,6 +525,7 @@ public partial class CollectionNode : Node
     }
     #endregion
 
+    //TODO: TEST - maybe these
     #region Utils
     private Maybe<T> GetChild<T>(Func<T, bool> _Predicate) where T : Node
         => GetChildren()

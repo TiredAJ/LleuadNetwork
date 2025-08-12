@@ -77,6 +77,7 @@ public partial class LuaScriptAssembler
         }
     }
 
+    //TODO: TEST - this
     static public Task<LuaScript> AssembleScript(string? _Destination = null, bool _PreLoad = false) {
 
         return Task.Run(async () => {
@@ -136,6 +137,7 @@ public partial class LuaScriptAssembler
                         });
     }
 
+    //TODO: TEST - this
     static private void CleanScript(string _ScriptLoc) {
         using StreamReader Reader = new(_ScriptLoc);
 

@@ -5,6 +5,7 @@ using Common.Messaging;
 
 namespace Common.Challenge;
 
+//TODO: TEST - serialisation
 public class ChallengeVO
 {
     /// <summary>

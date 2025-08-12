@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Common.Challenge;
 
+//TODO: TEST - Serialisation
+
 /// <summary>
 /// This represents the types of messages that can be sent. Each has a
 /// protocol type, size-range, and percentage completion.

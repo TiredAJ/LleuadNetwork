@@ -10,6 +10,7 @@ using NJsonSchema.Validation;
 
 namespace Common.Json;
 
+//TODO: TEST - all of these
 static public class JsonValidator
 {
     static public Maybe<Exception> ValidateJson<T>(string _JDataPath, out Stream? _JStream) where T : class {

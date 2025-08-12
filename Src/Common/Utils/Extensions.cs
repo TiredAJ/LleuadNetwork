@@ -10,6 +10,7 @@ using Common.Entities;
 
 namespace Common.Utils;
 
+//TODO: TEST - all of these
 static public class Extensions
 {
     static public byte[] AddValue(this string _A, string _B) {

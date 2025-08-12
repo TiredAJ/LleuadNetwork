@@ -8,7 +8,7 @@ using LleuadNetworkSim.Utils;
 using static Common.Conf.Conf;
 
 namespace LleuadNetworkSim.Models.Validation;
-
+//TODO: TEST - all of these
 static public class FileValidator
 {
     /// <summary>

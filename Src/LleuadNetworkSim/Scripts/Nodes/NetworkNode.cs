@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -167,12 +166,13 @@ public partial class NetworkNode : CharacterBody2D
 
         Packet.ZIndex -= NodeConn.FollowerCount;
 
-        NodeConn.CallDeferredThreadGroup("add_child", Packet);
+        NodeConn.CallDeferredThreadGroup(Node.MethodName.AddChild, Packet);
         NodeConn.SendMessage(_Msg);
         NodeConn.FollowerCount++;
     }
 
-    private void SendMessage(int _Port, Message _Msg) {
+    //TODO: TEST - maybe this
+    public void SendMessage(int _Port, Message _Msg) {
 
         _Port -= 1;
 
@@ -187,6 +187,7 @@ public partial class NetworkNode : CharacterBody2D
         SendMessage(Conn, _Msg);
     }
 
+    //TODO: TEST - maybe this
     public void MessageReceived(Message _Msg) {
 
         DB.JourneyColl()
@@ -272,6 +273,7 @@ public partial class NetworkNode : CharacterBody2D
     #endregion
 
     #region Persistence
+    //TODO: TEST - maybe this
     public NetworkNodeVO ToVO()
         => new() {
             Name = this.Name, 
@@ -279,8 +281,8 @@ public partial class NetworkNode : CharacterBody2D
             Pos = this.Position
         };
 
+    //TODO: TEST - maybe this
     public void Load(NetworkNodeVO _VOData) {
-
         this.Name = _VOData.Name;
         this.Position = _VOData.Pos.ToVec2();
     }
