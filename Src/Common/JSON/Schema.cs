@@ -9,12 +9,18 @@ namespace Common.Json;
 #pragma warning disable CS8618
 
 public interface IBaseVO
-{ }
+{
+    public int __Version { get; }
+
+    static abstract int GetVersion();
+}
 
 public record MapVO : IBaseVO
 {
     static public int SchemaVersion => 3;
     public int __Version { get => SchemaVersion; }
+    static public int GetVersion()
+        => SchemaVersion;
 
     [Required]
     public NetworkNodeVO[] NetworkNodes { get; set; }
@@ -26,6 +32,8 @@ public record NetworkNodeVO : IBaseVO
 {
     static public int SchemaVersion => 2;
     public int __Version { get => SchemaVersion; }
+    static public int GetVersion()
+        => SchemaVersion;
 
     [Required]
     public string Name { get; set; }
@@ -41,6 +49,8 @@ public record PositionVectorVO : IBaseVO
 {
     static public int SchemaVersion => 2;
     public int __Version { get => SchemaVersion; }
+    static public int GetVersion()
+        => SchemaVersion;
 
     [Required]
     public float X { get; set; }

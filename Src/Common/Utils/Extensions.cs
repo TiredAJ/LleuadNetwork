@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Text;
 using System.Buffers.Text;
 using System.Text.Json.Nodes;
@@ -32,31 +30,25 @@ static public class Extensions
     //thanks to fubo https://stackoverflow.com/a/15340481/19306828
     static public string ToFileSize(this long _Size) {
         if (_Size < 1024)
-        { return $"{(_Size):F0} B"; }
+        { return $"{(_Size):F0}B"; }
 
         if ((_Size >> 10) < 1024)
-        { return $"{(_Size / (float)1024):F1} KB"; }
+        { return $"{(_Size / (float)1024):F1}KB"; }
 
         if ((_Size >> 20) < 1024)
-        { return $"{((_Size >> 10) / (float)1024):F1} MB"; }
+        { return $"{((_Size >> 10) / (float)1024):F1}MB"; }
 
         if ((_Size >> 30) < 1024)
-        { return $"{((_Size >> 20) / (float)1024):F1} GB"; }
+        { return $"{((_Size >> 20) / (float)1024):F1}GB"; }
 
         if ((_Size >> 40) < 1024)
-        { return $"{((_Size >> 30) / (float)1024):F1} TB"; }
+        { return $"{((_Size >> 30) / (float)1024):F1}TB"; }
 
         if ((_Size >> 50) < 1024)
-        { return $"{((_Size >> 40) / (float)1024):F1} PB"; }
+        { return $"{((_Size >> 40) / (float)1024):F1}PB"; }
 
-        return $"{((_Size >> 50) / (float)1024):F0} EB";
+        return $"{((_Size >> 50) / (float)1024):F0}EB";
     }
-
-    static public int ToInt32(this JsonNode _JNode)
-        => Convert.ToInt32(_JNode);
-
-    static public int ToInt(this double _D)
-        => Convert.ToInt32(_D);
 
     static public int ToInt(this double? _D)
         => Convert.ToInt32(_D);

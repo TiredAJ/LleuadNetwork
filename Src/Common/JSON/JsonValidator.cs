@@ -13,7 +13,7 @@ namespace Common.Json;
 //TODO: TEST - all of these
 static public class JsonValidator
 {
-    static public Maybe<Exception> ValidateJson<T>(string _JDataPath, out Stream? _JStream) where T : class {
+    static public Maybe<Exception> ValidateJson<T>(string _JDataPath, out Stream? _JStream) where T : IBaseVO {
         _JStream = null;
         
         StreamReader Reader = new(_JDataPath);
@@ -37,7 +37,7 @@ static public class JsonValidator
         if (JData is null)
         { return new NotImplementedException(); }
 
-        Maybe<Exception> EXC = CheckSchemaVersion(JData);
+        Maybe<Exception> EXC = CheckSchemaVersion<T>(JData);
 
         if (EXC.HasValue)
         { return EXC; }
@@ -48,16 +48,17 @@ static public class JsonValidator
         return Maybe<Exception>.None;
     }
 
-    static private Maybe<Exception> CheckSchemaVersion(JsonNode _JData) {
+    static private Maybe<Exception> CheckSchemaVersion<T>(JsonNode _JData) where T : IBaseVO {
 
-        if (_JData["__Version"]?.GetValue<int>() != MapVO.SchemaVersion)
+        if (_JData["__Version"] is null)
+        { return Maybe<Exception>.None; }
+        
+        if (_JData["__Version"]?.GetValue<int>() != T.GetVersion())
         {
-            return new JsonSchemaVersionException("MapVO", MapVO.SchemaVersion,
+            return new JsonSchemaVersionException(nameof(T), T.GetVersion(),
                                                _JData["__Version"]?.GetValue<int>());
         }
-        
-        return _JData["NetworkNodes"]!.AsArray().Any(X => X!["__Version"]?.GetValue<int>() != NetworkNodeVO.SchemaVersion) 
-                   ? new JsonSchemaVersionException("MapVO", NetworkNodeVO.SchemaVersion) 
-                   : Maybe<Exception>.None;
+     
+        return Maybe<Exception>.None;
     }
 }
